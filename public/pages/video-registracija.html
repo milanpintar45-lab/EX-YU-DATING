@@ -5,22 +5,39 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EX YU DATE — Dobrodošli</title>
 <style>
-  body{
+  html, body{
     margin:0;
-    padding:20px;
+    padding:0;
+    height:100%;
     background:#1a0033;
     font-family:Arial,sans-serif;
-    text-align:center;
+    overflow:hidden;
   }
-  h1{color:#fff;margin-bottom:20px;}
+  h1{
+    color:#fff;
+    margin:0;
+    position:fixed;
+    top:20px;
+    left:0;
+    right:0;
+    text-align:center;
+    z-index:2;
+    text-shadow:0 2px 8px rgba(0,0,0,0.6);
+  }
   video{
-    width:100%;
-    max-width:700px;
-    border-radius:12px;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100vw;
+    height:100vh;
+    object-fit:cover;
   }
   .skip{
     display:block;
-    margin:24px auto 0;
+    position:fixed;
+    bottom:30px;
+    left:50%;
+    transform:translateX(-50%);
     color:#fff;
     background:#a23cff;
     border:none;
@@ -29,6 +46,8 @@
     font-size:20px;
     font-weight:700;
     cursor:pointer;
+    z-index:2;
+    box-shadow:0 8px 24px rgba(0,0,0,0.5);
   }
 </style>
 </head>
