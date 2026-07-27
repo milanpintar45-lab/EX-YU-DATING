@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EX YU DATE — Chat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#1a0033;
+  --purple-900:#2d0057;
+  --purple-800:#4a0a7a;
+  --purple-700:#6b1a9e;
+  --purple-600:#7b2cbf;
+  --purple-500:#a23cff;
+  --purple-300:#c57dff;
+  --purple-100:#e9c6ff;
+  --pink:#ff6b9d;
+  --text:#e9c6ff;
+  --muted:#b8a4d4;
+  --line:rgba(162,60,255,0.45);
+  --panel:rgba(45,0,87,0.4);
+  --msg-own:rgba(162,60,255,0.25);
+  --msg-other:rgba(255,255,255,0.06);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+  font-family:'Inter',sans-serif;
+  background:linear-gradient(135deg,#1a0033 0%,#2d0057 50%,#4a0a7a 100%);
+  color:var(--text);
+  min-height:100vh;
+  padding:18px;
+}
+a{color:inherit;text-decoration:none;cursor:pointer;}
+
+.app{
+  min-height:calc(100vh - 36px);
+  border:1px solid rgba(162,60,255,0.25);
+  border-radius:14px;
+  overflow:hidden;
+  background:rgba(0,0,0,0.15);
+  display:flex;
+  flex-direction:column;
+}
+
+/* TOP HEADER */
+.top{
+  display:grid;
+  grid-template-columns: 160px 1fr 220px;
+  padding:18px 22px;
+  gap:16px;
+  align-items:start;
+}
+.corner-links{display:flex;flex-direction:column;gap:6px;font-size:13px;}
+.corner-links a{color:var(--purple-300);font-size:15px;}
+.corner-links a:hover{color:#fff;}
+.title-wrap{text-align:center;}
+.title{
+  font-family:'Poppins',sans-serif;
+  font-size:44px;
+  font-weight:700;
+  letter-spacing:6px;
+  background:linear-gradient(180deg,#fff 0%,var(--purple-100) 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.title-sub{font-size:11px;color:var(--muted);letter-spacing:3px;margin-top:2px;}
+.right-of-title{display:flex;flex-direction:column;gap:8px;align-items:flex-end;font-size:13px;}
+.right-of-title a{color:var(--purple-300);font-size:15px;}
+.right-of-title a:hover{color:#fff;}
+
+/* NAV BAR */
+.nav-bar{
+  display:flex;
+  align-items:stretch;
+  border-bottom:2px solid rgba(255,45,149,0.5);
+}
+.nav-bar a{
+  display:inline-block;
+  padding:14px 22px;
+  font-weight:700;
+  letter-spacing:1.5px;
+  color:var(--muted);
+  border-right:1px solid rgba(255,45,149,0.35);
+  transition:all .2s;
+  text-transform:uppercase;
+  font-size:14px;
+  cursor:pointer;
+}
+.nav-bar a:hover{color:#fff;background:rgba(255,45,149,0.16);}
+.nav-bar a.flag-hr{color:#4da6ff;}
+.nav-bar a.flag-ba{color:#4dd980;}
+.nav-bar a.flag-rs{color:#ff5c5c;}
+.nav-bar a.active{color:#fff !important;}
+.nav-bar a.active{
+  color:#fff;
+  background:linear-gradient(180deg,#ff2d78,#c4145a);
+  box-shadow:inset 0 -3px 0 #ffb3d9;
+  text-shadow:0 0 12px rgba(255,92,173,0.85);
+}
+.nav-bar .spacer{flex:1;}
+
+/* CHAT LAYOUT */
+.chat-wrap{
+  flex:1;
+  display:grid;
+  grid-template-columns: 280px 1fr;
+  min-height:0;
+  overflow:hidden;
+}
+.sidebar{
+  border-right:1px solid rgba(162,60,255,0.35);
+  display:flex;
+  flex-direction:column;
+  background:rgba(0,0,0,0.12);
+}
+.sidebar-header{
+  padding:16px 18px;
+  border-bottom:1px solid rgba(162,60,255,0.3);
+  font-family:'Cormorant Garamond',serif;
+  font-size:20px;
+  color:var(--purple-100);
+  letter-spacing:2px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.sidebar-header .badge{
+  background:var(--purple-900);
+  border:1px solid rgba(162,60,255,0.4);
+  border-radius:10px;
+  padding:2px 10px;
+  font-size:12px;
+  font-family:'Inter',sans-serif;
+  color:#fff;
+}
+.search-convo{
+  padding:10px 14px;
+  border-bottom:1px solid rgba(162,60,255,0.25);
+}
+.search-convo input{
+  width:100%;
+  padding:8px 12px;
+  border-radius:8px;
+  border:1px solid rgba(162,60,255,0.35);
+  background:rgba(255,255,255,0.05);
+  color:#fff;
+  font-family:inherit;
+  font-size:13px;
+  outline:none;
+}
+.search-convo input::placeholder{color:var(--muted);}
+.convo-list{
+  flex:1;
+  overflow-y:auto;
+  padding:6px 8px;
+}
+.convo-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 12px;
+  border-radius:8px;
+  cursor:pointer;
+  transition:all .15s;
+  margin-bottom:4px;
+}
+.convo-item:hover{
+  background:rgba(162,60,255,0.15);
+}
+.convo-item.active{
+  background:linear-gradient(180deg,var(--purple-500),var(--purple-600));
+  border:1px solid var(--purple-100);
+}
+.convo-avatar{
+  width:40px;height:40px;border-radius:50%;
+  background:linear-gradient(135deg,var(--purple-500),var(--purple-300));
+  flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:18px;
+  border:1px solid rgba(255,224,236,0.4);
+  position:relative;
+}
+.convo-avatar .online-dot{
+  position:absolute;bottom:2px;right:2px;
+  width:10px;height:10px;border-radius:50%;
+  background:#22c55e;box-shadow:0 0 5px #22c55e;
+  border:2px solid var(--purple-900);
+}
+.convo-info{flex:1;min-width:0;}
+.convo-name{color:#fff;font-weight:600;font-size:14px;display:flex;justify-content:space-between;}
+.convo-preview{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
+.convo-time{color:var(--muted);font-size:11px;}
+.convo-unread{
+  min-width:20px;height:20px;border-radius:50%;
+  background:var(--pink);
+  color:#fff;font-size:11px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* CHAT AREA */
+.chat-area{
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+  background:rgba(0,0,0,0.08);
+}
+.chat-header{
+  padding:14px 22px;
+  border-bottom:1px solid rgba(162,60,255,0.3);
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.chat-header .avatar{
+  width:42px;height:42px;border-radius:50%;
+  background:linear-gradient(135deg,var(--purple-500),var(--purple-300));
+  display:flex;align-items:center;justify-content:center;font-size:20px;
+  border:1px solid rgba(255,224,236,0.4);
+}
+.chat-header .info{flex:1;}
+.chat-header .info .name{color:#ffe27a;font-weight:700;font-size:17px;text-shadow:0 0 6px rgba(255,226,122,0.5);}
+.chat-header .info .status{color:var(--muted);font-size:12px;}
+.chat-header .actions{display:flex;gap:10px;}
+.chat-header .actions a{
+  color:var(--purple-300);font-size:18px;transition:color .2s;
+}
+.chat-header .actions a:hover{color:#fff;}
+
+.chat-messages{
+  flex:1;
+  overflow-y:auto;
+  padding:18px 22px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+.msg-bubble{
+  max-width:72%;
+  padding:10px 14px;
+  border-radius:12px;
+  font-size:14px;
+  line-height:1.5;
+  position:relative;
+  word-break:break-word;
+}
+.msg-bubble.own{
+  align-self:flex-end;
+  background:var(--msg-own);
+  border:1px solid rgba(162,60,255,0.5);
+  border-bottom-right-radius:3px;
+}
+.msg-bubble.other{
+  align-self:flex-start;
+  background:var(--msg-other);
+  border:1px solid rgba(162,60,255,0.35);
+  border-bottom-left-radius:3px;
+}
+.msg-bubble .sender{
+  font-size:11px;
+  color:var(--purple-300);
+  font-weight:600;
+  margin-bottom:3px;
+}
+.msg-bubble .time{
+  font-size:10px;
+  color:var(--muted);
+  text-align:right;
+  margin-top:4px;
+}
+.msg-bubble .msg-delete{
+  position:absolute;
+  top:-8px;
+  width:20px;
+  height:20px;
+  border-radius:50%;
+  background:rgba(255,94,120,0.9);
+  color:#fff;
+  font-size:11px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  opacity:0;
+  transition:opacity .15s, transform .15s;
+  border:1px solid rgba(255,255,255,0.4);
+  box-shadow:0 2px 6px rgba(0,0,0,0.4);
+}
+.msg-bubble:hover .msg-delete{ opacity:1; }
+.msg-bubble .msg-delete:hover{ transform:scale(1.15); background:#ff2d55; }
+.msg-bubble.own .msg-delete{ right:-8px; }
+.msg-bubble.other .msg-delete{ left:-8px; }
+.typing-indicator{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  font-size:12px;
+  color:var(--muted);
+  font-style:italic;
+  padding:0 6px;
+}
+.dot-flash{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--purple-300);
+  animation:flash 1s infinite alternate;
+}
+.dot-flash:nth-child(2){animation-delay:.2s;}
+.dot-flash:nth-child(3){animation-delay:.4s;}
+@keyframes flash{0%{opacity:.3;}100%{opacity:1;}}
+
+.chat-input{
+  padding:12px 18px;
+  border-top:1px solid rgba(162,60,255,0.3);
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:rgba(0,0,0,0.12);
+}
+.chat-input input{
+  flex:1;
+  padding:10px 14px;
+  border-radius:10px;
+  border:1px solid rgba(162,60,255,0.4);
+  background:rgba(255,255,255,0.06);
+  color:#fff;
+  font-family:inherit;
+  font-size:14px;
+  outline:none;
+}
+.chat-input input::placeholder{color:var(--muted);}
+.chat-input .btn{
+  padding:10px 16px;
+  border-radius:10px;
+  border:none;
+  background:linear-gradient(45deg,var(--purple-500),var(--purple-300));
+  color:#fff;
+  font-weight:700;
+  cursor:pointer;
+  font-size:13px;
+  transition:all .2s;
+}
+.chat-input .btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(162,60,255,0.5);}
+.chat-input .icon-btn{
+  width:36px;height:36px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(162,60,255,0.4);
+  color:var(--purple-300);
+  font-size:18px;
+  cursor:pointer;
+  transition:all .2s;
+}
+.chat-input .icon-btn:hover{background:rgba(162,60,255,0.2);color:#fff;}
+
+/* FOOTER */
+.footer-nav{
+  padding:12px 22px;
+  border-top:1px solid rgba(162,60,255,0.35);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:rgba(0,0,0,0.22);
+  color:var(--muted);
+  font-size:12px;
+  letter-spacing:2px;
+}
+
+/* RESPONSIVE */
+@media (max-width:900px){
+  .top{grid-template-columns:1fr;text-align:center;}
+  .right-of-title{align-items:center;}
+  .nav-bar{flex-wrap:wrap;}
+  .chat-wrap{grid-template-columns:1fr;}
+  .sidebar{display:none;}
+}
+@media (max-width:600px){
+  .chat-header{padding:10px 14px;}
+  .chat-messages{padding:12px 14px;}
+  .msg-bubble{max-width:85%;}
+}
+
+
+/* MALI "TV" VIDEO U PRAZNOM SREDNJEM PROSTORU ZAGLAVLJA */
+.title-wrap-tv{
+  width:100%;
+  max-width:220px;
+  margin:0 auto;
+  aspect-ratio:16/9;
+  border-radius:10px;
+  overflow:hidden;
+  border:2px solid rgba(162,60,255,0.5);
+  box-shadow:0 6px 20px rgba(162,60,255,0.4);
+  background:#000;
+}
+.title-wrap-tv video{width:100%;height:100%;object-fit:cover;display:block;}
+
+/* HERO BANNER - puna širina, video na vrhu stranice */
+.hero-banner{
+  position:relative;
+  width:100%;
+  height:220px;
+  background:linear-gradient(135deg, #2d0057, #4a0a7a);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  border-bottom:2px solid rgba(255,255,255,0.15);
+}
+.hero-banner video{
+  position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:0;
+}
+.hero-banner .hero-overlay{
+  position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.2)); z-index:1;
+}
+@media(max-width:600px){ .hero-banner{ height:140px; } }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="hero-banner">
+    <video autoplay muted loop playsinline src="media/hero-banner-2.mp4"></video>
+    <div class="hero-overlay"></div>
+  </div>
+
+  <!-- TOP HEADER -->
+  <div class="top">
+    <div class="corner-links">
+      <a href="#" id="logoutL">Odjava</a>
+      <a href="chat.html">Poruke <span class="count-box" id="headerPorukeBadge">0</span></a>
+      <a href="#" id="friendReqLink">Zahtjevi za prijateljstvo <span class="count-box" id="friendReqBadge">0</span></a>
+      <a href="#" id="giftsLink">🎁 Pokloni</a>
+      <a href="#" id="pokesLink">👉 Bockanja <span class="count-box" id="pokesBadge">0</span></a>
+    </div>
+    <div class="title-wrap"></div>
+    <div class="right-of-title">
+      <a href="#" id="contactAdminLink">✉️ Kontakt admina</a>
+      <a href="settings.html">⚙️ Postavke</a>
+      <div id="adminQuickButtons" style="display:none;flex-direction:column;gap:6px;margin-top:6px;align-items:flex-end;">
+        <a href="../index.html" style="color:#ffd700;font-weight:700;letter-spacing:1px;text-shadow:0 0 8px rgba(255,215,0,0.6);">📋 Registracija</a>
+        <a href="#" id="firstPageBtn" style="color:#ffd700;font-weight:700;letter-spacing:1px;text-shadow:0 0 8px rgba(255,215,0,0.6);">🔧 Prva stranica</a>
+        <a href="admin.html" style="color:#ffd700;font-weight:700;letter-spacing:1px;text-shadow:0 0 8px rgba(255,215,0,0.6);">🛠️ Admin panel</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAV BAR -->
+  <nav class="nav-bar">
+    <a href="pocetna.html">Početna</a>
+    <a href="hrvatska.html" class="flag-hr">🇭🇷 Hrvatska</a>
+    <a href="bosna.html" class="flag-ba">🇧🇦 Bosna i Hercegovina</a>
+    <a href="srbija.html" class="flag-rs">🇷🇸 Srbija</a>
+    <a class="active" href="chat.html">Chat</a>
+    <a href="video.html">Video pozivi</a>
+    <a href="galerija.html">Galerija</a>
+    <a href="oglasnik.html">Oglasnik</a>
+    <a href="profil.html">Profil</a>
+    <a href="#" id="myFriendsNav">Moji prijatelji (<span id="myFriendsCount">0</span>)</a>
+    <a href="naplata.html" id="naplataNav" style="display:none;color:#ffd700;">💰 NAPLATA</a>
+    <div class="spacer"></div>
+  </nav>
+
+  <!-- CHAT WRAP -->
+  <div class="chat-wrap">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-header">Razgovori <span class="badge" id="convoCount">6</span></div>
+      <div class="my-mini-profile" id="myMiniProfile" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid rgba(162,60,255,0.25);cursor:pointer;" onclick="window.location.href='profil.html'">
+        <div id="myMiniAvatar" style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#a23cff,#c57dff);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;overflow:hidden;">👤</div>
+        <div style="flex:1;min-width:0;">
+          <div id="myMiniName" style="color:#fff;font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Moj profil</div>
+          <div style="color:var(--muted);font-size:11px;">Pogledaj profil</div>
+        </div>
+      </div>
+      <div class="convo-list" id="convoList">
+        <!-- Popunjava se dinamički iz stvarnih poruka -->
+      </div>
+    </div>
+
+    <!-- CHAT AREA -->
+    <div class="chat-area">
+      <div class="chat-header">
+        <div class="avatar">👩</div>
+        <div class="info">
+          <div class="name" id="chatName">Ana</div>
+          <div class="status" id="chatStatus">🟢 Online · Zagreb</div>
+        </div>
+        <div class="actions">
+          <a href="video.html" title="Video poziv">📹</a>
+          <a href="#" title="Više">⋮</a>
+        </div>
+      </div>
+      <div class="chat-messages" id="chatMessages">
+        <div class="empty-chat" id="emptyChat" style="display:none;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#b8a4d4;font-style:italic;gap:12px;">
+          <div style="font-size:3em;opacity:.3;">💬</div>
+          <div>Odaberite razgovor ili započnite novi</div>
+        </div>
+        <div class="typing-indicator" id="typing" style="display:none">
+          <div class="dot-flash"></div><div class="dot-flash"></div><div class="dot-flash"></div>
+          <span id="typingName"></span> piše…
+        </div>
+      </div>
+      <div class="chat-input" style="position:relative;">
+        <div id="mentionDropdown" style="display:none;position:absolute;bottom:100%;left:60px;margin-bottom:6px;background:linear-gradient(135deg,#2d0057,#4a0a7a);border:1px solid rgba(162,60,255,0.5);border-radius:10px;max-height:180px;overflow-y:auto;min-width:180px;box-shadow:0 10px 30px rgba(0,0,0,0.5);z-index:50;"></div>
+        <div class="icon-btn" title="Emoji">😊</div>
+        <div class="icon-btn" title="Priloži">📎</div>
+        <input type="text" placeholder="Napiši poruku… (@ za označavanje)" id="msgInput">
+        <button type="button" class="btn" id="sendBtn">Pošalji</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer-nav">
+    EX YU DATE — UPOZNAVANJE BEZ GRANICA
+  </div>
+
+</div>
+
+<script>
+const API_BASE = '/api';
+async function api(method, path, body) {
+  const opts = { method, headers: {}, credentials: 'include' };
+  if (body) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
+  const res = await fetch(API_BASE + path, opts);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'Greška.');
+  return data;
+}
+
+let activeName = '';
+
+function escHtml(t){return String(t).replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]);});}
+function fmtTime(iso){
+  var d = new Date(iso);
+  return d.getHours()+':'+String(d.getMinutes()).padStart(2,'0');
+}
+
+async function buildConvoList(){
+  var list = document.getElementById('convoList');
+  if(!list) return;
+  var data;
+  try { data = await api('GET', '/messages/conversations'); }
+  catch(e){ list.innerHTML = '<div style="padding:20px;text-align:center;color:#b8a4d4;">Greška pri učitavanju razgovora.</div>'; return; }
+
+  var conversations = data.conversations || [];
+  document.getElementById('convoCount').textContent = conversations.length;
+
+  if(conversations.length === 0){
+    list.innerHTML = '<div style="padding:20px;text-align:center;color:#b8a4d4;font-style:italic;">Nema razgovora.<br>Otvorite nečiji profil i pošaljite prvu poruku.</div>';
+    return;
+  }
+
+  list.innerHTML = conversations.map(function(c, idx){
+    var isActive = (activeName && c.nick === activeName) || (!activeName && idx === 0);
+    if(isActive && !activeName) activeName = c.nick;
+    return '<div class="convo-item ' + (isActive ? 'active' : '') + '" data-name="' + escHtml(c.nick) + '">' +
+      '<div class="convo-avatar">👤</div>' +
+      '<div class="convo-info"><div class="convo-name">' + escHtml(c.nick) + ' <span class="convo-time">' + (c.last_time ? fmtTime(c.last_time) : '') + '</span></div>' +
+      '<div class="convo-preview">' + escHtml(c.last_body || '') + '</div></div>' +
+      (c.unread > 0 ? '<div class="convo-unread">' + c.unread + '</div>' : '') +
+      '</div>';
+  }).join('');
+}
+
+function renderWithMentions(text){
+  var escaped = escHtml(text);
+  return escaped.replace(/(^|\s)@([a-zA-Z0-9_]{2,30})/g, function(match, pre, nick){
+    return pre + '<span class="mention" style="color:#ffe27a;font-weight:700;">@' + nick + '</span>';
+  });
+}
+
+function bubbleHtml(m){
+  return '<div class="msg-bubble ' + (m.own?'own':'other') + '" data-msg-id="' + m.id + '">' +
+    (m.own ? '<span class="msg-delete" title="Izbriši poruku" onclick="deleteMessage(\'' + m.id + '\')">✕</span>' : '') +
+    (!m.own?'<div class="sender">'+escHtml(activeName)+'</div>':'') +
+    renderWithMentions(m.body) +
+    '<div class="time">'+fmtTime(m.created_at)+'</div>' +
+    '</div>';
+}
+
+async function renderMessages(name){
+  const box = document.getElementById('chatMessages');
+  const empty = document.getElementById('emptyChat');
+  if(!name){
+    if(box) box.innerHTML = '';
+    if(empty) empty.style.display = 'flex';
+    document.getElementById('chatName').textContent = 'Odaberite razgovor';
+    document.getElementById('chatStatus').textContent = '';
+    return;
+  }
+  if(empty) empty.style.display = 'none';
+  document.getElementById('chatName').textContent = name;
+  document.getElementById('chatStatus').textContent = '';
+  var videoLink = document.querySelector('.chat-header .actions a[title="Video poziv"]');
+  if(videoLink) videoLink.setAttribute('href', 'video.html?user=' + encodeURIComponent(name));
+
+  try {
+    var data = await api('GET', '/messages/thread/' + encodeURIComponent(name));
+    box.innerHTML = (data.messages || []).map(bubbleHtml).join('');
+    box.innerHTML += '<div class="typing-indicator" id="typing" style="display:none">' +
+      '<div class="dot-flash"></div><div class="dot-flash"></div><div class="dot-flash"></div>' +
+      '<span id="typingName"></span> piše…' +
+      '</div>';
+    box.scrollTop = box.scrollHeight;
+  } catch(e) {
+    box.innerHTML = '<div style="padding:20px;text-align:center;color:#b8a4d4;">Greška pri učitavanju poruka.</div>';
+  }
+  buildConvoList();
+}
+
+async function deleteMessage(id){
+  if(!id) return;
+  try {
+    await api('DELETE', '/messages/' + id);
+    renderMessages(activeName);
+  } catch(e) { alert('❌ ' + e.message); }
+}
+
+// Switch conversation
+document.getElementById('convoList').addEventListener('click', function(e){
+  const item = e.target.closest('.convo-item');
+  if(!item) return;
+  document.querySelectorAll('.convo-item').forEach(function(i){ i.classList.remove('active'); });
+  item.classList.add('active');
+  activeName = item.dataset.name;
+  renderMessages(activeName);
+});
+
+// Send message
+async function sendMessage(){
+  const input = document.getElementById('msgInput');
+  const text = input.value.trim();
+  if(!text) return;
+  if(!activeName){ alert('Odaberite razgovor prije slanja poruke.'); return; }
+
+  try {
+    await api('POST', '/messages', { toNick: activeName, body: text });
+    input.value='';
+    renderMessages(activeName);
+  } catch(e) { alert('❌ ' + e.message); }
+}
+
+document.getElementById('sendBtn').addEventListener('click', sendMessage);
+document.getElementById('msgInput').addEventListener('keydown', function(e){ if(e.key==='Enter' && !mentionDropdownOpen()) sendMessage(); });
+
+// ===== @MENTION AUTOCOMPLETE =====
+var mentionSearchTimer = null;
+function mentionDropdownOpen(){
+  var dd = document.getElementById('mentionDropdown');
+  return dd && dd.style.display === 'block';
+}
+function closeMentionDropdown(){
+  var dd = document.getElementById('mentionDropdown');
+  if(dd){ dd.style.display = 'none'; dd.innerHTML = ''; }
+}
+function currentMentionQuery(){
+  var input = document.getElementById('msgInput');
+  var pos = input.selectionStart;
+  var textBefore = input.value.slice(0, pos);
+  var match = textBefore.match(/(^|\s)@([a-zA-Z0-9_]{0,30})$/);
+  return match ? match[2] : null;
+}
+async function updateMentionDropdown(){
+  var query = currentMentionQuery();
+  if(query === null){ closeMentionDropdown(); return; }
+  clearTimeout(mentionSearchTimer);
+  mentionSearchTimer = setTimeout(async function(){
+    try {
+      var qs = new URLSearchParams({ search: query });
+      var data = await api('GET', '/users?' + qs.toString());
+      var users = (data.users || []).slice(0, 6);
+      var dd = document.getElementById('mentionDropdown');
+      if(!users.length){ closeMentionDropdown(); return; }
+      dd.innerHTML = users.map(function(u){
+        return '<div class="mention-option" data-nick="'+escHtml(u.nick)+'" style="padding:8px 12px;cursor:pointer;color:#fff;font-size:13px;" onmouseover="this.style.background=\'rgba(162,60,255,0.25)\'" onmouseout="this.style.background=\'transparent\'">@'+escHtml(u.nick)+'</div>';
+      }).join('');
+      dd.style.display = 'block';
+      dd.querySelectorAll('.mention-option').forEach(function(opt){
+        opt.addEventListener('click', function(){
+          insertMention(opt.dataset.nick);
+        });
+      });
+    } catch(e) { closeMentionDropdown(); }
+  }, 150);
+}
+function insertMention(nick){
+  var input = document.getElementById('msgInput');
+  var pos = input.selectionStart;
+  var textBefore = input.value.slice(0, pos);
+  var textAfter = input.value.slice(pos);
+  var replaced = textBefore.replace(/(^|\s)@([a-zA-Z0-9_]{0,30})$/, function(m, pre){ return pre + '@' + nick + ' '; });
+  input.value = replaced + textAfter;
+  closeMentionDropdown();
+  input.focus();
+}
+document.getElementById('msgInput').addEventListener('input', updateMentionDropdown);
+document.getElementById('msgInput').addEventListener('keydown', function(e){
+  if(mentionDropdownOpen() && (e.key === 'Escape')) closeMentionDropdown();
+});
+document.addEventListener('click', function(e){
+  if(!e.target.closest('#mentionDropdown') && e.target.id !== 'msgInput') closeMentionDropdown();
+});
+
+async function loadMyMiniProfile(){
+  try {
+    var me = await api('GET', '/profile/me');
+    var av = document.getElementById('myMiniAvatar');
+    if (me.avatarUrl) { av.innerHTML = '<img src="'+me.avatarUrl+'" style="width:100%;height:100%;object-fit:cover;">'; }
+    document.getElementById('myMiniName').textContent = me.nick;
+  } catch(e) {}
+}
+
+(async function(){
+  var params = new URLSearchParams(window.location.search);
+  var target = params.get('user');
+  if(target) activeName = target;
+  await loadMyMiniProfile();
+  await buildConvoList();
+  renderMessages(activeName || '');
+})();
+</script>
+<script>
+(async function(){
+  try {
+    var fc = await api('GET', '/users/friends-count');
+    var cnt = document.getElementById('myFriendsCount');
+    if(cnt) cnt.textContent = fc.count;
+  } catch(e){}
+})();
+</script>
+
+<!-- OBRATI SE ADMINU + PORUKE WIDGET -->
+<style>
+.exyu-fab-wrap{position:fixed;right:16px;bottom:96px;z-index:9998;display:flex;flex-direction:column;gap:10px;align-items:flex-end;}
+.exyu-fab{background:linear-gradient(45deg,#a23cff,#c57dff);color:#fff;border:none;padding:12px 18px;border-radius:30px;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 8px 25px rgba(162,60,255,0.5);font-family:inherit;letter-spacing:.5px;}
+.exyu-fab:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(162,60,255,0.7);}
+.exyu-fab.msg{background:linear-gradient(45deg,#ff6b9d,#a23cff);}
+.exyu-fab .badge{background:#fff;color:#a23cff;border-radius:12px;padding:2px 8px;margin-left:6px;font-size:11px;font-weight:800;}
+.exyu-modal{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px);}
+.exyu-modal.on{display:flex;}
+.exyu-modal-box{background:linear-gradient(135deg,#2d0057,#4a0a7a);border:2px solid rgba(162,60,255,0.5);border-radius:20px;padding:30px;max-width:480px;width:100%;color:#e9c6ff;box-shadow:0 25px 70px rgba(0,0,0,0.7);}
+.exyu-modal-box h3{font-family:'Cormorant Garamond',serif;font-size:1.8em;color:#fff;margin-bottom:14px;letter-spacing:1px;}
+.exyu-modal-box textarea{width:100%;min-height:120px;padding:12px;border-radius:12px;border:2px solid rgba(162,60,255,0.4);background:rgba(255,255,255,0.08);color:#fff;font-family:inherit;font-size:15px;margin-bottom:14px;resize:vertical;}
+.exyu-modal-box textarea:focus{outline:none;border-color:#c57dff;}
+.exyu-modal-actions{display:flex;gap:10px;}
+.exyu-btn-send{flex:1;background:linear-gradient(45deg,#a23cff,#c57dff);color:#fff;border:none;padding:14px;border-radius:12px;font-weight:700;cursor:pointer;font-family:inherit;font-size:15px;}
+.exyu-btn-cancel{flex:1;background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(162,60,255,0.4);padding:14px;border-radius:12px;font-weight:700;cursor:pointer;font-family:inherit;font-size:15px;}
+.exyu-msg-item{background:rgba(0,0,0,0.3);border-left:3px solid #a23cff;padding:12px;border-radius:8px;margin-bottom:10px;}
+.exyu-msg-item .from{color:#c57dff;font-weight:700;font-size:13px;}
+.exyu-msg-item .txt{margin-top:6px;font-size:14px;color:#e9c6ff;}
+.exyu-msg-item .time{font-size:11px;color:#b8a4d4;margin-top:4px;}
+.exyu-empty{text-align:center;color:#b8a4d4;padding:30px;font-style:italic;}
+@media(max-width:600px){.exyu-fab{padding:10px 14px;font-size:13px;}}
+</style>
+<script>
+(async function(){
+  let me = { loggedIn: false };
+  try { me = await api('GET', '/auth/me'); } catch(e){}
+  if (!me.loggedIn) { window.location.href = '../index.html'; return; }
+
+  document.getElementById('logoutL').addEventListener('click', async function(e) {
+    e.preventDefault();
+    try { await api('POST', '/auth/logout'); } catch(err){}
+    window.location.href = '../index.html';
+  });
+  document.getElementById('contactAdminLink').addEventListener('click', function(e){
+    e.preventDefault();
+    if (window.exyuOpenAdmin) window.exyuOpenAdmin();
+  });
+  document.getElementById('friendReqLink').addEventListener('click', function(e){
+    e.preventDefault();
+    if (window.exyuOpenFriendRequests) window.exyuOpenFriendRequests();
+  });
+  document.getElementById('giftsLink').addEventListener('click', function(e){
+    e.preventDefault();
+    if (window.exyuOpenGifts) window.exyuOpenGifts();
+  });
+  document.getElementById('pokesLink').addEventListener('click', function(e){
+    e.preventDefault();
+    if (window.exyuOpenPokes) window.exyuOpenPokes();
+  });
+  if (window.exyuUpdateFriendReqBadge) window.exyuUpdateFriendReqBadge();
+  if (window.exyuUpdatePokesBadge) window.exyuUpdatePokesBadge();
+
+  // Obavijesti preglednika (opt-in) - provjerava nove poruke/bockanja/zahtjeve svakih 20s
+  // i prikazuje pravu obavijest preglednika, ali SAMO ako je korisnik to sam uključio u postavkama
+  // I ako je dao dopuštenje pregledniku.
+  (async function(){
+    if (!('Notification' in window)) return;
+    let notifEnabled = false;
+    try { notifEnabled = (await api('GET', '/settings')).browserNotifications; } catch(e){}
+    if (!notifEnabled || Notification.permission !== 'granted') return;
+
+    let lastMsgCount = null, lastPokeCount = null, lastFriendReqCount = null;
+    async function pollNotifications(){
+      try {
+        var msgData = await api('GET', '/messages/unread-count');
+        if (lastMsgCount !== null && msgData.count > lastMsgCount) {
+          new Notification('EX YU DATE', { body: 'Imate novu poruku!' });
+        }
+        lastMsgCount = msgData.count;
+
+        var notifData = await api('GET', '/moderation/notifications');
+        var pokeCount = (notifData.notifications || []).filter(function(n){ return n.type === 'poke' && !n.read_at; }).length;
+        if (lastPokeCount !== null && pokeCount > lastPokeCount) {
+          new Notification('EX YU DATE', { body: 'Netko vas je bocnuo! 👉' });
+        }
+        lastPokeCount = pokeCount;
+
+        var freqData = await api('GET', '/friends/requests');
+        var freqCount = (freqData.requests || []).length;
+        if (lastFriendReqCount !== null && freqCount > lastFriendReqCount) {
+          new Notification('EX YU DATE', { body: 'Imate novi zahtjev za prijateljstvo! 🤝' });
+        }
+        lastFriendReqCount = freqCount;
+      } catch(e) { /* korisnik se možda odjavio - tiho preskoči */ }
+    }
+    pollNotifications();
+    setInterval(pollNotifications, 20000);
+  })();
+
+  try {
+    var msgData = await api('GET', '/messages/unread-count');
+    var b = document.getElementById('headerPorukeBadge');
+    if (b) b.textContent = msgData.count;
+  } catch(e){}
+
+  var adminQuickButtons = document.getElementById('adminQuickButtons');
+  if (me.isAdmin && adminQuickButtons) {
+    adminQuickButtons.style.display = 'flex';
+      var naplataNav = document.getElementById('naplataNav');
+      if (naplataNav) naplataNav.style.display = 'inline-block';
+    document.getElementById('firstPageBtn').addEventListener('click', function(e){
+      e.preventDefault();
+      localStorage.removeItem('exyu_welcome_accepted');
+      window.location.href = '../index.html';
+    });
+  }
+})();
+</script>
+
+<div class="exyu-modal" id="exyuAdminModal">
+  <div class="exyu-modal-box">
+    <h3>✉️ Poruka adminu</h3>
+    <p style="margin-bottom:12px;font-size:14px;color:#b8a4d4;">Napišite pitanje ili prijavu — admin (marko) će je vidjeti u svojim porukama.</p>
+    <textarea id="exyuAdminText" placeholder="Vaša poruka..."></textarea>
+    <div class="exyu-modal-actions">
+      <button type="button" class="exyu-btn-cancel" onclick="exyuCloseAdmin()">Odustani</button>
+      <button type="button" class="exyu-btn-send" onclick="exyuSendAdmin()">Pošalji</button>
+    </div>
+  </div>
+</div>
+<div class="exyu-modal" id="exyuFriendReqModal">
+  <div class="exyu-modal-box">
+    <h3>🤝 Zahtjevi za prijateljstvo</h3>
+    <div id="exyuFriendReqList" style="max-height:400px;overflow-y:auto;"></div>
+    <div class="exyu-modal-actions" style="margin-top:14px;">
+      <button type="button" class="exyu-btn-cancel" onclick="document.getElementById('exyuFriendReqModal').classList.remove('on')" style="flex:1;">Zatvori</button>
+    </div>
+  </div>
+</div>
+<div class="exyu-modal" id="exyuGiftsModal">
+  <div class="exyu-modal-box">
+    <h3>🎁 Pokloni</h3>
+    <p style="margin-bottom:10px;font-size:13px;color:#b8a4d4;">Pošalji poklon</p>
+    <div style="display:flex;gap:8px;margin-bottom:10px;">
+      <input type="text" id="giftToNick" placeholder="Nick primatelja" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(162,60,255,0.4);background:rgba(255,255,255,0.08);color:#fff;">
+      <select id="giftType" style="padding:10px;border-radius:8px;border:1px solid rgba(162,60,255,0.4);background:rgba(255,255,255,0.08);color:#fff;">
+        <option value="ruza">🌹 Ruža</option>
+        <option value="srce">❤️ Srce</option>
+        <option value="dijamant">💎 Dijamant</option>
+        <option value="medvjedic">🧸 Medvjedić</option>
+        <option value="sampanjac">🍾 Šampanjac</option>
+      </select>
+    </div>
+    <textarea id="giftMessage" placeholder="Poruka uz poklon (opcionalno)..." style="width:100%;min-height:60px;padding:10px;border-radius:8px;border:1px solid rgba(162,60,255,0.4);background:rgba(255,255,255,0.08);color:#fff;font-family:inherit;margin-bottom:10px;"></textarea>
+    <button type="button" class="exyu-btn-send" onclick="exyuSendGift()" style="width:100%;margin-bottom:14px;">Pošalji poklon</button>
+    <div style="font-weight:700;color:#c57dff;font-size:13px;margin-bottom:8px;">Primljeni pokloni</div>
+    <div id="exyuGiftsList" style="max-height:250px;overflow-y:auto;"></div>
+    <div class="exyu-modal-actions" style="margin-top:14px;">
+      <button type="button" class="exyu-btn-cancel" onclick="document.getElementById('exyuGiftsModal').classList.remove('on')" style="flex:1;">Zatvori</button>
+    </div>
+  </div>
+</div>
+<div class="exyu-modal" id="exyuPokesModal2">
+  <div class="exyu-modal-box">
+    <h3>👉 Bockanja</h3>
+    <div style="display:flex;gap:8px;margin-bottom:14px;">
+      <input type="text" id="pokeToNick" placeholder="Nick korisnika za bockanje" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(162,60,255,0.4);background:rgba(255,255,255,0.08);color:#fff;">
+      <button type="button" class="exyu-btn-send" onclick="exyuSendPoke()" style="width:auto;padding:10px 18px;">Bocni</button>
+    </div>
+    <div id="exyuPokesList2" style="max-height:350px;overflow-y:auto;"></div>
+    <div class="exyu-modal-actions" style="margin-top:14px;">
+      <button type="button" class="exyu-btn-cancel" onclick="document.getElementById('exyuPokesModal2').classList.remove('on')" style="flex:1;">Zatvori</button>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  function esc(t){ return String(t).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]); }); }
+  var GIFT_ICONS = { ruza:'🌹', srce:'❤️', dijamant:'💎', medvjedic:'🧸', sampanjac:'🍾' };
+  var GIFT_LABELS = { ruza:'Ruža', srce:'Srce', dijamant:'Dijamant', medvjedic:'Medvjedić', sampanjac:'Šampanjac' };
+
+  window.exyuOpenAdmin = function(){ document.getElementById('exyuAdminModal').classList.add('on'); };
+  window.exyuCloseAdmin = function(){ document.getElementById('exyuAdminModal').classList.remove('on'); document.getElementById('exyuAdminText').value=''; };
+  window.exyuSendAdmin = async function(){
+    var t = document.getElementById('exyuAdminText').value.trim();
+    if(!t){ alert('Napišite poruku!'); return; }
+    try {
+      await api('POST', '/messages', { toNick: 'marko', body: t });
+      exyuCloseAdmin();
+      alert('✅ Poruka poslana adminu!');
+    } catch (err) { alert('❌ ' + err.message); }
+  };
+
+  window.exyuUpdateFriendReqBadge = async function(){
+    try {
+      var data = await api('GET', '/friends/requests');
+      var b = document.getElementById('friendReqBadge');
+      if (b) b.textContent = (data.requests || []).length;
+    } catch(e){}
+  };
+  window.exyuOpenFriendRequests = async function(){
+    var list = document.getElementById('exyuFriendReqList');
+    list.innerHTML = 'Učitavam...';
+    document.getElementById('exyuFriendReqModal').classList.add('on');
+    try {
+      var data = await api('GET', '/friends/requests');
+      var reqs = data.requests || [];
+      list.innerHTML = reqs.length ? reqs.map(function(r){
+        return '<div class="exyu-msg-item"><div class="from">' + esc(r.from_nick) + '</div>' +
+          '<div class="exyu-modal-actions" style="margin-top:8px;">' +
+            '<button type="button" class="exyu-btn-send" style="padding:8px 14px;font-size:13px;" onclick="exyuAcceptFriendReq(' + r.id + ')">✅ Prihvati</button>' +
+            '<button type="button" class="exyu-btn-cancel" style="padding:8px 14px;font-size:13px;" onclick="exyuDeclineFriendReq(' + r.id + ')">✖ Odbij</button>' +
+          '</div></div>';
+      }).join('') : '<div class="exyu-empty">Nema zahtjeva na čekanju.</div>';
+    } catch(e) { list.innerHTML = '<div class="exyu-empty">Greška pri učitavanju.</div>'; }
+  };
+  window.exyuAcceptFriendReq = async function(id){
+    try { await api('POST', '/friends/requests/' + id + '/accept'); window.exyuOpenFriendRequests(); window.exyuUpdateFriendReqBadge(); }
+    catch(e){ alert('❌ ' + e.message); }
+  };
+  window.exyuDeclineFriendReq = async function(id){
+    try { await api('POST', '/friends/requests/' + id + '/decline'); window.exyuOpenFriendRequests(); window.exyuUpdateFriendReqBadge(); }
+    catch(e){ alert('❌ ' + e.message); }
+  };
+
+  window.exyuOpenGifts = async function(){
+    document.getElementById('exyuGiftsModal').classList.add('on');
+    var list = document.getElementById('exyuGiftsList');
+    list.innerHTML = 'Učitavam...';
+    try {
+      var data = await api('GET', '/gifts/received');
+      var gifts = data.gifts || [];
+      list.innerHTML = gifts.length ? gifts.map(function(g){
+        return '<div class="exyu-msg-item"><div class="from">' + (GIFT_ICONS[g.gift_type]||'🎁') + ' ' + GIFT_LABELS[g.gift_type] + ' od ' + esc(g.from_nick) + '</div>' +
+          (g.message ? '<div class="txt">' + esc(g.message) + '</div>' : '') +
+          '<div class="time">' + new Date(g.created_at).toLocaleString('hr-HR') + '</div></div>';
+      }).join('') : '<div class="exyu-empty">Nema primljenih poklona.</div>';
+    } catch(e) { list.innerHTML = '<div class="exyu-empty">Greška pri učitavanju.</div>'; }
+  };
+  window.exyuSendGift = async function(){
+    var toNick = document.getElementById('giftToNick').value.trim();
+    var giftType = document.getElementById('giftType').value;
+    var message = document.getElementById('giftMessage').value.trim();
+    if(!toNick){ alert('Upišite nick primatelja!'); return; }
+    try {
+      await api('POST', '/gifts', { toNick: toNick, giftType: giftType, message: message });
+      alert('🎁 Poklon poslan!');
+      document.getElementById('giftToNick').value = '';
+      document.getElementById('giftMessage').value = '';
+    } catch(e) { alert('❌ ' + e.message); }
+  };
+
+  window.exyuUpdatePokesBadge = async function(){
+    try {
+      var data = await api('GET', '/moderation/notifications');
+      var n = (data.notifications || []).filter(function(x){ return x.type === 'poke' && !x.read_at; }).length;
+      var b = document.getElementById('pokesBadge');
+      if (b) b.textContent = n;
+    } catch(e){}
+  };
+  window.exyuOpenPokes = async function(){
+    document.getElementById('exyuPokesModal2').classList.add('on');
+    var list = document.getElementById('exyuPokesList2');
+    list.innerHTML = 'Učitavam...';
+    try {
+      var data = await api('GET', '/moderation/pokes');
+      var received = data.received || [], sent = data.sent || [];
+      var html = '<div style="font-weight:700;color:#c57dff;font-size:13px;margin-bottom:8px;">Primljena bockanja (' + received.length + ')</div>';
+      html += received.length ? received.map(function(p){
+        return '<div class="exyu-msg-item"><div class="from">' + esc(p.from_nick) + '</div><div class="time">' + new Date(p.created_at).toLocaleString('hr-HR') + '</div></div>';
+      }).join('') : '<div class="exyu-empty" style="padding:12px;">Nema primljenih bockanja.</div>';
+      html += '<div style="font-weight:700;color:#c57dff;font-size:13px;margin:14px 0 8px;">Poslana bockanja (' + sent.length + ')</div>';
+      html += sent.length ? sent.map(function(p){
+        return '<div class="exyu-msg-item"><div class="from">' + esc(p.to_nick) + '</div><div class="time">' + new Date(p.created_at).toLocaleString('hr-HR') + '</div></div>';
+      }).join('') : '<div class="exyu-empty" style="padding:12px;">Niste nikoga bocnuli.</div>';
+      list.innerHTML = html;
+      await api('POST', '/moderation/notifications/mark-read');
+      window.exyuUpdatePokesBadge();
+    } catch(e) { list.innerHTML = '<div class="exyu-empty">Greška pri učitavanju.</div>'; }
+  };
+  window.exyuSendPoke = async function(){
+    var nick = document.getElementById('pokeToNick').value.trim();
+    if(!nick){ alert('Upišite nick!'); return; }
+    try {
+      await api('POST', '/moderation/poke', { toNick: nick });
+      alert('👉 Bocnuo/la si korisnika "' + nick + '"!');
+      document.getElementById('pokeToNick').value = '';
+      window.exyuOpenPokes();
+    } catch(e) { alert('❌ ' + e.message); }
+  };
+
+  document.getElementById('exyuFriendReqModal').addEventListener('click', function(e){ if(e.target === this) this.classList.remove('on'); });
+  document.getElementById('exyuGiftsModal').addEventListener('click', function(e){ if(e.target === this) this.classList.remove('on'); });
+  document.getElementById('exyuPokesModal2').addEventListener('click', function(e){ if(e.target === this) this.classList.remove('on'); });
+})();
+</script>
+
+</body>
+</html>

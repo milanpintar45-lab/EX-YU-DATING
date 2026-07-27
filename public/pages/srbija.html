@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EX YU DATE — Srbija</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#1a0033;
+  --purple-900:#2d0057;
+  --county-name-color:#00e5ff;
+  --purple-800:#4a0a7a;
+  --purple-700:#6b1a9e;
+  --purple-600:#7b2cbf;
+  --purple-500:#a23cff;
+  --purple-300:#c57dff;
+  --purple-100:#e9c6ff;
+  --pink:#ff6b9d;
+  --text:#e9c6ff;
+  --muted:#b8a4d4;
+  --line:rgba(162,60,255,0.45);
+  --panel:rgba(45,0,87,0.4);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+  font-family:'Inter',sans-serif;
+  background:linear-gradient(135deg,#1a0033 0%,#2d0057 50%,#4a0a7a 100%);
+  color:var(--text);
+  min-height:100vh;
+  padding:18px;
+}
+a{color:inherit;text-decoration:none;cursor:pointer;}
+
+.app{
+  min-height:calc(100vh - 36px);
+  border:1px solid rgba(162,60,255,0.25);
+  border-radius:14px;
+  overflow:hidden;
+  background:rgba(0,0,0,0.15);
+  display:flex;
+  flex-direction:column;
+}
+
+/* TOP HEADER */
+.top{
+  display:grid;
+  grid-template-columns: 160px 1fr 220px;
+  padding:18px 22px;
+  gap:16px;
+  align-items:start;
+}
+.corner-links{display:flex;flex-direction:column;gap:6px;font-size:13px;}
+.corner-links a{color:var(--purple-300);font-size:15px;}
+.corner-links a:hover{color:#fff;}
+
+.title-wrap{text-align:center;}
+.title{
+  font-family:'Poppins',sans-serif;
+  font-size:44px;
+  font-weight:700;
+  letter-spacing:6px;
+  background:linear-gradient(180deg,#fff 0%,var(--purple-100) 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  cursor:pointer;
+}
+.title-sub{font-size:11px;color:var(--muted);letter-spacing:3px;margin-top:2px;}
+
+.right-of-title{display:flex;flex-direction:column;gap:8px;align-items:flex-end;font-size:13px;}
+.right-of-title a{color:var(--purple-300);font-size:15px;}
+.right-of-title .with-count{display:flex;align-items:center;gap:6px;}
+.count-box{
+  min-width:32px;padding:2px 8px;text-align:center;
+  background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.6);border-radius:10px;font-size:13px;color:#ff5c5c;font-weight:700;
+}
+
+.middle-row{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  padding:6px 22px 14px;
+  gap:24px;
+}
+.messages a{color:var(--purple-300);font-weight:500;}
+.messages{display:flex;align-items:center;gap:8px;}
+.search-row{display:flex;align-items:center;gap:8px;}
+.search-row label{color:var(--purple-300);white-space:nowrap;}
+.search-row input{
+  flex:0 1 200px;max-width:200px;background:rgba(255,255,255,0.06);
+  border:1px solid rgba(162,60,255,0.4);border-radius:8px;
+  padding:6px 10px;color:#fff;font-family:inherit;font-size:13px;
+}
+.search-row input::placeholder{color:var(--muted);}
+
+/* NAV BAR */
+.nav-bar{
+  display:flex;
+  align-items:stretch;
+  border-bottom:2px solid rgba(255,45,149,0.5);
+}
+.nav-bar a{
+  display:inline-block;
+  padding:14px 22px;
+  font-weight:700;
+  letter-spacing:1.5px;
+  color:var(--muted);
+  border-right:1px solid rgba(255,45,149,0.35);
+  transition:all .2s;
+  text-transform:uppercase;
+  font-size:14px;
+  cursor:pointer;
+}
+.nav-bar a:hover{color:#fff;background:rgba(255,45,149,0.16);}
+.nav-bar a.flag-hr{color:#4da6ff;}
+.nav-bar a.flag-ba{color:#4dd980;}
+.nav-bar a.flag-rs{color:#ff5c5c;}
+.nav-bar a.active{color:#fff !important;}
+.nav-bar a.active{
+  color:#fff;
+  background:linear-gradient(180deg,#ff2d78,#c4145a);
+  box-shadow:inset 0 -3px 0 #ffb3d9;
+  text-shadow:0 0 12px rgba(255,92,173,0.85);
+}
+.nav-bar .spacer{flex:1;}
+
+/* STATUS BAR */
+.status-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:18px;
+  padding:12px 22px;
+  border-bottom:2px solid var(--line);
+  background:rgba(0,0,0,0.18);
+}
+.status-stats{display:flex;gap:22px;flex-wrap:wrap;}
+.status-stats .stat{display:flex;align-items:center;gap:8px;font-size:13px;}
+.status-stats .stat span:first-child{color:var(--muted);letter-spacing:.5px;}
+.status-stats .stat .count-box{font-weight:600;background:var(--purple-900);border:1px solid rgba(162,60,255,0.4);color:#fff;}
+
+.status-menu{display:flex;gap:18px;flex-wrap:wrap;}
+.status-menu a{
+  color:var(--purple-300);font-weight:500;font-size:14px;letter-spacing:.5px;
+  transition:color .2s;
+}
+.status-menu a:hover{color:#fff;}
+
+/* 4 COLUMNS */
+.columns{
+  display:grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  flex:1;
+  min-height:480px;
+}
+.col{
+  padding:14px 14px 18px;
+  border-right:1px solid rgba(162,60,255,0.35);
+  display:flex;flex-direction:column;
+  min-height:100%;
+}
+.col:last-child{border-right:none;}
+.col-header{
+  font-family:'Cormorant Garamond',serif;
+  font-size:20px;
+  color:var(--purple-100);
+  font-weight:700;
+  text-align:center;
+  letter-spacing:2px;
+  padding-bottom:10px;
+  margin-bottom:12px;
+  border-bottom:1px solid rgba(162,60,255,0.35);
+}
+.col-body{flex:1;display:flex;flex-direction:column;gap:6px;font-size:13px;}
+
+/* county list */
+.county-list{display:flex;flex-direction:column;gap:4px;}
+.county-list a{
+  padding:7px 10px;
+  border-radius:6px;
+  color:var(--county-name-color);
+  border:1px solid transparent;
+  transition:all .15s;
+  font-size:15px;
+  font-weight:600;
+  text-shadow:0 0 8px rgba(0,229,255,0.55);
+}
+.county-list a:hover{
+  background:rgba(162,60,255,0.18);
+  border-color:rgba(255,224,236,0.35);
+  color:#fff;
+}
+.county-list a.active{
+  background:linear-gradient(180deg,var(--purple-500),var(--purple-600));
+  color:#fff;
+  border-color:var(--purple-100);
+  font-weight:600;
+}
+.county-list a.svi{
+  font-weight:700;
+  letter-spacing:2px;
+  text-align:center;
+  background:rgba(162,60,255,0.1);
+  border-color:rgba(255,224,236,0.25);
+  margin-bottom:6px;
+}
+.county-list a.svi.active{background:linear-gradient(180deg,var(--purple-500),var(--purple-600));}
+
+/* profile cards */
+.profile-card{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(162,60,255,0.35);
+  border-radius:8px;
+  padding:8px 10px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:13px;
+}
+.profile-card .avatar{
+  width:36px;height:36px;border-radius:50%;
+  background:linear-gradient(135deg,var(--purple-500),var(--purple-300));
+  flex-shrink:0;
+  border:1px solid rgba(255,224,236,0.4);
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+}
+.profile-card .info{flex:1;min-width:0;}
+.profile-card .info .name{color:#ffe27a;font-weight:700;font-size:15px;text-shadow:0 0 6px rgba(255,226,122,0.5);}
+.profile-card .info .meta{color:var(--muted);font-size:11px;}
+.dot-online{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 6px #22c55e;}
+
+.chat-card{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(162,60,255,0.35);
+  border-radius:8px;
+  padding:8px 10px;
+  font-size:13px;
+}
+.chat-card .who{color:#ffe27a;font-weight:700;font-size:14px;text-shadow:0 0 6px rgba(255,226,122,0.5);}
+.chat-card .msg{color:var(--text);margin-top:2px;}
+
+.empty{
+  text-align:center;color:var(--muted);font-style:italic;
+  padding:18px 8px;font-size:12px;
+}
+
+/* FOOTER NAV */
+.footer-nav{
+  padding:14px 22px;
+  border-top:1px solid rgba(162,60,255,0.35);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:rgba(0,0,0,0.22);
+}
+.btn{
+  background:linear-gradient(180deg,var(--purple-500),var(--purple-600));
+  color:#fff;
+  padding:10px 18px;
+  border-radius:8px;
+  font-weight:600;
+  letter-spacing:1px;
+  border:1px solid var(--purple-300);
+  font-size:13px;
+  cursor:pointer;
+  transition:all .2s;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+}
+.btn:hover{
+  background:linear-gradient(180deg,var(--purple-600),var(--purple-700));
+  box-shadow:0 0 14px rgba(199,155,255,0.4);
+}
+.current-filter{
+  color:var(--muted);
+  font-size:13px;
+  letter-spacing:.5px;
+}
+.current-filter b{color:var(--purple-100);}
+
+.filter-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:10px 22px;border-bottom:1px solid rgba(162,60,255,0.25);background:rgba(0,0,0,0.1);}
+.filter-bar .fb-group{display:flex;align-items:center;gap:6px;}
+.filter-bar label{color:var(--muted);font-size:12px;letter-spacing:.5px;white-space:nowrap;}
+.filter-bar select,.filter-bar input{background:rgba(255,255,255,0.06);border:1px solid rgba(162,60,255,0.4);border-radius:8px;padding:6px 10px;color:#fff;font-family:inherit;font-size:13px;outline:none;}
+.filter-bar select:focus,.filter-bar input:focus{border-color:#c57dff;}
+
+.profile-card{position:relative;flex-wrap:wrap;}
+.card-actions{display:flex;gap:6px;width:100%;margin-top:8px;justify-content:flex-end;}
+.act-btn{background:rgba(255,255,255,0.08);border:1px solid rgba(162,60,255,0.35);color:#fff;border-radius:8px;width:30px;height:30px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.act-btn:hover{transform:translateY(-2px);}
+.act-like:hover{background:linear-gradient(45deg,#a23cff,#c57dff);}
+.act-pass:hover{background:rgba(255,255,255,0.2);}
+.act-report:hover{background:#f59e0b;}
+.act-block:hover{background:#ef4444;}
+
+.exyu-notif-badge{background:#a23cff;color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;font-weight:800;margin-left:3px;display:none;vertical-align:top;}
+.exyu-notif-panel{position:fixed;top:60px;right:16px;width:320px;max-width:92vw;max-height:70vh;overflow-y:auto;background:linear-gradient(135deg,#2d0057,#4a0a7a);border:2px solid rgba(162,60,255,0.5);border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,0.6);z-index:9997;display:none;}
+.exyu-notif-panel.on{display:block;}
+.exyu-notif-head{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;font-weight:700;color:#fff;border-bottom:1px solid rgba(162,60,255,0.3);font-size:13px;}
+.exyu-notif-head a{color:var(--purple-300);font-size:11px;font-weight:600;}
+.exyu-notif-item{padding:10px 14px;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.06);color:var(--muted);display:flex;gap:8px;}
+.exyu-notif-item.unread{background:rgba(162,60,255,0.12);color:#fff;}
+
+@media (max-width: 1100px){
+  .columns{grid-template-columns:1fr 1fr;}
+  .col{border-bottom:1px solid rgba(162,60,255,0.35);}
+}
+@media (max-width: 900px){
+  .top{grid-template-columns:1fr 1fr; gap:10px; padding:14px 18px;}
+  .title{font-size:32px; letter-spacing:3px;}
+  .title-sub{font-size:10px;}
+  .corner-links{font-size:12px;}
+  .right-of-title{font-size:12px;}
+  .nav-bar a{padding:12px 16px; font-size:12px; letter-spacing:1px;}
+  .status-bar{padding:10px 18px;}
+  .middle-row{padding:6px 18px 12px;}
+}
+@media (max-width: 600px){
+  body{padding:8px;}
+  .app{min-height:calc(100vh - 16px); border-radius:10px;}
+  .top{grid-template-columns:1fr; text-align:center; gap:8px; padding:12px 14px;}
+  .corner-links{flex-direction:row; justify-content:center; gap:10px; flex-wrap:wrap;}
+  .right-of-title{align-items:center; gap:6px;}
+  .title{font-size:26px; letter-spacing:2px;}
+  .title-sub{font-size:9px; letter-spacing:2px;}
+  .middle-row{grid-template-columns:1fr; gap:10px; padding:6px 14px 10px;}
+  .messages{justify-content:center;}
+  .search-row{flex-direction:column; align-items:stretch; gap:6px;}
+  .search-row label{align-self:flex-start; font-size:12px;}
+  .search-row input{padding:8px 10px; font-size:14px;}
+  .nav-bar{flex-wrap:nowrap; overflow-x:auto; gap:0; -webkit-overflow-scrolling:touch;}
+  .nav-bar::-webkit-scrollbar{height:3px;}
+  .nav-bar::-webkit-scrollbar-thumb{background:rgba(162,60,255,0.5); border-radius:4px;}
+  .nav-bar a{padding:10px 12px; font-size:11px; letter-spacing:1px; border-right:none; border-bottom:1px solid rgba(162,60,255,0.2); white-space:nowrap; flex-shrink:0;}
+  .status-bar{flex-direction:column; align-items:flex-start; gap:10px; padding:10px 14px;}
+  .status-stats{gap:12px;}
+  .status-stats .stat{font-size:12px;}
+  .status-menu{gap:12px;}
+  .status-menu a{font-size:13px;}
+  .columns{grid-template-columns:1fr; gap:0;}
+  .col{padding:10px 14px 14px; border-right:none; border-bottom:1px solid rgba(162,60,255,0.35);}
+  .col:last-child{border-bottom:none;}
+  .col-header{font-size:17px; padding-bottom:8px; margin-bottom:10px;}
+  .col-body{gap:8px;}
+  .profile-card{padding:10px 12px; gap:10px; font-size:14px;}
+  .profile-card .avatar{width:40px;height:40px; font-size:18px;}
+  .profile-card .info .meta{font-size:12px;}
+  .gallery-grid{grid-template-columns:1fr 1fr; gap:8px;}
+  .thumb{max-height:110px;}
+  .chat-card{padding:10px 12px; font-size:14px;}
+  .empty{padding:22px 8px; font-size:13px;}
+  .footer-nav{padding:10px 14px; font-size:11px;}
+  .count-box{padding:3px 8px; font-size:11px;}
+  .county-list{flex-direction:row; flex-wrap:nowrap; overflow-x:auto; gap:6px; padding-bottom:4px; -webkit-overflow-scrolling:touch;}
+  .county-list::-webkit-scrollbar{height:4px;}
+  .county-list::-webkit-scrollbar-thumb{background:rgba(162,60,255,0.5); border-radius:4px;}
+  .county-list a{white-space:nowrap; padding:6px 10px; font-size:14px; flex-shrink:0; border-radius:6px;}
+  .county-list a.svi{margin-bottom:0;}
+  .current-filter{font-size:12px; text-align:center;}
+}
+
+/* ===================================================
+   EX YU DATE — ANTI-TRZANJE v3 (FINALNA VERZIJA)
+   =================================================== */
+
+/* 1. Pozadina nikad ne nestaje — nema bijelog bljeska */
+html {
+  background: linear-gradient(135deg,#1a0033 0%,#2d0057 50%,#4a0a7a 100%);
+  background-attachment: fixed;
+  overflow-y: scroll; /* scrollbar uvijek prisutan → nema layout shiftova */
+}
+
+/* 2. View Transitions API (Chrome 111+) — čista crossfade, bez pokreta */
+@view-transition {
+  navigation: auto;
+}
+::view-transition-old(root) {
+  animation: 180ms linear forwards exyu-out;
+}
+::view-transition-new(root) {
+  animation: 220ms linear forwards exyu-in;
+}
+@keyframes exyu-out { to   { opacity: 0; } }
+@keyframes exyu-in  { from { opacity: 0; } }
+
+/* 3. Fallback — isti efekt za Firefox/Safari, BEZ pokreta */
+body {
+  animation: exyu-body-in 0.22s linear both;
+}
+@keyframes exyu-body-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* HERO BANNER - puna širina, "TV ekran" na vrhu stranice */
+.hero-banner{
+  position:relative;
+  width:100%;
+  height:260px;
+  background-size:cover;
+  background-position:center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  border-bottom:2px solid rgba(255,255,255,0.15);
+}
+.hero-banner video{
+  position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:0;
+}
+.hero-banner .hero-overlay{
+  position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.2)); z-index:1;
+}
+.hero-banner .hero-content{ position:relative; z-index:2; text-align:center; padding:0 20px; }
+.hero-banner .hero-flag{ font-size:64px; margin-bottom:8px; filter:drop-shadow(0 4px 12px rgba(0,0,0,0.5)); }
+.hero-banner .hero-title{ font-family:'Poppins',sans-serif; font-size:42px; font-weight:800; color:#fff; letter-spacing:3px; text-shadow:0 4px 20px rgba(0,0,0,0.6); }
+.hero-banner .hero-sub{ font-size:14px; color:rgba(255,255,255,0.9); letter-spacing:2px; margin-top:6px; text-transform:uppercase; }
+@media(max-width:600px){
+  .hero-banner{ height:160px; }
+  .hero-banner .hero-flag{ font-size:40px; }
+  .hero-banner .hero-title{ font-size:24px; letter-spacing:1.5px; }
+  .hero-banner .hero-sub{ font-size:11px; }
+}
+
+/* SLIKA IZNAD CHATA - odvojen prostor, klikni da postaviš/zamijeniš (samo admin) */
+.above-chat-img{
+  position:relative;
+  width:100%;
+  min-height:180px;
+  background:rgba(162,60,255,0.12);
+  background-size:cover;
+  background-position:center;
+  border-radius:10px;
+  margin-bottom:16px;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:2px dashed rgba(162,60,255,0.6);
+}
+.above-chat-img img{position:relative;display:block;max-width:100%;max-height:340px;width:auto;height:auto;object-fit:contain;margin:0 auto;}
+.above-chat-img .above-chat-placeholder{position:relative;z-index:1;color:#fff;font-size:14px;font-weight:600;text-align:center;padding:14px;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HERO BANNER - video: media/hero-banner.mp4 -->
+  <div class="hero-banner" style="background-image:linear-gradient(135deg, #4d0d0d, #ff5c5c);">
+    <video autoplay muted loop playsinline src="media/hero-banner.mp4"></video>
+    <div class="hero-overlay"></div>
+  </div>
+
+  <!-- TOP HEADER -->
+  <div class="top">
+    <div class="corner-links">
+      <a href="#" id="logoutL">Odjava</a>
+      <a href="chat.html">Poruke <span class="count-box" id="headerPorukeBadge">0</span></a>
+      <a href="#" id="friendReqLink">Zahtjevi za prijateljstvo <span class="count-box" id="friendReqBadge">0</span></a>
+      <a href="#" id="giftsLink">🎁 Pokloni</a>
+      <a href="#" id="pokesLink">👉 Bockanja <span class="count-box" id="pokesBadge">0</span></a>
+    </div>
+    <div class="title-wrap"></div>
+    <div class="right-of-title">
+      <a href="#" id="contactAdminLink">✉️ Kontakt admina</a>
+      <a href="settings.html">⚙️ Postavke</a>
+      <div id="adminQuickButtons" style="display:none;flex-direction:column;gap:6px;margin-top:6px;align-items:flex-end;">
+        <a href="../index.html" style="color:#ffd700;font-weight:700;letter-spacing:1px;text-shadow:0 0 8px rgba(255,215,0,0.6);">📋 Registracija</a>
+        <a href="#" id="firstPageBtn" style="color:#ffd700;font-weight:700;letter-spacing:1px;text-shadow:0 0 8px rgba(255,215,0,0.6);">🔧 Prva stranica</a>
+        <a href="admin.html" style="color:#ffd700;font-weight:700;letter-spacing:1px;text-shadow:0 0 8px rgba(255,215,0,0.6);">🛠️ Admin panel</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="middle-row">
+    <div class="search-row">
+      <label>Traži po nicku</label>
+      <input type="text" id="nickSearch" placeholder="Upiši nick…">
+    </div>
+  </div>
+
+  <!-- NAV BAR -->
+  <nav class="nav-bar">
+    <a href="pocetna.html">Početna</a>
+    <a href="hrvatska.html" class="flag-hr">🇭🇷 Hrvatska</a>
+    <a href="bosna.html" class="flag-ba">🇧🇦 Bosna i Hercegovina</a>
+    <a href="srbija.html" class="flag-rs active">🇷🇸 Srbija</a>
+    <a href="chat.html">Chat</a>
+    <a href="video.html">Video pozivi</a>
+    <a href="galerija.html">Galerija</a>
+    <a href="oglasnik.html">Oglasnik</a>
+    <a href="profil.html">Profil</a>
+    <a href="#" id="myFriendsNav">Moji prijatelji (<span id="myFriendsCount">0</span>)</a>
+    <a href="naplata.html" id="naplataNav" style="display:none;color:#ffd700;">💰 NAPLATA</a>
+    <div class="spacer"></div>
+  </nav>
+
+  <!-- STATUS BAR -->
+  <div class="status-bar">
+    <div class="status-stats">
+      <div class="stat"><span>online</span><span class="count-box">0</span></div>
+      <div class="stat"><span>žene</span><span class="count-box">0</span></div>
+      <div class="stat"><span>parovi</span><span class="count-box">0</span></div>
+      <div class="stat"><span>muškarci</span><span class="count-box">0</span></div>
+    </div>
+  </div>
+
+  <!-- SEARCH / FILTER / SORT BAR -->
+  <div class="filter-bar">
+    <div class="fb-group">
+      <label>Spol</label>
+      <select id="genderFilter">
+        <option value="svi">Svi</option>
+        <option value="M">Muškarci</option>
+        <option value="Z">Žene</option>
+        <option value="P">Parovi</option>
+      </select>
+    </div>
+    <div class="fb-group">
+      <label>Godine</label>
+      <select id="ageFilter">
+        <option value="svi">Sve</option>
+        <option value="18-25">18–25</option>
+        <option value="26-35">26–35</option>
+        <option value="36-45">36–45</option>
+        <option value="46-99">46+</option>
+      </select>
+    </div>
+    <div class="fb-group">
+      <label>Status</label>
+      <select id="onlineFilter">
+        <option value="svi">Svi</option>
+        <option value="online">Samo online</option>
+      </select>
+    </div>
+    <div class="fb-group">
+      <label>Sortiraj</label>
+      <select id="sortFilter">
+        <option value="online">Online prvo</option>
+        <option value="ime">Ime A–Ž</option>
+        <option value="godine">Godine</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- 4 COLUMNS -->
+  <div class="columns">
+
+    <!-- COLUMN 1: OKRUZI -->
+    <div class="col">
+      <div class="col-header">OKRUZI</div>
+      <div class="col-body">
+        <div class="county-list" id="countyList">
+          <a href="#" class="svi active" data-county="SVI">SVI KORISNICI</a>
+          <a href="#" data-county="Beograd">Beograd</a>
+          <a href="#" data-county="Bor">Bor</a>
+          <a href="#" data-county="Braničevo">Braničevo</a>
+          <a href="#" data-county="Zaječar">Zaječar</a>
+          <a href="#" data-county="Zapadna Bačka">Zapadna Bačka</a>
+          <a href="#" data-county="Južna Bačka">Južna Bačka</a>
+          <a href="#" data-county="Južni Banat">Južni Banat</a>
+          <a href="#" data-county="Zlatibor">Zlatibor</a>
+          <a href="#" data-county="Kolubara">Kolubara</a>
+          <a href="#" data-county="Mačva">Mačva</a>
+          <a href="#" data-county="Moravica">Moravica</a>
+          <a href="#" data-county="Nišava">Nišava</a>
+          <a href="#" data-county="Pčinja">Pčinja</a>
+          <a href="#" data-county="Pirot">Pirot</a>
+          <a href="#" data-county="Podunavlje">Podunavlje</a>
+          <a href="#" data-county="Pomoravlje">Pomoravlje</a>
+          <a href="#" data-county="Raška">Raška</a>
+          <a href="#" data-county="Rasina">Rasina</a>
+          <a href="#" data-county="Severna Bačka">Severna Bačka</a>
+          <a href="#" data-county="Severni Banat">Severni Banat</a>
+          <a href="#" data-county="Srednji Banat">Srednji Banat</a>
+          <a href="#" data-county="Srem">Srem</a>
+          <a href="#" data-county="Šumadija">Šumadija</a>
+          <a href="#" data-county="Toplica">Toplica</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- COLUMN 2: NA MREŽI -->
+    <div class="col">
+      <div class="col-header">NA MREŽI <a href="na-mrezi.html?country=rs" style="font-size:11px;color:#00ffff;float:right;text-decoration:underline;">Proširi ↗</a></div>
+      <div class="col-body" id="onlineCol"></div>
+    </div>
+
+    <!-- COLUMN 3: CHAT -->
+    <div class="col">
+      <div class="col-header">CHAT <a href="prosireni-chat.html?country=rs" style="font-size:11px;color:#00ffff;float:right;text-decoration:underline;">Proširi ↗</a></div>
+      <div class="col-body" id="chatCol"></div>
+      <div class="chat-input-wrap" style="margin-top:8px;display:flex;gap:6px;">
+        <input type="text" id="chatInput" placeholder="Napiši poruku…" style="flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(162,60,255,0.4);border-radius:8px;padding:8px 10px;color:#fff;font-family:inherit;font-size:13px;outline:none;">
+        <button type="button" id="chatSendBtn" style="background:linear-gradient(180deg,var(--purple-500),var(--purple-600));color:#fff;border:none;border-radius:8px;padding:8px 14px;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:inherit;font-size:13px;">POŠALJI</button>
+      </div>
+    </div>
+
+    <!-- COLUMN 4: SVI KORISNICI -->
+    <div class="col">
+      <div class="col-header">SVI KORISNICI <a href="svi-korisnici.html?country=rs" style="font-size:11px;color:#00ffff;float:right;text-decoration:underline;">Proširi ↗</a></div>
+      <div class="col-body" id="usersCol"></div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER NAV -->
+  <div class="footer-nav">
+    <a href="pocetna.html" class="btn">← Početna stranica</a>
+    <div class="current-filter">Prikaz: <b id="currentFilter">SVI — cijela Srbija</b></div>
+  </div>
+
+</div>
+
+<script>
+const API_BASE = '/api';
+async function api(method, path, body) {
+  const opts = { method, headers: {}, credentials: 'include' };
+  if (body) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
+  const res = await fetch(API_BASE + path, opts);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'Greška.');
+  return data;
+}
+
+const COUNTRY_LABEL_TOP = "Srbija";
+const COUNTRY_CODE = 'rs';
+
+function escHtml(t){ return String(t).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]); }); }
+
+function profileCard(p){
+  const giMap={m:'👨',z:'👩',p:'💑'};
+  const genderIcon = giMap[p.gender] || '👤';
+  var metaText = p.city ? (p.city.charAt(0).toUpperCase()+p.city.slice(1)) : '';
+  if (p.region && p.region.toLowerCase() !== metaText.toLowerCase()) metaText += ' · ' + p.region;
+  return `<div class="profile-card" data-name="${escHtml(p.nick)}">
+    <div class="avatar">${genderIcon}</div>
+    <div class="info" data-view-profile style="cursor:pointer;">
+      <div class="name">${escHtml(p.nick)}${p.age ? ', '+p.age : ''}</div>
+      <div class="meta">${escHtml(metaText)}</div>
+    </div>
+    ${p.is_online ? '<div class="dot-online" title="online"></div>' : ''}
+    <div class="card-actions">
+      <button type="button" class="act-btn act-report" data-act="report" title="Prijavi profil">🚩</button>
+      <button type="button" class="act-btn act-block" data-act="block" title="Blokiraj">🚫</button>
+    </div>
+  </div>`;
+}
+function chatCard(c){
+  return `<div class="chat-card">
+    <div class="who">${escHtml(c.who)} <span style="color:var(--muted);font-weight:400">· ${escHtml(c.city||'')}</span></div>
+    <div class="msg">${escHtml(c.body)}</div>
+  </div>`;
+}
+
+async function render(filter){
+  const nameQ = (document.getElementById('nickSearch') && document.getElementById('nickSearch').value || '').trim();
+  const genderMapBack={M:'m',Z:'z',P:'p'};
+  const genderQ = document.getElementById('genderFilter') ? document.getElementById('genderFilter').value : 'svi';
+  const ageQ = document.getElementById('ageFilter') ? document.getElementById('ageFilter').value : 'svi';
+  const onlineQ = document.getElementById('onlineFilter') ? document.getElementById('onlineFilter').value : 'svi';
+  const sortQ = document.getElementById('sortFilter') ? document.getElementById('sortFilter').value : 'online';
+
+  const qs = new URLSearchParams({ country: COUNTRY_CODE });
+  if (filter !== 'SVI') qs.set('region', filter);
+  if (nameQ) qs.set('search', nameQ);
+  if (genderQ !== 'svi') qs.set('gender', genderMapBack[genderQ] || genderQ);
+  if (onlineQ === 'online') qs.set('onlineOnly', 'true');
+  if (sortQ === 'ime') qs.set('sort', 'ime');
+  if (ageQ !== 'svi') {
+    const parts = ageQ.split('-');
+    qs.set('ageMin', parts[0]);
+    qs.set('ageMax', parts[1]);
+  }
+
+  let list = [];
+  try {
+    const data = await api('GET', '/users?' + qs.toString());
+    list = data.users || [];
+    if (sortQ === 'online') list = list.slice().sort((a,b) => (b.is_online?1:0)-(a.is_online?1:0));
+  } catch (e) {
+    document.getElementById('onlineCol').innerHTML = '<div class="empty">Greška pri učitavanju (jeste li prijavljeni?)</div>';
+    document.getElementById('usersCol').innerHTML = '';
+    return;
+  }
+
+  const online = list.filter(p => p.is_online);
+  document.getElementById('onlineCol').innerHTML =
+    online.length ? online.map(profileCard).join('') : '<div class="empty">Nema korisnika online</div>';
+  document.getElementById('usersCol').innerHTML =
+    list.length ? list.map(profileCard).join('') : '<div class="empty">Nema korisnika za odabrane filtere</div>';
+
+  document.getElementById('currentFilter').textContent =
+    filter === "SVI" ? "SVI — cijela Srbija" : filter;
+
+  try {
+    const chatData = await api('GET', '/country-chat?country=' + COUNTRY_CODE + '&limit=8');
+    const chatList = filter === 'SVI' ? chatData.messages : chatData.messages.filter(c => c.region === filter);
+    document.getElementById('chatCol').innerHTML =
+      chatList.length ? chatList.map(chatCard).join('') : '<div class="empty">Nema poruka</div>';
+  } catch (e) {
+    document.getElementById('chatCol').innerHTML = '<div class="empty">Greška pri učitavanju chata</div>';
+  }
+}
+
+// Wire up county clicks
+document.querySelectorAll('#countyList a').forEach(a=>{
+  a.addEventListener('click', e=>{
+    e.preventDefault();
+    document.querySelectorAll('#countyList a').forEach(x=>x.classList.remove('active'));
+    a.classList.add('active');
+    render(a.dataset.county);
+  });
+});
+// Dodaj expand linkove svakom okrugu
+document.querySelectorAll('#countyList a[data-county]:not(.svi)').forEach(function(a){
+  var c=a.dataset.county;
+  var enc=encodeURIComponent(c);
+  var expand=document.createElement('a');
+  expand.href='na-mrezi.html?country=rs&county='+enc;
+  expand.textContent='↗';
+  expand.title='Prošireni prikaz — '+c;
+  expand.style.cssText='font-size:10px;color:#00ffff;text-decoration:none;font-weight:700;opacity:0.7;transition:opacity .15s;flex-shrink:0;margin-left:4px;vertical-align:middle;';
+  expand.addEventListener('mouseenter',function(){this.style.opacity='1';});
+  expand.addEventListener('mouseleave',function(){this.style.opacity='0.7';});
+  expand.addEventListener('click',function(e){e.stopPropagation();});
+  a.style.display='inline';
+  a.parentNode.insertBefore(expand,a.nextSibling);
+});
+
+// Wire up search/filter/sort controls
+['nickSearch'].forEach(function(id){
+  var el = document.getElementById(id);
+  if(el) el.addEventListener('input', function(){ render(activeCountyTop()); });
+});
+['genderFilter','ageFilter','onlineFilter','sortFilter'].forEach(function(id){
+  var el = document.getElementById(id);
+  if(el) el.addEventListener('change', function(){ render(activeCountyTop()); });
+});
+function activeCountyTop(){
+  var a = document.querySelector('#countyList a.active');
+  return a ? a.dataset.county : 'SVI';
+}
+
+// Initial render
+render("SVI");
+
+// ===== JAVNI CHAT PO DRŽAVI + PRIJATELJI + ADMIN =====
+(function(){
+  async function sendMsg(){
+    const inp = document.getElementById('chatInput');
+    const text = inp.value.trim();
+    if(!text) return;
+    try {
+      await api('POST', '/country-chat', { country: COUNTRY_CODE, body: text });
+      inp.value = '';
+      render(activeCountyTop());
+    } catch(e) { alert('❌ ' + e.message); }
+  }
+  const sendBtn = document.getElementById('chatSendBtn');
+  const inp = document.getElementById('chatInput');
+  if(sendBtn) sendBtn.addEventListener('click', sendMsg);
+  if(inp) inp.addEventListener('keydown', function(e){ if(e.key==='Enter') sendMsg(); });
+
+  api('GET', '/users/friends-count').then(function(fc){
+    const cnt = document.getElementById('myFriendsCount');
+    if(cnt) cnt.textContent = fc.count;
+  }).catch(function(){});
+
+  const adminBtn = document.getElementById('adminBackReg');
+  if(adminBtn){
+    adminBtn.addEventListener('click', function(e){
+      e.preventDefault();
+      localStorage.removeItem('exyu_welcome_accepted');
+      window.location.href = '../index.html';
+    });
+  }
+})();
+</script>
+
+<!-- MATCHING / REPORT / BLOCK / NOTIFIKACIJE ENGINE -->
+<script>
+(function(){
+  function eschtml(t){ return String(t).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]); }); }
+
+  window.exyuReport = async function(name){
+    var reason = prompt('Razlog prijave korisnika "'+name+'" (npr. neprimjeren sadržaj, lažni profil, spam, uznemiravanje):');
+    if(reason===null) return;
+    if(!reason.trim()){ alert('Molimo unesite razlog prijave.'); return; }
+    try {
+      await api('POST', '/moderation/report', { toNick: name, reason: reason.trim() });
+      alert('🚩 Prijava je poslana administratoru. Hvala što čuvate zajednicu sigurnom.');
+    } catch (err) { alert('❌ ' + err.message); }
+  };
+
+  window.exyuBlock = async function(name){
+    if(!confirm('Blokirati korisnika "'+name+'"? Nećete više vidjeti profil ni poruke jedno drugom.')) return;
+    try {
+      await api('POST', '/moderation/block', { toNick: name });
+      alert('🚫 Korisnik "'+name+'" je blokiran.');
+      if(typeof render === 'function' && typeof activeCountyTop === 'function') render(activeCountyTop());
+    } catch (err) { alert('❌ ' + err.message); }
+  };
+
+  async function updateNotifBadge(){
+    try {
+      var data = await api('GET', '/moderation/notifications');
+      var n = (data.notifications || []).filter(function(x){ return !x.read_at; }).length;
+      var b = document.getElementById('exyuNotifBadge');
+      if(b){ b.textContent = n>0 ? n : ''; b.style.display = n>0 ? 'inline-block' : 'none'; }
+    } catch(e) {}
+  }
+  window.exyuUpdateNotifBadge = updateNotifBadge;
+
+  function ensurePanel(){
+    var p = document.getElementById('exyuNotifPanel');
+    if(p) return p;
+    p = document.createElement('div');
+    p.id = 'exyuNotifPanel';
+    p.className = 'exyu-notif-panel';
+    document.body.appendChild(p);
+    return p;
+  }
+  async function renderNotifPanel(){
+    var icon = {match:'💞', like:'💗', report:'🚩', msg:'💬', poke:'👉'};
+    var p = ensurePanel();
+    p.innerHTML = '<div class="exyu-notif-head"><span>🔔 Notifikacije</span><a href="#" id="exyuNotifClear">Označi sve pročitano</a></div><div class="exyu-notif-item">Učitavam...</div>';
+    try {
+      var data = await api('GET', '/moderation/notifications');
+      var list = data.notifications || [];
+      p.innerHTML = '<div class="exyu-notif-head"><span>🔔 Notifikacije</span><a href="#" id="exyuNotifClear">Označi sve pročitano</a></div>' +
+        (list.length ? list.map(function(n){
+          return '<div class="exyu-notif-item'+(n.read_at?'':' unread')+'"><span>'+(icon[n.type]||'🔔')+'</span><span>'+eschtml(n.text)+'</span></div>';
+        }).join('') : '<div class="exyu-notif-item">Nema notifikacija.</div>');
+      var clearBtn = document.getElementById('exyuNotifClear');
+      if(clearBtn) clearBtn.addEventListener('click', async function(e){
+        e.preventDefault();
+        try { await api('POST', '/moderation/notifications/mark-read'); } catch(err){}
+        updateNotifBadge();
+        renderNotifPanel();
+      });
+    } catch(e) {
+      p.innerHTML = '<div class="exyu-notif-head"><span>🔔 Notifikacije</span></div><div class="exyu-notif-item">Greška pri učitavanju.</div>';
+    }
+  }
+  window.exyuToggleNotifPanel = function(){
+    var p = ensurePanel();
+    var willOpen = !p.classList.contains('on');
+    if(willOpen) renderNotifPanel();
+    p.classList.toggle('on');
+  };
+
+  document.addEventListener('click', function(e){
+    var viewBtn = e.target.closest('[data-view-profile]');
+    if(viewBtn && !e.target.closest('.act-btn')){
+      var card = viewBtn.closest('.profile-card');
+      var name = card ? card.getAttribute('data-name') : null;
+      if(name) window.location.href = 'profil.html?user=' + encodeURIComponent(name);
+      return;
+    }
+    var btn = e.target.closest('.act-btn');
+    if(btn){
+      var card = btn.closest('.profile-card');
+      if(card){
+        var name = card.getAttribute('data-name');
+        var act = btn.getAttribute('data-act');
+        if(act==='report') window.exyuReport(name);
+        else if(act==='block') window.exyuBlock(name);
+      }
+      return;
+    }
+    if(e.target.closest('#exyuBellBtn')){ e.preventDefault(); window.exyuToggleNotifPanel(); return; }
+    if(!e.target.closest('#exyuNotifPanel')){
+      var panel = document.getElementById('exyuNotifPanel');
+      if(panel) panel.classList.remove('on');
+    }
+  });
+
+  updateNotifBadge();
+})();
+</script>
+
+  <script>
+  (async function(){
+    let me = { loggedIn: false };
+    try { me = await api('GET', '/auth/me'); } catch(e){}
+    if (!me.loggedIn) { window.location.href = '../index.html'; return; }
+
+    document.getElementById('logoutL').addEventListener('click', async function(e) {
+      e.preventDefault();
+      try { await api('POST', '/auth/logout'); } catch(err){}
+      window.location.href = '../index.html';
+    });
+    document.getElementById('contactAdminLink').addEventListener('click', function(e){
+      e.preventDefault();
+      if (window.exyuOpenAdmin) window.exyuOpenAdmin();
+    });
+    document.getElementById('friendReqLink').addEventListener('click', function(e){
+      e.preventDefault();
+      if (window.exyuOpenFriendRequests) window.exyuOpenFriendRequests();
+    });
+    document.getElementById('giftsLink').addEventListener('click', function(e){
+      e.preventDefault();
+      if (window.exyuOpenGifts) window.exyuOpenGifts();
+    });
+    document.getElementById('pokesLink').addEventListener('click', function(e){
+      e.preventDefault();
+      if (window.exyuOpenPokes) window.exyuOpenPokes();
+    });
+    if (window.exyuUpdateFriendReqBadge) window.exyuUpdateFriendReqBadge();
+    if (window.exyuUpdatePokesBadge) window.exyuUpdatePokesBadge();
+
+  // Obavijesti preglednika (opt-in) - provjerava nove poruke/bockanja/zahtjeve svakih 20s
+  // i prikazuje pravu obavijest preglednika, ali SAMO ako je korisnik to sam uključio u postavkama
+  // I ako je dao dopuštenje pregledniku.
+  (async function(){
+    if (!('Notification' in window)) return;
+    let notifEnabled = false;
+    try { notifEnabled = (await api('GET', '/settings')).browserNotifications; } catch(e){}
+    if (!notifEnabled || Notification.permission !== 'granted') return;
+
+    let lastMsgCount = null, lastPokeCount = null, lastFriendReqCount = null;
+    async function pollNotifications(){
+      try {
+        var msgData = await api('GET', '/messages/unread-count');
+        if (lastMsgCount !== null && msgData.count > lastMsgCount) {
+          new Notification('EX YU DATE', { body: 'Imate novu poruku!' });
+        }
+        lastMsgCount = msgData.count;
+
+        var notifData = await api('GET', '/moderation/notifications');
+        var pokeCount = (notifData.notifications || []).filter(function(n){ return n.type === 'poke' && !n.read_at; }).length;
+        if (lastPokeCount !== null && pokeCount > lastPokeCount) {
+          new Notification('EX YU DATE', { body: 'Netko vas je bocnuo! 👉' });
+        }
+        lastPokeCount = pokeCount;
+
+        var freqData = await api('GET', '/friends/requests');
+        var freqCount = (freqData.requests || []).length;
+        if (lastFriendReqCount !== null && freqCount > lastFriendReqCount) {
+          new Notification('EX YU DATE', { body: 'Imate novi zahtjev za prijateljstvo! 🤝' });
+        }
+        lastFriendReqCount = freqCount;
+      } catch(e) { /* korisnik se možda odjavio - tiho preskoči */ }
+    }
+    pollNotifications();
+    setInterval(pollNotifications, 20000);
+  })();
+
+    var adminQuickButtons = document.getElementById('adminQuickButtons');
+    if (me.isAdmin && adminQuickButtons) {
+      adminQuickButtons.style.display = 'flex';
+      var naplataNav = document.getElementById('naplataNav');
+      if (naplataNav) naplataNav.style.display = 'inline-block';
+      document.getElementById('firstPageBtn').addEventListener('click', function(e){
+        e.preventDefault();
+        localStorage.removeItem('exyu_welcome_accepted');
+        window.location.href = '../index.html';
+      });
+    }
+
+  })();
+  </script>
+
+  <!-- ZAHTJEVI ZA PRIJATELJSTVO + POKLONI -->
+  <div class="exyu-modal" id="exyuFriendReqModal">
+    <div class="exyu-modal-box">
+      <h3>🤝 Zahtjevi za prijateljstvo</h3>
+      <div id="exyuFriendReqList" style="max-height:400px;overflow-y:auto;"></div>
+      <div class="exyu-modal-actions" style="margin-top:14px;">
+        <button type="button" class="exyu-btn-cancel" onclick="document.getElementById('exyuFriendReqModal').classList.remove('on')" style="flex:1;">Zatvori</button>
+      </div>
+    </div>
+  </div>
+  <div class="exyu-modal" id="exyuGiftsModal">
+    <div class="exyu-modal-box">
+      <h3>🎁 Pokloni</h3>
+      <p style="margin-bottom:10px;font-size:13px;color:#b8a4d4;">Pošalji poklon</p>
+      <div style="display:flex;gap:8px;margin-bottom:10px;">
+        <input type="text" id="giftToNick" placeholder="Nick primatelja" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(162,60,255,0.4);background:rgba(255,255,255,0.08);color:#fff;">
+        <select id="giftType" style="padding:10px;border-radius:8px;border:1px solid rgba(162,60,255,0.4);background:rgba(255,255,255,0.08);color:#fff;">
+          <option value="ruza">🌹 Ruža</option>
+          <option value="srce">❤️ Srce</option>
+          <option value="dijamant">💎 Dijamant</option>
+          <option value="medvjedic">🧸 Medvjedić</option>
+          <option value="sampanjac">🍾 Šampanjac</option>
+        </select>
+      </div>
+      <textarea id="giftMessage" placeholder="Poruka uz poklon (opcionalno)..." style="width:100%;min-height:60px;padding:10px;border-radius:8px;border:1px solid rgba(162,60,255,0.4);background:rgba(255,255,255,0.08);color:#fff;font-family:inherit;margin-bottom:10px;"></textarea>
+      <button type="button" class="exyu-btn-send" onclick="exyuSendGift()" style="width:100%;margin-bottom:14px;">Pošalji poklon</button>
+      <div style="font-weight:700;color:#c57dff;font-size:13px;margin-bottom:8px;">Primljeni pokloni</div>
+      <div id="exyuGiftsList" style="max-height:250px;overflow-y:auto;"></div>
+      <div class="exyu-modal-actions" style="margin-top:14px;">
+        <button type="button" class="exyu-btn-cancel" onclick="document.getElementById('exyuGiftsModal').classList.remove('on')" style="flex:1;">Zatvori</button>
+      </div>
+    </div>
+  </div>
+  <script>
+  (function(){
+    function esc(t){ return String(t).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]); }); }
+    var GIFT_ICONS = { ruza:'🌹', srce:'❤️', dijamant:'💎', medvjedic:'🧸', sampanjac:'🍾' };
+    var GIFT_LABELS = { ruza:'Ruža', srce:'Srce', dijamant:'Dijamant', medvjedic:'Medvjedić', sampanjac:'Šampanjac' };
+
+    window.exyuUpdateFriendReqBadge = async function(){
+      try {
+        var data = await api('GET', '/friends/requests');
+        var b = document.getElementById('friendReqBadge');
+        if (b) b.textContent = (data.requests || []).length;
+      } catch(e){}
+    };
+
+    window.exyuOpenFriendRequests = async function(){
+      var list = document.getElementById('exyuFriendReqList');
+      list.innerHTML = 'Učitavam...';
+      document.getElementById('exyuFriendReqModal').classList.add('on');
+      try {
+        var data = await api('GET', '/friends/requests');
+        var reqs = data.requests || [];
+        list.innerHTML = reqs.length ? reqs.map(function(r){
+          return '<div class="exyu-msg-item"><div class="from">' + esc(r.from_nick) + '</div>' +
+            '<div class="exyu-modal-actions" style="margin-top:8px;">' +
+              '<button type="button" class="exyu-btn-send" style="padding:8px 14px;font-size:13px;" onclick="exyuAcceptFriendReq(' + r.id + ')">✅ Prihvati</button>' +
+              '<button type="button" class="exyu-btn-cancel" style="padding:8px 14px;font-size:13px;" onclick="exyuDeclineFriendReq(' + r.id + ')">✖ Odbij</button>' +
+            '</div></div>';
+        }).join('') : '<div class="exyu-empty">Nema zahtjeva na čekanju.</div>';
+      } catch(e) {
+        list.innerHTML = '<div class="exyu-empty">Greška pri učitavanju.</div>';
+      }
+    };
+    window.exyuAcceptFriendReq = async function(id){
+      try { await api('POST', '/friends/requests/' + id + '/accept'); window.exyuOpenFriendRequests(); window.exyuUpdateFriendReqBadge(); }
+      catch(e){ alert('❌ ' + e.message); }
+    };
+    window.exyuDeclineFriendReq = async function(id){
+      try { await api('POST', '/friends/requests/' + id + '/decline'); window.exyuOpenFriendRequests(); window.exyuUpdateFriendReqBadge(); }
+      catch(e){ alert('❌ ' + e.message); }
+    };
+
+    window.exyuOpenGifts = async function(){
+      document.getElementById('exyuGiftsModal').classList.add('on');
+      var list = document.getElementById('exyuGiftsList');
+      list.innerHTML = 'Učitavam...';
+      try {
+        var data = await api('GET', '/gifts/received');
+        var gifts = data.gifts || [];
+        list.innerHTML = gifts.length ? gifts.map(function(g){
+          return '<div class="exyu-msg-item"><div class="from">' + (GIFT_ICONS[g.gift_type]||'🎁') + ' ' + GIFT_LABELS[g.gift_type] + ' od ' + esc(g.from_nick) + '</div>' +
+            (g.message ? '<div class="txt">' + esc(g.message) + '</div>' : '') +
+            '<div class="time">' + new Date(g.created_at).toLocaleString('hr-HR') + '</div></div>';
+        }).join('') : '<div class="exyu-empty">Nema primljenih poklona.</div>';
+      } catch(e) {
+        list.innerHTML = '<div class="exyu-empty">Greška pri učitavanju.</div>';
+      }
+    };
+    window.exyuSendGift = async function(){
+      var toNick = document.getElementById('giftToNick').value.trim();
+      var giftType = document.getElementById('giftType').value;
+      var message = document.getElementById('giftMessage').value.trim();
+      if(!toNick){ alert('Upišite nick primatelja!'); return; }
+      try {
+        await api('POST', '/gifts', { toNick: toNick, giftType: giftType, message: message });
+        alert('🎁 Poklon poslan!');
+        document.getElementById('giftToNick').value = '';
+        document.getElementById('giftMessage').value = '';
+      } catch(e) { alert('❌ ' + e.message); }
+    };
+
+    document.getElementById('exyuFriendReqModal').addEventListener('click', function(e){ if(e.target === this) this.classList.remove('on'); });
+    document.getElementById('exyuGiftsModal').addEventListener('click', function(e){ if(e.target === this) this.classList.remove('on'); });
+  })();
+  </script>
+
+  <!-- BOCKANJA -->
+  <div class="exyu-modal" id="exyuPokesModal2">
+    <div class="exyu-modal-box">
+      <h3>👉 Bockanja</h3>
+      <div style="display:flex;gap:8px;margin-bottom:14px;">
+        <input type="text" id="pokeToNick" placeholder="Nick korisnika za bockanje" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(162,60,255,0.4);background:rgba(255,255,255,0.08);color:#fff;">
+        <button type="button" class="exyu-btn-send" onclick="exyuSendPoke()" style="width:auto;padding:10px 18px;">Bocni</button>
+      </div>
+      <div id="exyuPokesList2" style="max-height:350px;overflow-y:auto;"></div>
+      <div class="exyu-modal-actions" style="margin-top:14px;">
+        <button type="button" class="exyu-btn-cancel" onclick="document.getElementById('exyuPokesModal2').classList.remove('on')" style="flex:1;">Zatvori</button>
+      </div>
+    </div>
+  </div>
+  <script>
+  (function(){
+    function esc(t){ return String(t).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]); }); }
+
+    window.exyuUpdatePokesBadge = async function(){
+      try {
+        var data = await api('GET', '/moderation/notifications');
+        var n = (data.notifications || []).filter(function(x){ return x.type === 'poke' && !x.read_at; }).length;
+        var b = document.getElementById('pokesBadge');
+        if (b) b.textContent = n;
+      } catch(e){}
+    };
+
+    window.exyuOpenPokes = async function(){
+      document.getElementById('exyuPokesModal2').classList.add('on');
+      var list = document.getElementById('exyuPokesList2');
+      list.innerHTML = 'Učitavam...';
+      try {
+        var data = await api('GET', '/moderation/pokes');
+        var received = data.received || [], sent = data.sent || [];
+        var html = '<div style="font-weight:700;color:#c57dff;font-size:13px;margin-bottom:8px;">Primljena bockanja (' + received.length + ')</div>';
+        html += received.length ? received.map(function(p){
+          return '<div class="exyu-msg-item"><div class="from">' + esc(p.from_nick) + '</div><div class="time">' + new Date(p.created_at).toLocaleString('hr-HR') + '</div></div>';
+        }).join('') : '<div class="exyu-empty" style="padding:12px;">Nema primljenih bockanja.</div>';
+        html += '<div style="font-weight:700;color:#c57dff;font-size:13px;margin:14px 0 8px;">Poslana bockanja (' + sent.length + ')</div>';
+        html += sent.length ? sent.map(function(p){
+          return '<div class="exyu-msg-item"><div class="from">' + esc(p.to_nick) + '</div><div class="time">' + new Date(p.created_at).toLocaleString('hr-HR') + '</div></div>';
+        }).join('') : '<div class="exyu-empty" style="padding:12px;">Niste nikoga bocnuli.</div>';
+        list.innerHTML = html;
+        await api('POST', '/moderation/notifications/mark-read');
+        window.exyuUpdatePokesBadge();
+      } catch(e) {
+        list.innerHTML = '<div class="exyu-empty">Greška pri učitavanju.</div>';
+      }
+    };
+    window.exyuSendPoke = async function(){
+      var nick = document.getElementById('pokeToNick').value.trim();
+      if(!nick){ alert('Upišite nick!'); return; }
+      try {
+        await api('POST', '/moderation/poke', { toNick: nick });
+        alert('👉 Bocnuo/la si korisnika "' + nick + '"!');
+        document.getElementById('pokeToNick').value = '';
+        window.exyuOpenPokes();
+      } catch(e) { alert('❌ ' + e.message); }
+    };
+
+    document.getElementById('exyuPokesModal2').addEventListener('click', function(e){ if(e.target === this) this.classList.remove('on'); });
+  })();
+  </script>
+
+<!-- OBRATI SE ADMINU + PORUKE WIDGET -->
+<style>
+.exyu-fab-wrap{position:fixed;right:16px;bottom:16px;z-index:9998;display:flex;flex-direction:column;gap:10px;align-items:flex-end;}
+.exyu-fab{background:linear-gradient(45deg,#a23cff,#c57dff);color:#fff;border:none;padding:12px 18px;border-radius:30px;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 8px 25px rgba(162,60,255,0.5);font-family:inherit;letter-spacing:.5px;}
+.exyu-fab:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(162,60,255,0.7);}
+.exyu-fab.msg{background:linear-gradient(45deg,#ff6b9d,#a23cff);}
+.exyu-fab .badge{background:#fff;color:#a23cff;border-radius:12px;padding:2px 8px;margin-left:6px;font-size:11px;font-weight:800;}
+.exyu-modal{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px);}
+.exyu-modal.on{display:flex;}
+.exyu-modal-box{background:linear-gradient(135deg,#2d0057,#4a0a7a);border:2px solid rgba(162,60,255,0.5);border-radius:20px;padding:30px;max-width:480px;width:100%;color:#e9c6ff;box-shadow:0 25px 70px rgba(0,0,0,0.7);}
+.exyu-modal-box h3{font-family:'Cormorant Garamond',serif;font-size:1.8em;color:#fff;margin-bottom:14px;letter-spacing:1px;}
+.exyu-modal-box textarea{width:100%;min-height:120px;padding:12px;border-radius:12px;border:2px solid rgba(162,60,255,0.4);background:rgba(255,255,255,0.08);color:#fff;font-family:inherit;font-size:15px;margin-bottom:14px;resize:vertical;}
+.exyu-modal-box textarea:focus{outline:none;border-color:#c57dff;}
+.exyu-modal-actions{display:flex;gap:10px;}
+.exyu-btn-send{flex:1;background:linear-gradient(45deg,#a23cff,#c57dff);color:#fff;border:none;padding:14px;border-radius:12px;font-weight:700;cursor:pointer;font-family:inherit;font-size:15px;}
+.exyu-btn-cancel{flex:1;background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(162,60,255,0.4);padding:14px;border-radius:12px;font-weight:700;cursor:pointer;font-family:inherit;font-size:15px;}
+.exyu-msg-item{background:rgba(0,0,0,0.3);border-left:3px solid #a23cff;padding:12px;border-radius:8px;margin-bottom:10px;}
+.exyu-msg-item .from{color:#c57dff;font-weight:700;font-size:13px;}
+.exyu-msg-item .txt{margin-top:6px;font-size:14px;color:#e9c6ff;}
+.exyu-msg-item .time{font-size:11px;color:#b8a4d4;margin-top:4px;}
+.exyu-empty{text-align:center;color:#b8a4d4;padding:30px;font-style:italic;}
+@media(max-width:600px){.exyu-fab{padding:10px 14px;font-size:13px;}}
+</style>
+<div class="exyu-modal" id="exyuAdminModal">
+  <div class="exyu-modal-box">
+    <h3>✉️ Poruka adminu</h3>
+    <p style="margin-bottom:12px;font-size:14px;color:#b8a4d4;">Napišite pitanje ili prijavu — admin (marko) će je vidjeti u svojim porukama.</p>
+    <textarea id="exyuAdminText" placeholder="Vaša poruka..."></textarea>
+    <div class="exyu-modal-actions">
+      <button type="button" class="exyu-btn-cancel" onclick="exyuCloseAdmin()">Odustani</button>
+      <button type="button" class="exyu-btn-send" onclick="exyuSendAdmin()">Pošalji</button>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  window.exyuOpenAdmin = function(){ document.getElementById('exyuAdminModal').classList.add('on'); };
+  window.exyuCloseAdmin = function(){ document.getElementById('exyuAdminModal').classList.remove('on'); document.getElementById('exyuAdminText').value=''; };
+  window.exyuSendAdmin = async function(){
+    var t = document.getElementById('exyuAdminText').value.trim();
+    if(!t){ alert('Napišite poruku!'); return; }
+    try {
+      await api('POST', '/messages', { toNick: 'marko', body: t });
+      exyuCloseAdmin();
+      alert('✅ Poruka poslana adminu!');
+      updateBadge();
+    } catch (err) { alert('❌ ' + err.message); }
+  };
+  async function updateBadge(){
+    try {
+      var data = await api('GET', '/messages/unread-count');
+      var b = document.getElementById('headerPorukeBadge');
+      if(b) b.textContent = data.count;
+    } catch (e) {}
+  }
+  updateBadge();
+  setInterval(updateBadge, 15000);
+})();
+</script>
+
+<script>
+(function(){
+  /* Hover prefetch — počni učitavati stranicu čim miš prijeđe na link */
+  var prefetched = {};
+  document.addEventListener('mouseover', function(e){
+    var a = e.target.closest('a[href]');
+    if (!a) return;
+    var href = a.getAttribute('href');
+    if (!href || href[0] === '#') return;
+    if (/^(javascript|mailto|tel):/.test(href)) return;
+    if (a.target === '_blank') return;
+    if (prefetched[href]) return;
+    prefetched[href] = true;
+    var l = document.createElement('link');
+    l.rel = 'prefetch'; l.href = href;
+    document.head.appendChild(l);
+  }, { passive: true });
+
+  /* Fallback za preglednike bez View Transitions API */
+  if (!document.startViewTransition) {
+    document.addEventListener('click', function(e){
+      if (e.defaultPrevented) return;
+      var a = e.target.closest('a[href]');
+      if (!a) return;
+      var href = a.getAttribute('href');
+      if (!href || href[0] === '#') return;
+      if (/^(javascript|mailto|tel):/.test(href)) return;
+      if (a.target === '_blank') return;
+      if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      document.body.style.transition = 'opacity 0.15s linear';
+      document.body.style.opacity   = '0';
+      setTimeout(function(){ window.location.href = href; }, 155);
+    });
+  }
+
+  /* Ako view transitions JEST aktivan, ugasi body animaciju —
+     preglednik već radi crossfade, dupla animacija = trzaj */
+  if (document.startViewTransition) {
+    var s = document.createElement('style');
+    s.textContent = 'body{animation:none!important;}';
+    document.head.appendChild(s);
+  }
+})();
+</script>
+</body>
+</html>

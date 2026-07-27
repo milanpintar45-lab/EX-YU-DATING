@@ -1,0 +1,1727 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EX YU DATE — Admin Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#1a0033; --purple-900:#2d0057; --purple-800:#4a0a7a; --purple-700:#6b1a9e;
+  --purple-600:#7b2cbf; --purple-500:#a23cff; --purple-300:#c57dff; --purple-100:#e9c6ff;
+  --pink:#ff6b9d; --text:#e9c6ff; --muted:#b8a4d4; --line:rgba(162,60,255,0.45);
+  --panel:rgba(45,0,87,0.4); --green:#22c55e; --red:#ef4444; --orange:#f59e0b; --blue:#3b82f6;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+  font-family:'Inter',sans-serif;
+  background:linear-gradient(135deg,#1a0033 0%,#2d0057 50%,#4a0a7a 100%);
+  color:var(--text); min-height:100vh;
+}
+a{color:inherit;text-decoration:none;cursor:pointer;}
+
+.app{display:flex;min-height:100vh;}
+
+/* SIDEBAR */
+.sidebar{
+  width:260px; min-height:100vh;
+  background:linear-gradient(180deg,var(--purple-900),var(--bg));
+  border-right:1px solid rgba(162,60,255,0.35);
+  display:flex; flex-direction:column;
+  position:fixed; top:0; left:0; bottom:0; z-index:100;
+}
+.sidebar-brand{
+  padding:24px 20px 18px;
+  border-bottom:1px solid rgba(162,60,255,0.35);
+  text-align:center;
+}
+.sidebar-brand .logo{
+  font-family:'Cormorant Garamond',serif; font-size:26px; font-weight:700;
+  letter-spacing:4px; color:#fff; text-shadow:0 0 15px rgba(162,60,255,0.7);
+}
+.sidebar-brand .sub{font-size:10px; color:var(--muted); letter-spacing:3px; margin-top:4px;}
+
+.sidebar-nav{flex:1; padding:14px 10px; display:flex; flex-direction:column; gap:4px;}
+.usage-bar-track{width:100%;height:22px;background:rgba(255,255,255,0.08);border-radius:11px;overflow:hidden;position:relative;}
+.usage-bar-fill{height:100%;border-radius:11px;transition:width .3s;}
+.usage-bar-fill.green{background:linear-gradient(90deg,#00cc66,#00ff88);}
+.usage-bar-fill.yellow{background:linear-gradient(90deg,#e6c200,#ffe066);}
+.usage-bar-fill.orange{background:linear-gradient(90deg,#e67e00,#ffa640);}
+.usage-bar-fill.red{background:linear-gradient(90deg,#cc0000,#ff4d4d);}
+.usage-row{margin-bottom:20px;}
+.usage-row-head{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;color:#fff;font-weight:600;}
+.usage-warning{padding:10px 14px;border-radius:10px;font-size:13px;margin-top:6px;display:none;}
+.usage-warning.show{display:block;}
+.usage-warning.warn80{background:rgba(255,204,0,0.15);color:#ffe066;border:1px solid rgba(255,204,0,0.4);}
+.usage-warning.warn90{background:rgba(230,126,0,0.15);color:#ffa640;border:1px solid rgba(230,126,0,0.4);}
+.usage-warning.warn100{background:rgba(204,0,0,0.15);color:#ff8080;border:1px solid rgba(204,0,0,0.4);}
+.payments-placeholder{padding:30px;text-align:center;color:var(--muted);}
+.sidebar-nav a{
+  display:flex; align-items:center; gap:12px;
+  padding:12px 14px; border-radius:8px;
+  font-size:13.5px; font-weight:500; color:var(--muted);
+  transition:all .2s; border:1px solid transparent;
+}
+.sidebar-nav a:hover{
+  background:rgba(255,45,149,0.16); color:#fff; border-color:rgba(255,224,236,0.25);
+}
+.sidebar-nav a.active{
+  background:linear-gradient(90deg,#ff2d78,#c4145a);
+  color:#fff; font-weight:600; border-color:#ffb3d9;
+  box-shadow:0 0 15px rgba(255,45,149,0.45);
+}
+.sidebar-nav a .icon{font-size:18px; width:24px; text-align:center;}
+
+.sidebar-footer{
+  padding:14px 16px; border-top:1px solid rgba(162,60,255,0.35);
+  font-size:11px; color:var(--muted); text-align:center;
+}
+
+/* MAIN CONTENT */
+.main{
+  flex:1; margin-left:260px; min-height:100vh;
+  display:flex; flex-direction:column;
+}
+
+/* TOP BAR */
+.topbar{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 28px; background:rgba(0,0,0,0.22);
+  border-bottom:1px solid rgba(162,60,255,0.35);
+}
+.topbar-left{display:flex; align-items:center; gap:16px;}
+.burger{
+  display:none; font-size:22px; color:var(--purple-100); cursor:pointer; background:none; border:none;
+}
+.topbar-title{font-family:'Cormorant Garamond',serif; font-size:22px; color:var(--purple-100); font-weight:700;}
+.breadcrumb{font-size:12px; color:var(--muted);}
+.breadcrumb span{color:var(--purple-300);}
+
+.topbar-right{display:flex; align-items:center; gap:18px;}
+.search-box{
+  display:flex; align-items:center; gap:8px;
+  background:rgba(255,255,255,0.06); border:1px solid rgba(162,60,255,0.35);
+  border-radius:8px; padding:7px 12px; min-width:220px;
+}
+.search-box input{
+  background:transparent; border:none; outline:none; color:#fff; font-family:inherit; font-size:13px; width:100%;
+}
+.search-box input::placeholder{color:var(--muted);}
+
+.topbar-actions{display:flex; align-items:center; gap:14px;}
+.btn-icon{
+  width:36px; height:36px; border-radius:8px;
+  background:rgba(162,60,255,0.15); border:1px solid rgba(162,60,255,0.35);
+  color:var(--purple-100); display:flex; align-items:center; justify-content:center;
+  font-size:16px; cursor:pointer; transition:all .2s;
+}
+.btn-icon:hover{background:var(--purple-500); color:#fff;}
+
+.user-badge{
+  display:flex; align-items:center; gap:10px;
+  padding:6px 12px; border-radius:8px;
+  background:rgba(162,60,255,0.12); border:1px solid rgba(162,60,255,0.35);
+  font-size:13px; color:var(--purple-100); font-weight:600;
+}
+.user-badge .dot{width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 6px var(--green);}
+
+/* CONTENT AREA */
+.content{flex:1; padding:24px 28px;}
+
+/* SECTIONS */
+.section{display:none; animation:fadeIn .3s ease;}
+.section.active{display:block;}
+@keyframes fadeIn{from{opacity:0; transform:translateY(8px);}to{opacity:1; transform:translateY(0);}}
+
+.section-header{
+  display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:12px;
+}
+.section-title{
+  font-family:'Cormorant Garamond',serif; font-size:24px; font-weight:700;
+  color:var(--purple-100); letter-spacing:2px;
+}
+.section-actions{display:flex; gap:10px;}
+
+/* BUTTONS */
+.btn{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:9px 18px; border-radius:8px; font-size:13px; font-weight:600;
+  border:1px solid transparent; cursor:pointer; transition:all .2s; font-family:inherit;
+}
+.btn-primary{background:linear-gradient(45deg,var(--purple-500),var(--purple-300)); color:#fff; border-color:rgba(255,255,255,0.2);}
+.btn-primary:hover{transform:translateY(-2px); box-shadow:0 10px 25px rgba(162,60,255,0.5);}
+.btn-outline{background:transparent; color:var(--purple-300); border-color:rgba(162,60,255,0.5);}
+.btn-outline:hover{background:rgba(162,60,255,0.15); color:#fff;}
+.btn-danger{background:rgba(239,68,68,0.15); color:var(--red); border-color:rgba(239,68,68,0.4);}
+.btn-danger:hover{background:var(--red); color:#fff;}
+.btn-success{background:rgba(34,197,94,0.15); color:var(--green); border-color:rgba(34,197,94,0.4);}
+.btn-success:hover{background:var(--green); color:#fff;}
+
+/* STATS CARDS */
+.stats-grid{
+  display:grid; grid-template-columns:repeat(4,1fr); gap:18px; margin-bottom:24px;
+}
+.stat-card{
+  background:rgba(255,255,255,0.04); border:1px solid rgba(162,60,255,0.35);
+  border-radius:12px; padding:18px; display:flex; align-items:flex-start; gap:14px;
+  transition:all .2s;
+}
+.stat-card:hover{transform:translateY(-3px); border-color:rgba(162,60,255,0.6); box-shadow:0 10px 30px rgba(162,60,255,0.2);}
+.stat-icon{
+  width:44px; height:44px; border-radius:10px;
+  display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;
+}
+.stat-icon.purple{background:rgba(162,60,255,0.15); color:var(--purple-300);}
+.stat-icon.green{background:rgba(34,197,94,0.15); color:var(--green);}
+.stat-icon.pink{background:rgba(255,77,109,0.15); color:var(--pink);}
+.stat-icon.blue{background:rgba(59,130,246,0.15); color:var(--blue);}
+.stat-icon.orange{background:rgba(245,158,11,0.15); color:var(--orange);}
+.stat-icon.red{background:rgba(239,68,68,0.15); color:var(--red);}
+.stat-info{flex:1;}
+.stat-value{font-size:24px; font-weight:700; color:#fff; margin-bottom:2px;}
+.stat-label{font-size:12px; color:var(--muted); letter-spacing:.5px;}
+.stat-change{font-size:11px; margin-top:4px; font-weight:600;}
+.stat-change.up{color:var(--green);}
+.stat-change.down{color:var(--red);}
+
+/* CHARTS ROW */
+.charts-row{
+  display:grid; grid-template-columns:2fr 1fr; gap:18px; margin-bottom:24px;
+}
+.chart-card{
+  background:rgba(255,255,255,0.04); border:1px solid rgba(162,60,255,0.35);
+  border-radius:12px; padding:20px;
+}
+.chart-card h3{
+  font-family:'Cormorant Garamond',serif; font-size:18px; color:var(--purple-100); margin-bottom:16px; font-weight:700; letter-spacing:1px;
+}
+
+/* Bar chart CSS */
+.bar-chart{display:flex; align-items:flex-end; gap:10px; height:180px; padding-top:20px;}
+.bar-wrap{flex:1; display:flex; flex-direction:column; align-items:center; gap:6px;}
+.bar{
+  width:100%; max-width:40px; border-radius:6px 6px 0 0;
+  background:linear-gradient(180deg,var(--purple-500),var(--purple-700));
+  transition:all .3s; position:relative;
+}
+.bar:hover{opacity:.9;}
+.bar-label{font-size:10px; color:var(--muted);}
+.bar-tooltip{
+  position:absolute; bottom:calc(100% + 6px); left:50%; transform:translateX(-50%);
+  background:var(--purple-900); border:1px solid rgba(162,60,255,0.5);
+  padding:4px 8px; border-radius:6px; font-size:11px; color:#fff; white-space:nowrap;
+  opacity:0; pointer-events:none; transition:opacity .2s;
+}
+.bar:hover .bar-tooltip{opacity:1;}
+
+/* Donut chart */
+.donut-wrap{display:flex; align-items:center; justify-content:center; gap:24px;}
+.donut-chart{width:140px; height:140px; border-radius:50%;
+  background:conic-gradient(var(--green) 0% 35%, var(--purple-500) 35% 65%, var(--pink) 65% 85%, var(--blue) 85% 100%);
+  position:relative; display:flex; align-items:center; justify-content:center;
+}
+.donut-chart::after{
+  content:''; width:90px; height:90px; border-radius:50%;
+  background:var(--bg); position:absolute;
+}
+.donut-center{position:relative; z-index:2; text-align:center;}
+.donut-center .num{font-size:20px; font-weight:700; color:#fff;}
+.donut-center .txt{font-size:10px; color:var(--muted);}
+.donut-legend{display:flex; flex-direction:column; gap:8px;}
+.legend-item{display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted);}
+.legend-dot{width:10px; height:10px; border-radius:50%;}
+
+/* TABLE */
+.table-wrap{
+  background:rgba(255,255,255,0.04); border:1px solid rgba(162,60,255,0.35);
+  border-radius:12px; overflow:hidden;
+}
+.table-wrap table{width:100%; border-collapse:collapse; font-size:13px;}
+.table-wrap th{
+  background:rgba(162,60,255,0.15); color:var(--purple-100); font-weight:600;
+  padding:12px 14px; text-align:left; font-size:12px; letter-spacing:.5px; text-transform:uppercase;
+  border-bottom:1px solid rgba(162,60,255,0.35);
+}
+.table-wrap td{padding:12px 14px; border-bottom:1px solid rgba(162,60,255,0.2); color:var(--text);}
+.table-wrap tr:hover td{background:rgba(162,60,255,0.08);}
+.table-wrap tr:last-child td{border-bottom:none;}
+
+.status-badge{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:3px 10px; border-radius:12px; font-size:11px; font-weight:600;
+}
+.status-badge.online{background:rgba(34,197,94,0.15); color:var(--green); border:1px solid rgba(34,197,94,0.35);}
+.status-badge.offline{background:rgba(184,164,212,0.15); color:var(--muted); border:1px solid rgba(184,164,212,0.35);}
+.status-badge.blocked{background:rgba(239,68,68,0.15); color:var(--red); border:1px solid rgba(239,68,68,0.35);}
+.status-badge.vip{background:rgba(245,158,11,0.15); color:var(--orange); border:1px solid rgba(245,158,11,0.35);}
+
+.user-cell{display:flex; align-items:center; gap:10px;}
+.user-avatar{
+  width:32px; height:32px; border-radius:50%;
+  background:linear-gradient(135deg,var(--purple-500),var(--purple-300));
+  display:flex; align-items:center; justify-content:center; font-size:14px; border:1px solid rgba(255,224,236,0.4); flex-shrink:0;
+}
+.user-name{color:#fff; font-weight:600; font-size:13px;}
+.user-meta{font-size:11px; color:var(--muted);}
+
+.action-btns{display:flex; gap:6px;}
+.action-btn{
+  width:28px; height:28px; border-radius:6px;
+  border:1px solid rgba(162,60,255,0.35); background:rgba(255,255,255,0.04);
+  color:var(--purple-300); display:flex; align-items:center; justify-content:center;
+  font-size:12px; cursor:pointer; transition:all .2s;
+}
+.action-btn:hover{background:var(--purple-500); color:#fff; border-color:var(--purple-500);}
+.action-btn.delete:hover{background:var(--red); color:#fff; border-color:var(--red);}
+
+/* RECENT ACTIVITY */
+.activity-list{display:flex; flex-direction:column; gap:10px;}
+.activity-item{
+  display:flex; align-items:center; gap:12px;
+  padding:12px 14px; border-radius:8px;
+  background:rgba(255,255,255,0.04); border:1px solid rgba(162,60,255,0.25);
+}
+.activity-icon{width:34px; height:34px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0;}
+.activity-icon.join{background:rgba(34,197,94,0.15); color:var(--green);}
+.activity-icon.msg{background:rgba(59,130,246,0.15); color:var(--blue);}
+.activity-icon.block{background:rgba(239,68,68,0.15); color:var(--red);}
+.activity-icon.vip{background:rgba(245,158,11,0.15); color:var(--orange);}
+.activity-info{flex:1;}
+.activity-text{font-size:13px; color:var(--text);}
+.activity-text b{color:#fff; font-weight:600;}
+.activity-time{font-size:11px; color:var(--muted); margin-top:2px;}
+
+/* TWO COLUMNS */
+.two-col{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:24px;}
+
+/* MODAL */
+.modal-overlay{
+  display:none; position:fixed; inset:0; z-index:200;
+  background:rgba(0,0,0,0.7); backdrop-filter:blur(6px);
+  align-items:center; justify-content:center;
+}
+.modal-overlay.active{display:flex;}
+.modal{
+  background:linear-gradient(135deg,var(--purple-900),var(--bg));
+  border:1px solid rgba(162,60,255,0.5); border-radius:14px;
+  width:90%; max-width:520px; max-height:90vh; overflow-y:auto;
+  padding:24px; box-shadow:0 25px 70px rgba(0,0,0,0.6);
+}
+.modal-header{display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;}
+.modal-title{font-family:'Cormorant Garamond',serif; font-size:22px; color:var(--purple-100); font-weight:700;}
+.modal-close{width:32px; height:32px; border-radius:8px; border:1px solid rgba(162,60,255,0.35); background:rgba(255,255,255,0.04); color:var(--purple-100); font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center;}
+.modal-close:hover{background:var(--red); color:#fff; border-color:var(--red);}
+
+.form-group{margin-bottom:16px;}
+.form-group label{display:block; margin-bottom:6px; font-size:13px; color:var(--purple-100); font-weight:600;}
+.form-group input, .form-group select, .form-group textarea{
+  width:100%; padding:10px 12px; border-radius:8px;
+  background:rgba(255,255,255,0.06); border:1px solid rgba(162,60,255,0.4);
+  color:#fff; font-family:inherit; font-size:13px; outline:none; transition:all .2s;
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus{border-color:var(--purple-300); box-shadow:0 0 12px rgba(162,60,255,0.3);}
+.form-group input::placeholder, .form-group textarea::placeholder{color:var(--muted);}
+.form-group textarea{resize:vertical; min-height:80px;}
+
+.modal-footer{display:flex; justify-content:flex-end; gap:10px; margin-top:20px;}
+
+/* PAGINATION */
+.pagination{display:flex; align-items:center; justify-content:center; gap:6px; margin-top:16px;}
+.pagination a, .pagination span{
+  min-width:32px; height:32px; display:flex; align-items:center; justify-content:center;
+  border-radius:6px; font-size:12px; font-weight:600; border:1px solid rgba(162,60,255,0.35);
+}
+.pagination a{color:var(--purple-300); background:rgba(255,255,255,0.04); cursor:pointer; transition:all .2s;}
+.pagination a:hover{background:var(--purple-500); color:#fff; border-color:var(--purple-500);}
+.pagination span{background:linear-gradient(45deg,var(--purple-500),var(--purple-600)); color:#fff; border-color:var(--purple-100);}
+
+/* MOBILE SIDEBAR */
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%); transition:transform .3s;}
+  .sidebar.open{transform:translateX(0);}
+  .main{margin-left:0;}
+  .burger{display:block;}
+  .stats-grid{grid-template-columns:repeat(2,1fr);}
+  .charts-row{grid-template-columns:1fr;}
+  .two-col{grid-template-columns:1fr;}
+  .table-wrap{overflow-x:auto;}
+  .table-wrap table{min-width:700px;}
+}
+@media(max-width:600px){
+  .stats-grid{grid-template-columns:1fr;}
+  .topbar{padding:12px 16px;}
+  .content{padding:16px;}
+  .search-box{display:none;}
+}
+
+/* Footer */
+.admin-footer{
+  padding:14px 28px; border-top:1px solid rgba(162,60,255,0.35);
+  background:rgba(0,0,0,0.22); color:var(--muted); font-size:12px; text-align:center; letter-spacing:1px;
+}
+
+/* ===================================================
+   EX YU DATE — ANTI-TRZANJE v3 (FINALNA VERZIJA)
+   =================================================== */
+
+/* 1. Pozadina nikad ne nestaje — nema bijelog bljeska */
+html {
+  background: linear-gradient(135deg,#1a0033 0%,#2d0057 50%,#4a0a7a 100%);
+  background-attachment: fixed;
+  overflow-y: scroll; /* scrollbar uvijek prisutan → nema layout shiftova */
+}
+
+/* 2. View Transitions API (Chrome 111+) — čista crossfade, bez pokreta */
+@view-transition {
+  navigation: auto;
+}
+::view-transition-old(root) {
+  animation: 180ms linear forwards exyu-out;
+}
+::view-transition-new(root) {
+  animation: 220ms linear forwards exyu-in;
+}
+@keyframes exyu-out { to   { opacity: 0; } }
+@keyframes exyu-in  { from { opacity: 0; } }
+
+/* 3. Fallback — isti efekt za Firefox/Safari, BEZ pokreta */
+body {
+  animation: exyu-body-in 0.22s linear both;
+}
+@keyframes exyu-body-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+</style>
+</head>
+<body>
+<script>
+const API_BASE = '/api';
+async function api(method, path, body) {
+  const opts = { method, headers: {}, credentials: 'include' };
+  if (body) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
+  const res = await fetch(API_BASE + path, opts);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'Greška.');
+  return data;
+}
+
+window.exyuAdminReady = (async function(){
+  let me = { loggedIn: false };
+  try { me = await api('GET', '/auth/me'); } catch(e){}
+  if (!me.loggedIn || !me.isAdmin) {
+    document.documentElement.innerHTML = '<body style="background:#1a0033;color:#e9c6ff;font-family:Inter,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px;text-align:center;"><div><h1 style="color:#ff6b9d;font-size:2.5em;margin-bottom:20px;">🔒 PRISTUP ZABRANJEN</h1><p style="font-size:1.2em;margin-bottom:30px;">Ova stranica je dostupna samo administratoru.</p><a href="pocetna.html" style="background:linear-gradient(45deg,#a23cff,#c57dff);color:#fff;padding:14px 28px;border-radius:12px;text-decoration:none;font-weight:700;">← Vrati se na početnu</a></div></body>';
+    throw new Error('not admin');
+  }
+  return me;
+})();
+</script>
+<!-- OBRATI SE ADMINU + PORUKE WIDGET -->
+<style>
+.exyu-fab-wrap{position:fixed;right:16px;bottom:16px;z-index:9998;display:flex;flex-direction:column;gap:10px;align-items:flex-end;}
+.exyu-fab{background:linear-gradient(45deg,#a23cff,#c57dff);color:#fff;border:none;padding:12px 18px;border-radius:30px;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 8px 25px rgba(162,60,255,0.5);font-family:inherit;letter-spacing:.5px;}
+.exyu-fab:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(162,60,255,0.7);}
+.exyu-fab.msg{background:linear-gradient(45deg,#ff6b9d,#a23cff);}
+.exyu-fab .badge{background:#fff;color:#a23cff;border-radius:12px;padding:2px 8px;margin-left:6px;font-size:11px;font-weight:800;}
+.exyu-modal{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px);}
+.exyu-modal.on{display:flex;}
+.exyu-modal-box{background:linear-gradient(135deg,#2d0057,#4a0a7a);border:2px solid rgba(162,60,255,0.5);border-radius:20px;padding:30px;max-width:480px;width:100%;color:#e9c6ff;box-shadow:0 25px 70px rgba(0,0,0,0.7);}
+.exyu-modal-box h3{font-family:'Cormorant Garamond',serif;font-size:1.8em;color:#fff;margin-bottom:14px;letter-spacing:1px;}
+.exyu-modal-box textarea{width:100%;min-height:120px;padding:12px;border-radius:12px;border:2px solid rgba(162,60,255,0.4);background:rgba(255,255,255,0.08);color:#fff;font-family:inherit;font-size:15px;margin-bottom:14px;resize:vertical;}
+.exyu-modal-box textarea:focus{outline:none;border-color:#c57dff;}
+.exyu-modal-actions{display:flex;gap:10px;}
+.exyu-btn-send{flex:1;background:linear-gradient(45deg,#a23cff,#c57dff);color:#fff;border:none;padding:14px;border-radius:12px;font-weight:700;cursor:pointer;font-family:inherit;font-size:15px;}
+.exyu-btn-cancel{flex:1;background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(162,60,255,0.4);padding:14px;border-radius:12px;font-weight:700;cursor:pointer;font-family:inherit;font-size:15px;}
+.exyu-msg-item{background:rgba(0,0,0,0.3);border-left:3px solid #a23cff;padding:12px;border-radius:8px;margin-bottom:10px;}
+.exyu-msg-item .from{color:#c57dff;font-weight:700;font-size:13px;}
+.exyu-msg-item .txt{margin-top:6px;font-size:14px;color:#e9c6ff;}
+.exyu-msg-item .time{font-size:11px;color:#b8a4d4;margin-top:4px;}
+.exyu-empty{text-align:center;color:#b8a4d4;padding:30px;font-style:italic;}
+@media(max-width:600px){.exyu-fab{padding:10px 14px;font-size:13px;}}
+</style>
+
+<!-- SIDEBAR -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="logo">EX YU DATE</div>
+    <div class="sub">ADMIN PANEL</div>
+  </div>
+  <div class="sidebar-nav">
+    <a href="#" class="active" data-section="dashboard"><span class="icon">📊</span> Dashboard</a>
+    <a href="#" data-section="users"><span class="icon">👥</span> Korisnici</a>
+    <a href="#" data-section="messages"><span class="icon">💬</span> Poruke</a>
+    <a href="#" data-section="photos"><span class="icon">📸</span> Slike</a>
+    <a href="#" data-section="videos"><span class="icon">🎬</span> Videi</a>
+    <a href="#" data-section="profiles"><span class="icon">👤</span> Profili</a>
+    <a href="#" data-section="ads"><span class="icon">📢</span> Oglasi</a>
+    <a href="#" data-section="reports"><span class="icon">🚩</span> Prijave</a>
+    <a href="#" data-section="settings"><span class="icon">⚙️</span> Postavke</a>
+    <a href="#" data-section="usage"><span class="icon">📈</span> Potrošnja i upozorenja</a>
+    <a href="#" data-section="payments"><span class="icon">💰</span> Uplate i isplate</a>
+    <a href="pocetna.html"><span class="icon">🏠</span> Pogledaj stranicu</a>
+    <a href="../index.html"><span class="icon">🚪</span> Odjava</a>
+  </div>
+  <div class="sidebar-footer">
+    EX YU DATE v1.0<br>Admin Panel
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <button type="button" class="burger" id="burgerBtn">☰</button>
+      <div>
+        <div class="topbar-title">Dashboard</div>
+        <div class="breadcrumb">Početna <span>›</span> Dashboard</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="search-box">
+        <span>🔍</span>
+        <input type="text" placeholder="Pretraži admin panel...">
+      </div>
+      <div class="topbar-actions">
+        <button type="button" class="btn-icon">🔔</button>
+        <button type="button" class="btn-icon">⚙️</button>
+      </div>
+      <div class="user-badge">
+        <div class="dot"></div>
+        <span>Admin</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- ========== ADMIN LIVE TOOLS ========== -->
+    <div class="section active" id="dashboard">
+
+      <div style="background:linear-gradient(135deg,#2d0057,#4a0a7a);border:2px solid rgba(162,60,255,0.5);border-radius:16px;padding:20px;margin-bottom:20px;">
+        <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.6em;color:#fff;margin-bottom:14px;">📢 Pošalji poruku SVIM korisnicima</h2>
+        <textarea id="broadcastText" placeholder="Napišite obavijest za sve korisnike sajta..." style="width:100%;min-height:90px;padding:12px;border-radius:10px;border:2px solid rgba(162,60,255,0.4);background:rgba(0,0,0,0.3);color:#fff;font-family:inherit;font-size:14px;margin-bottom:10px;"></textarea>
+        <button type="button" onclick="adminBroadcast()" style="background:linear-gradient(45deg,#a23cff,#c57dff);color:#fff;border:none;padding:12px 24px;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px;">📤 Pošalji svima</button>
+      </div>
+
+      <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(162,60,255,0.4);border-radius:16px;padding:20px;margin-bottom:20px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.6em;color:#fff;">📨 Poruke od korisnika (adminu)</h2>
+          <button type="button" onclick="adminReloadMsgs()" style="background:rgba(162,60,255,0.3);color:#fff;border:1px solid rgba(162,60,255,0.5);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:12px;">🔄 Osvježi</button>
+        </div>
+        <div id="adminMsgList" style="max-height:350px;overflow-y:auto;"></div>
+      </div>
+
+      <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(162,60,255,0.4);border-radius:16px;padding:20px;margin-bottom:20px;">
+        <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.6em;color:#fff;margin-bottom:14px;">👥 Registrirani korisnici (kontrola)</h2>
+        <div id="adminUserList"></div>
+      </div>
+
+      <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(162,60,255,0.4);border-radius:16px;padding:20px;margin-bottom:20px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.6em;color:#fff;">🚩 Prijave korisnika</h2>
+          <span id="adminReportCount" style="background:#f59e0b;color:#000;font-weight:800;font-size:12px;padding:3px 10px;border-radius:10px;">0 na čekanju</span>
+        </div>
+        <div id="adminReportList"></div>
+      </div>
+
+      <script>
+      (function(){
+        function esc(t){return String(t).replace(/[<>&]/g,function(c){return{'<':'&lt;','>':'&gt;','&':'&amp;'}[c];});}
+
+        window.adminResolveReport = async function(id){
+          try { await api('POST', '/admin/reports/' + id + '/resolve'); renderReports(); }
+          catch(e) { alert('❌ ' + e.message); }
+        };
+        window.adminDismissReport = async function(id){
+          if(!confirm('Odbaciti ovu prijavu?')) return;
+          try { await api('DELETE', '/admin/reports/' + id); renderReports(); }
+          catch(e) { alert('❌ ' + e.message); }
+        };
+        window.adminKickFromReport = async function(nick, id){
+          if(!confirm('Izbaciti prijavljenog korisnika "'+nick+'"?')) return;
+          try {
+            await api('DELETE', '/users/' + encodeURIComponent(nick));
+            renderReports();
+            if(typeof renderUsersTable === 'function') renderUsersTable('');
+            alert('Korisnik "'+nick+'" je izbačen.');
+          } catch(e) { alert('❌ ' + e.message); }
+        };
+
+        var SANCTION_LABELS = { kicked: '🚫 Izbačen', suspended: '⏸️ Suspendiran' };
+
+        async function renderReports(){
+          var list = document.getElementById('adminReportList');
+          var reports;
+          try { reports = (await api('GET', '/admin/reports')).reports || []; }
+          catch(e) { list.innerHTML = '<div style="text-align:center;color:#b8a4d4;padding:20px;">Greška pri učitavanju.</div>'; return; }
+
+          var pending = reports.filter(function(r){return r.status==='pending';});
+          var countEl = document.getElementById('adminReportCount');
+          if(countEl) countEl.textContent = pending.length + ' na čekanju';
+          if(reports.length===0){ list.innerHTML='<div style="text-align:center;color:#b8a4d4;padding:20px;font-style:italic;">Nema prijava.</div>'; return; }
+          list.innerHTML = reports.map(function(r){
+            var resolved = r.status !== 'pending';
+            var sanctionBadge = r.sanction ? ' <span style="color:#ff8f8f;font-size:11px;">'+(SANCTION_LABELS[r.sanction]||r.sanction)+'</span>' : '';
+            var deletedBadge = r.to_user_deleted ? ' <span style="color:#8f8fb8;font-size:11px;">(račun obrisan)</span>' : '';
+            return '<div style="background:'+(resolved?'rgba(0,0,0,0.2)':'rgba(245,158,11,0.12)')+';border-left:3px solid '+(resolved?'#6b7280':'#f59e0b')+';padding:12px;border-radius:8px;margin-bottom:10px;">'+
+              '<div style="color:#fff;font-size:13px;"><b>'+esc(r.from_nick)+'</b> je prijavio/la <b>'+esc(r.to_nick)+'</b>'+deletedBadge+(resolved?' <span style="color:#8fffb0;font-size:11px;">✔ RIJEŠENO</span>'+sanctionBadge:'')+'</div>'+
+              '<div style="margin-top:6px;color:#e9c6ff;">'+esc(r.reason)+'</div>'+
+              '<div style="font-size:11px;color:#b8a4d4;margin-top:4px;">'+new Date(r.created_at).toLocaleString('hr-HR')+'</div>'+
+              (resolved || r.to_user_deleted ? '' :
+                '<div style="display:flex;gap:8px;margin-top:10px;">'+
+                  '<button type="button" onclick="adminResolveReport('+r.id+')" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px;">✔ Označi riješeno</button>'+
+                  '<button type="button" onclick="adminKickFromReport(\''+esc(r.to_nick)+'\','+r.id+')" style="background:#ef4444;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:700;">🚫 Izbaci korisnika</button>'+
+                  '<button type="button" onclick="adminDismissReport('+r.id+')" style="background:transparent;color:#b8a4d4;border:1px solid rgba(255,255,255,0.2);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px;">Odbaci</button>'+
+                '</div>')+
+            '</div>';
+          }).join('');
+        }
+        window.exyuAdminReady.then(function(){ renderReports(); setInterval(renderReports, 15000); });
+      })();
+      </script>
+
+      <script>
+      (function(){
+        function esc(t){return String(t).replace(/[<>&]/g,function(c){return{'<':'&lt;','>':'&gt;','&':'&amp;'}[c];});}
+
+        window.adminBroadcast = async function(){
+          var t = document.getElementById('broadcastText').value.trim();
+          if(!t){alert('Napišite poruku!');return;}
+          try {
+            var res = await api('POST', '/admin/broadcast', { body: t });
+            document.getElementById('broadcastText').value='';
+            alert('✅ Poruka poslana na '+res.sent+' korisnika.');
+          } catch(e) { alert('❌ ' + e.message); }
+        };
+        window.adminReloadMsgs = async function(){
+          var list = document.getElementById('adminMsgList');
+          try {
+            var data = await api('GET', '/messages/inbox');
+            var msgs = data.messages || [];
+            if(msgs.length===0){ list.innerHTML='<div style="text-align:center;color:#b8a4d4;padding:20px;font-style:italic;">Nema poruka.</div>'; return; }
+            list.innerHTML = msgs.map(function(m){
+              return '<div style="background:rgba(162,60,255,0.1);border-left:3px solid #a23cff;padding:12px;border-radius:8px;margin-bottom:10px;">'+
+                '<div style="color:#c57dff;font-weight:700;font-size:13px;">Od: '+esc(m.from_nick)+'</div>'+
+                '<div style="margin-top:6px;color:#fff;">'+esc(m.body)+'</div>'+
+                '<div style="font-size:11px;color:#b8a4d4;margin-top:4px;">'+new Date(m.created_at).toLocaleString('hr-HR')+'</div>'+
+              '</div>';
+            }).join('');
+          } catch(e) {
+            list.innerHTML = '<div style="text-align:center;color:#b8a4d4;padding:20px;">Greška pri učitavanju.</div>';
+          }
+        };
+        window.adminKick = async function(nick){
+          if(!confirm('Izbaciti korisnika "'+nick+'"?')) return;
+          try {
+            await api('DELETE', '/users/' + encodeURIComponent(nick));
+            renderUsers();
+            if(typeof renderUsersTable === 'function') renderUsersTable('');
+            alert('Korisnik "'+nick+'" izbačen.');
+          } catch(e) { alert('❌ ' + e.message); }
+        };
+        async function renderUsers(){
+          var list = document.getElementById('adminUserList');
+          try {
+            var data = await api('GET', '/admin/users');
+            var users = data.users || [];
+            if(users.length===0){ list.innerHTML='<div style="text-align:center;color:#b8a4d4;padding:20px;font-style:italic;">Nema registriranih korisnika.</div>'; return; }
+            list.innerHTML = users.map(function(u){
+              return '<div style="display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,0.3);padding:10px 14px;border-radius:8px;margin-bottom:8px;border:1px solid rgba(162,60,255,0.3);">'+
+                '<div><b style="color:#fff;">'+esc(u.nick)+'</b> <span style="color:#b8a4d4;font-size:12px;">('+esc(u.email||'-')+')</span></div>'+
+                '<button type="button" onclick="adminKick(\''+esc(u.nick)+'\')" style="background:#ef4444;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:700;">🚫 Izbaci</button>'+
+              '</div>';
+            }).join('');
+          } catch(e) {
+            list.innerHTML = '<div style="text-align:center;color:#b8a4d4;padding:20px;">Greška pri učitavanju.</div>';
+          }
+        }
+        window.exyuAdminReady.then(function(){
+          adminReloadMsgs();
+          renderUsers();
+          setInterval(adminReloadMsgs, 15000);
+        });
+      })();
+      </script>
+
+
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon purple">👥</div>
+          <div class="stat-info">
+            <div class="stat-value">2,847</div>
+            <div class="stat-label">UKUPNO KORISNIKA</div>
+            <div class="stat-change up">▲ +124 ovaj mjesec</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green">🟢</div>
+          <div class="stat-info">
+            <div class="stat-value">412</div>
+            <div class="stat-label">ONLINE KORISNIKA</div>
+            <div class="stat-change up">▲ +18 u posljednjih sat</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon pink">💬</div>
+          <div class="stat-info">
+            <div class="stat-value">15,932</div>
+            <div class="stat-label">PORUKA DANAS</div>
+            <div class="stat-change up">▲ +8.5% od jučer</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon blue">📢</div>
+          <div class="stat-info">
+            <div class="stat-value">48</div>
+            <div class="stat-label">AKTIVNI OGLASI</div>
+            <div class="stat-change down">▼ -3 ovaj tjedan</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon orange">⭐</div>
+          <div class="stat-info">
+            <div class="stat-value">386</div>
+            <div class="stat-label">VIP KORISNIKA</div>
+            <div class="stat-change up">▲ +22 ovaj mjesec</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon red">🚩</div>
+          <div class="stat-info">
+            <div class="stat-value">17</div>
+            <div class="stat-label">PRIJAVE</div>
+            <div class="stat-change down">▼ -5 riješenih</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon purple">🆕</div>
+          <div class="stat-info">
+            <div class="stat-value">89</div>
+            <div class="stat-label">NOVI DANAS</div>
+            <div class="stat-change up">▲ +12</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green">📈</div>
+          <div class="stat-info">
+            <div class="stat-value">94.2%</div>
+            <div class="stat-label">AKTIVNOST</div>
+            <div class="stat-change up">▲ +2.1%</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="charts-row">
+        <div class="chart-card">
+          <h3>📈 Aktivnost po zemljama (zadnjih 7 dana)</h3>
+          <div class="bar-chart">
+            <div class="bar-wrap"><div class="bar" style="height:45%"><div class="bar-tooltip">124 korisnika</div></div><div class="bar-label">Pon</div></div>
+            <div class="bar-wrap"><div class="bar" style="height:62%"><div class="bar-tooltip">186 korisnika</div></div><div class="bar-label">Uto</div></div>
+            <div class="bar-wrap"><div class="bar" style="height:38%"><div class="bar-tooltip">98 korisnika</div></div><div class="bar-label">Sri</div></div>
+            <div class="bar-wrap"><div class="bar" style="height:78%"><div class="bar-tooltip">241 korisnik</div></div><div class="bar-label">Čet</div></div>
+            <div class="bar-wrap"><div class="bar" style="height:55%"><div class="bar-tooltip">162 korisnika</div></div><div class="bar-label">Pet</div></div>
+            <div class="bar-wrap"><div class="bar" style="height:88%"><div class="bar-tooltip">298 korisnika</div></div><div class="bar-label">Sub</div></div>
+            <div class="bar-wrap"><div class="bar" style="height:72%"><div class="bar-tooltip">215 korisnika</div></div><div class="bar-label">Ned</div></div>
+          </div>
+        </div>
+        <div class="chart-card">
+          <h3>🌍 Korisnici po zemljama</h3>
+          <div class="donut-wrap">
+            <div class="donut-chart">
+              <div class="donut-center">
+                <div class="num">2,847</div>
+                <div class="txt">ukupno</div>
+              </div>
+            </div>
+            <div class="donut-legend">
+              <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Hrvatska (35%)</div>
+              <div class="legend-item"><div class="legend-dot" style="background:var(--purple-500)"></div>Srbija (30%)</div>
+              <div class="legend-item"><div class="legend-dot" style="background:var(--pink)"></div>BiH (20%)</div>
+              <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>Ostalo (15%)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="chart-card">
+          <h3>🕐 Nedavne aktivnosti</h3>
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="activity-icon join">👤</div>
+              <div class="activity-info">
+                <div class="activity-text">Novi korisnik <b>Marko, 28</b> se pridružio iz Zagreba</div>
+                <div class="activity-time">Prije 2 minute</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon msg">💬</div>
+              <div class="activity-info">
+                <div class="activity-text"><b>Ana</b> je poslala poruku <b>Ivanu</b></div>
+                <div class="activity-time">Prije 5 minuta</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon vip">⭐</div>
+              <div class="activity-info">
+                <div class="activity-text"><b>Jovan, 32</b> je postao VIP korisnik</div>
+                <div class="activity-time">Prije 12 minuta</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon block">🚫</div>
+              <div class="activity-info">
+                <div class="activity-text">Korisnik <b>User99</b> je blokiran od strane admina</div>
+                <div class="activity-time">Prije 34 minute</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon join">👤</div>
+              <div class="activity-info">
+                <div class="activity-text">Novi korisnik <b>Sara, 24</b> se pridružio iz Beograda</div>
+                <div class="activity-time">Prije 1 sat</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="chart-card">
+          <h3>🚨 Nove prijave</h3>
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="activity-icon block">🚩</div>
+              <div class="activity-info">
+                <div class="activity-text">Prijavljen <b>User42</b> — Neprimjereni sadržaj</div>
+                <div class="activity-time">Prije 10 minuta · <span style="color:var(--red)">Hitno</span></div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon block">🚩</div>
+              <div class="activity-info">
+                <div class="activity-text">Prijavljen <b>MarkoX</b> — Lažni profil</div>
+                <div class="activity-time">Prije 45 minuta · <span style="color:var(--orange)">Na čekanju</span></div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon block">🚩</div>
+              <div class="activity-info">
+                <div class="activity-text">Prijavljen <b>TestUser</b> — Spam poruke</div>
+                <div class="activity-time">Prije 2 sata · <span style="color:var(--orange)">Na čekanju</span></div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon join">✅</div>
+              <div class="activity-info">
+                <div class="activity-text">Prijavljen <b>OldUser</b> — <span style="color:var(--green)">Riješeno</span></div>
+                <div class="activity-time">Prije 5 sati</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========== KORISNICI ========== -->
+    <div class="section" id="users">
+      <div class="section-header">
+        <div>
+          <div class="section-title">👥 Korisnici</div>
+          <div class="breadcrumb">Početna <span>›</span> Korisnici</div>
+        </div>
+        <div class="section-actions">
+          <input type="text" id="userSearchInput" placeholder="🔎 Pretraži po nicku ili emailu..." style="background:rgba(255,255,255,0.06);border:1px solid rgba(162,60,255,0.4);border-radius:8px;padding:9px 12px;color:#fff;font-family:inherit;font-size:13px;min-width:220px;">
+          <button type="button" class="btn btn-outline" onclick="openModal('userModal')">➕ Dodaj korisnika</button>
+          <button type="button" class="btn btn-primary" onclick="exportUsersCSV()">📥 Export (CSV)</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Korisnik</th>
+              <th>ID</th>
+              <th>Zemlja</th>
+              <th>Regija</th>
+              <th>Status</th>
+              <th>Uloga</th>
+              <th>Registracija</th>
+              <th>Akcije</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody">
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination" id="usersPagination" style="display:none;"></div>
+    </div>
+
+    <!-- ========== PORUKE ========== -->
+    <div class="section" id="messages">
+      <div class="section-header">
+        <div>
+          <div class="section-title">💬 Poruke</div>
+          <div class="breadcrumb">Početna <span>›</span> Poruke</div>
+        </div>
+        <div class="section-actions">
+          <button type="button" class="btn btn-outline" onclick="adminClearAllMessages()">🗑️ Očisti sve</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Od</th>
+              <th>Za</th>
+              <th>Sadržaj</th>
+              <th>Zemlja</th>
+              <th>Vrijeme</th>
+              <th>Status</th>
+              <th>Akcije</th>
+            </tr>
+          </thead>
+          <tbody id="allMessagesBody">
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ========== SLIKE ========== -->
+    <div class="section" id="photos">
+      <div class="section-header">
+        <div>
+          <div class="section-title">📸 Slike</div>
+          <div class="breadcrumb">Početna <span>›</span> Slike</div>
+        </div>
+        <div class="section-actions">
+          <button type="button" class="btn btn-outline" onclick="location.reload()">🔄 Osvježi</button>
+        </div>
+      </div>
+      <div class="table-wrap" id="photosTableWrap">
+        <table>
+          <thead><tr><th>Korisnik</th><th>Slika</th><th>Veličina</th><th>Datum</th><th>Status</th><th>Akcija</th></tr></thead>
+          <tbody id="photosBody"><tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px;">Nema slika za prikaz.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ========== VIDEI ========== -->
+    <div class="section" id="videos">
+      <div class="section-header">
+        <div>
+          <div class="section-title">🎬 Videi</div>
+          <div class="breadcrumb">Početna <span>›</span> Videi</div>
+        </div>
+        <div class="section-actions">
+          <button type="button" class="btn btn-outline" onclick="location.reload()">🔄 Osvježi</button>
+        </div>
+      </div>
+      <div class="table-wrap" id="videosTableWrap">
+        <table>
+          <thead><tr><th>Korisnik</th><th>Video</th><th>Trajanje</th><th>Datum</th><th>Status</th><th>Akcija</th></tr></thead>
+          <tbody id="videosBody"><tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px;">Nema videa za prikaz.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ========== PROFILI ========== -->
+    <div class="section" id="profiles">
+      <div class="section-header">
+        <div>
+          <div class="section-title">👤 Profili</div>
+          <div class="breadcrumb">Početna <span>›</span> Profili</div>
+        </div>
+        <div class="section-actions">
+          <button type="button" class="btn btn-outline" onclick="location.reload()">🔄 Osvježi</button>
+        </div>
+      </div>
+      <div class="table-wrap" id="profilesTableWrap">
+        <table>
+          <thead><tr><th>Nick</th><th>Spol</th><th>Država</th><th>Grad</th><th>Email</th><th>Status</th><th>Akcija</th></tr></thead>
+          <tbody id="profilesBody"><tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px;">Nema profila za prikaz.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ========== OGLASI ========== -->
+    <div class="section" id="ads">
+      <div class="section-header">
+        <div>
+          <div class="section-title">📢 Oglasi</div>
+          <div class="breadcrumb">Početna <span>›</span> Oglasi</div>
+        </div>
+        <div class="section-actions">
+          <button type="button" class="btn btn-outline" onclick="openModal('adModal')">➕ Novi oglas</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Naslov</th>
+              <th>Pozicija</th>
+              <th>Zemlja</th>
+              <th>Prikaži</th>
+              <th>Klikovi</th>
+              <th>Status</th>
+              <th>Akcije</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>#AD01</td>
+              <td><b>Premium Upoznavanje</b></td>
+              <td>Dashboard Top</td>
+              <td>Sve</td>
+              <td>12,450</td>
+              <td>342</td>
+              <td><span class="status-badge online">● Aktivan</span></td>
+              <td>
+                <div class="action-btns">
+                  <button type="button" class="action-btn">✏️</button>
+                  <button type="button" class="action-btn">⏸️</button>
+                  <button type="button" class="action-btn delete">🗑️</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>#AD02</td>
+              <td><b>Nova Godina — Popust 50%</b></td>
+              <td>Sidebar</td>
+              <td>🇭🇷 Hrvatska</td>
+              <td>8,200</td>
+              <td>189</td>
+              <td><span class="status-badge online">● Aktivan</span></td>
+              <td>
+                <div class="action-btns">
+                  <button type="button" class="action-btn">✏️</button>
+                  <button type="button" class="action-btn">⏸️</button>
+                  <button type="button" class="action-btn delete">🗑️</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>#AD03</td>
+              <td><b>VIP Članstvo</b></td>
+              <td>Chat Column</td>
+              <td>Sve</td>
+              <td>15,100</td>
+              <td>567</td>
+              <td><span class="status-badge offline">● Pauza</span></td>
+              <td>
+                <div class="action-btns">
+                  <button type="button" class="action-btn">✏️</button>
+                  <button type="button" class="action-btn">▶️</button>
+                  <button type="button" class="action-btn delete">🗑️</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>#AD04</td>
+              <td><b>Ljetni Dodatak</b></td>
+              <td>Footer</td>
+              <td>🇭🇷 Hrvatska</td>
+              <td>3,400</td>
+              <td>78</td>
+              <td><span class="status-badge online">● Aktivan</span></td>
+              <td>
+                <div class="action-btns">
+                  <button type="button" class="action-btn">✏️</button>
+                  <button type="button" class="action-btn">⏸️</button>
+                  <button type="button" class="action-btn delete">🗑️</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ========== PRIJAVE ========== -->
+    <div class="section" id="reports">
+      <div class="section-header">
+        <div>
+          <div class="section-title">🚩 Prijave korisnika</div>
+          <div class="breadcrumb">Početna <span>›</span> Prijave</div>
+        </div>
+        <div class="section-actions">
+          <button type="button" class="btn btn-success">✅ Označi sve riješenim</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Prijavljeni</th>
+              <th>Prijavio</th>
+              <th>Razlog</th>
+              <th>Zemlja</th>
+              <th>Vrijeme</th>
+              <th>Status</th>
+              <th>Akcije</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>#R001</td>
+              <td><b>User42</b></td>
+              <td>Ana</td>
+              <td>Neprimjereni sadržaj</td>
+              <td>🇭🇷 Hrvatska</td>
+              <td>14:20</td>
+              <td><span class="status-badge blocked">Hitno</span></td>
+              <td>
+                <div class="action-btns">
+                  <button type="button" class="action-btn">👁️</button>
+                  <button type="button" class="action-btn">✅</button>
+                  <button type="button" class="action-btn delete">🗑️</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>#R002</td>
+              <td><b>MarkoX</b></td>
+              <td>Petra</td>
+              <td>Lažni profil</td>
+              <td>🇷🇸 Srbija</td>
+              <td>13:50</td>
+              <td><span class="status-badge vip">Na čekanju</span></td>
+              <td>
+                <div class="action-btns">
+                  <button type="button" class="action-btn">👁️</button>
+                  <button type="button" class="action-btn">✅</button>
+                  <button type="button" class="action-btn delete">🗑️</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>#R003</td>
+              <td><b>TestUser</b></td>
+              <td>Jovan</td>
+              <td>Spam poruke</td>
+              <td>🇷🇸 Srbija</td>
+              <td>12:30</td>
+              <td><span class="status-badge vip">Na čekanju</span></td>
+              <td>
+                <div class="action-btns">
+                  <button type="button" class="action-btn">👁️</button>
+                  <button type="button" class="action-btn">✅</button>
+                  <button type="button" class="action-btn delete">🗑️</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>#R004</td>
+              <td><b>OldUser</b></td>
+              <td>Sara</td>
+              <td>Uznemiravanje</td>
+              <td>🇧🇦 BiH</td>
+              <td>09:15</td>
+              <td><span class="status-badge online">Riješeno</span></td>
+              <td>
+                <div class="action-btns">
+                  <button type="button" class="action-btn">👁️</button>
+                  <button type="button" class="action-btn">↩️</button>
+                  <button type="button" class="action-btn delete">🗑️</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ========== POSTAVKE ========== -->
+    <div class="section" id="settings">
+      <div class="section-header">
+        <div>
+          <div class="section-title">⚙️ Postavke</div>
+          <div class="breadcrumb">Početna <span>›</span> Postavke</div>
+        </div>
+        <div class="section-actions">
+          <button type="button" class="btn btn-primary">💾 Spremi promjene</button>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="chart-card">
+          <h3>🌐 Opće postavke</h3>
+          <div class="form-group">
+            <label>Naziv stranice</label>
+            <input type="text" value="EX YU DATE">
+          </div>
+          <div class="form-group">
+            <label>Podnaslov</label>
+            <input type="text" value="UPOZNAVANJE BEZ GRANICA">
+          </div>
+          <div class="form-group">
+            <label>Email za kontakt</label>
+            <input type="text" value="admin@exyudate.com">
+          </div>
+          <div class="form-group">
+            <label>Default zemlja</label>
+            <select>
+              <option>Hrvatska</option>
+              <option>Bosna i Hercegovina</option>
+              <option>Srbija</option>
+            </select>
+          </div>
+        </div>
+        <div class="chart-card">
+          <h3>🔒 Sigurnost</h3>
+          <div class="form-group">
+            <label>Minimalna dob registracije</label>
+            <input type="number" value="18">
+          </div>
+          <div class="form-group">
+            <label>Max pokušaja prijave</label>
+            <input type="number" value="5">
+          </div>
+          <div class="form-group">
+            <label>Auto-blokiranje nakon prijava</label>
+            <select>
+              <option>3 prijave</option>
+              <option>5 prijava</option>
+              <option>10 prijava</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Verifikacija emaila</label>
+            <select>
+              <option>Obavezna</option>
+              <option>Neobavezna</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-card" style="margin-top:18px;">
+        <h3>💳 VIP / Pretplata</h3>
+        <div class="two-col" style="margin-bottom:0;">
+          <div>
+            <div class="form-group">
+              <label>VIP cijena (mjesečno)</label>
+              <input type="text" value="9.99 €">
+            </div>
+            <div class="form-group">
+              <label>VIP cijena (godišnje)</label>
+              <input type="text" value="79.99 €">
+            </div>
+          </div>
+          <div>
+            <div class="form-group">
+              <label>Max poruka za besplatne</label>
+              <input type="number" value="10">
+            </div>
+            <div class="form-group">
+              <label>Max prijateljstava besplatni</label>
+              <input type="number" value="20">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== POTROŠNJA I UPOZORENJA ========== -->
+    <div class="section" id="usage">
+      <div class="section-header">
+        <div>
+          <div class="section-title">📈 Potrošnja i upozorenja</div>
+          <div class="breadcrumb">Početna <span>›</span> Potrošnja i upozorenja</div>
+        </div>
+        <div class="section-actions">
+          <button type="button" class="btn btn-primary" onclick="alert('Za nadogradnju plana obratite se svom hosting/cloud provideru (npr. AWS, Vercel, Supabase, itd.) — ova stranica prikazuje trenutnu potrošnju kada je poveže se s njihovim API-jem za obračun.')">⬆️ Nadogradi plan</button>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <h3>💽 Hosting (prostor i promet)</h3>
+        <div class="usage-row">
+          <div class="usage-row-head"><span>Iskorišteno ovaj tjedan</span><span id="usageHostingPct">—</span></div>
+          <div class="usage-bar-track"><div class="usage-bar-fill" id="usageHostingBar"></div></div>
+          <div class="usage-warning" id="usageHostingWarn"></div>
+        </div>
+      </div>
+
+      <div class="chart-card" style="margin-top:18px;">
+        <h3>🗄️ Baza podataka</h3>
+        <div class="usage-row">
+          <div class="usage-row-head"><span>Iskorišteno ovaj tjedan</span><span id="usageDbPct">—</span></div>
+          <div class="usage-bar-track"><div class="usage-bar-fill" id="usageDbBar"></div></div>
+          <div class="usage-warning" id="usageDbWarn"></div>
+        </div>
+      </div>
+
+      <div class="chart-card" style="margin-top:18px;">
+        <h3>📹 Video / poruke servisi</h3>
+        <div class="usage-row">
+          <div class="usage-row-head"><span>Iskorišteno ovaj tjedan</span><span id="usageMsgPct">—</span></div>
+          <div class="usage-bar-track"><div class="usage-bar-fill" id="usageMsgBar"></div></div>
+          <div class="usage-warning" id="usageMsgWarn"></div>
+        </div>
+      </div>
+
+      <div class="chart-card" style="margin-top:18px;">
+        <h3>📊 Sažetak po servisima (po danima, zadnjih 7 dana)</h3>
+        <div class="bar-chart" id="usageDailyChart"></div>
+        <p style="color:var(--muted);font-size:12px;margin-top:14px;">
+          Spremno za spajanje na pravi hosting/cloud usage API (npr. AWS CloudWatch, Vercel Analytics).
+        </p>
+      </div>
+    </div>
+
+    <!-- ========== UPLATE I ISPLATE ========== -->
+    <div class="section" id="payments">
+      <div class="section-header">
+        <div>
+          <div class="section-title">💰 Uplate i isplate</div>
+          <div class="breadcrumb">Početna <span>›</span> Uplate i isplate</div>
+        </div>
+        <div class="section-actions">
+          <button type="button" class="btn btn-primary" onclick="alert('Izvoz će biti dostupan kada se poveže pravi platni servis (npr. Stripe).')">⬇️ Izvoz podataka</button>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <h3>💳 Pregled transakcija</h3>
+        <div class="payments-placeholder">
+          <p>Priprema za buduću integraciju platnog sustava (npr. Stripe) — trenutno nema stvarnih transakcija.</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Datum</th><th>Korisnik</th><th>Vrsta</th><th>Iznos</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px;">Nema podataka za prikaz — spremno za povezivanje s platnim servisom.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="admin-footer">
+    EX YU DATE — ADMIN PANEL v1.0 | UPOZNAVANJE BEZ GRANICA
+  </div>
+</div>
+
+<!-- MODAL: Dodaj korisnika -->
+<div class="modal-overlay" id="userModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">➕ Dodaj novog korisnika</div>
+      <button type="button" class="modal-close" onclick="closeModal('userModal')">✕</button>
+    </div>
+    <div class="form-group">
+      <label>Nadimak</label>
+      <input type="text" placeholder="Upiši nadimak...">
+    </div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" placeholder="email@example.com">
+    </div>
+    <div class="form-group">
+      <label>Zemlja</label>
+      <select>
+        <option>Hrvatska</option>
+        <option>Bosna i Hercegovina</option>
+        <option>Srbija</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Regija</label>
+      <input type="text" placeholder="npr. Grad Zagreb">
+    </div>
+    <div class="form-group">
+      <label>Uloga</label>
+      <select>
+        <option>Standard</option>
+        <option>VIP</option>
+        <option>Admin</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline" onclick="closeModal('userModal')">Odustani</button>
+      <button type="button" class="btn btn-primary">💾 Spremi korisnika</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Novi oglas -->
+<div class="modal-overlay" id="adModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📢 Novi oglas</div>
+      <button type="button" class="modal-close" onclick="closeModal('adModal')">✕</button>
+    </div>
+    <div class="form-group">
+      <label>Naslov oglasa</label>
+      <input type="text" placeholder="Upiši naslov...">
+    </div>
+    <div class="form-group">
+      <label>Sadržaj</label>
+      <textarea placeholder="Upiši sadržaj oglasa..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>Pozicija</label>
+      <select>
+        <option>Dashboard Top</option>
+        <option>Sidebar</option>
+        <option>Chat Column</option>
+        <option>Footer</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Zemlja</label>
+      <select>
+        <option>Sve zemlje</option>
+        <option>Hrvatska</option>
+        <option>Bosna i Hercegovina</option>
+        <option>Srbija</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline" onclick="closeModal('adModal')">Odustani</button>
+      <button type="button" class="btn btn-primary">💾 Objavi oglas</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Sidebar navigation
+// ======================
+// POTROŠNJA I UPOZORENJA (14) — struktura spremna za pravi API hosting/cloud providera
+// Trenutno prikazuje primjer podataka dok se ne spoji stvarni izvor.
+// ======================
+function renderUsageBar(pct, barId, pctId, warnId, label){
+  var bar = document.getElementById(barId);
+  var pctEl = document.getElementById(pctId);
+  var warnEl = document.getElementById(warnId);
+  var color = pct >= 90 ? 'red' : pct >= 80 ? 'orange' : pct >= 50 ? 'yellow' : 'green';
+  bar.style.width = Math.min(pct,100) + '%';
+  bar.className = 'usage-bar-fill ' + color;
+  pctEl.textContent = pct + '%';
+  warnEl.className = 'usage-warning';
+  if (pct >= 100) {
+    warnEl.classList.add('show','warn100');
+    warnEl.textContent = '🔴 ' + label + ' je dosegao 100% besplatnog plana! Potrebna je nadogradnja da usluga ne prestane raditi.';
+  } else if (pct >= 90) {
+    warnEl.classList.add('show','warn90');
+    warnEl.textContent = '🟠 ' + label + ' je na 90% besplatnog plana — razmislite o nadogradnji.';
+  } else if (pct >= 80) {
+    warnEl.classList.add('show','warn80');
+    warnEl.textContent = '🟡 ' + label + ' je na 80% besplatnog plana — pratite potrošnju.';
+  }
+}
+(function initUsagePanel(){
+  // PRIMJER PODATAKA — zamijeniti pravim vrijednostima iz API-ja hosting/baza/video providera
+  renderUsageBar(42, 'usageHostingBar', 'usageHostingPct', 'usageHostingWarn', 'Hosting');
+  renderUsageBar(76, 'usageDbBar', 'usageDbPct', 'usageDbWarn', 'Baza podataka');
+  renderUsageBar(88, 'usageMsgBar', 'usageMsgPct', 'usageMsgWarn', 'Video/poruke servisi');
+
+  var days = ['Pon','Uto','Sri','Čet','Pet','Sub','Ned'];
+  var exampleUsage = [30,45,38,60,55,70,88];
+  var chart = document.getElementById('usageDailyChart');
+  if (chart) {
+    chart.innerHTML = days.map(function(d,i){
+      var v = exampleUsage[i];
+      return '<div class="bar-wrap"><div class="bar" style="height:'+v+'%"><div class="bar-tooltip">'+v+'%</div></div><div class="bar-label">'+d+'</div></div>';
+    }).join('');
+  }
+})();
+
+// ======================
+// KORISNICI — STVARNO UPRAVLJANJE (18)
+// ======================
+var _cachedAdminUsers = [];
+async function renderUsersTable(filterText){
+  var tbody = document.getElementById('usersTableBody');
+  if(!tbody) return;
+  var users;
+  try { users = (await api('GET', '/admin/users')).users || []; }
+  catch(e) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px;">Greška pri učitavanju.</td></tr>'; return; }
+  _cachedAdminUsers = users;
+
+  var q = (filterText || '').toLowerCase().trim();
+  if(q){
+    users = users.filter(function(u){
+      return (u.nick||'').toLowerCase().includes(q) || (u.email||'').toLowerCase().includes(q);
+    });
+  }
+  if(users.length === 0){
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px;">Nema registriranih korisnika za prikaz.</td></tr>';
+    return;
+  }
+  var gmap = {m:'Muškarac', z:'Žena', p:'Par'};
+  var countryFlag = {hr:'🇭🇷', ba:'🇧🇦', rs:'🇷🇸'};
+  var statusLabel = {pending:'⏳ Na čekanju', approved:'', rejected:'⛔ Odbijen'};
+  tbody.innerHTML = users.map(function(u){
+    var suspended = !!u.suspended;
+    var statusHtml = suspended
+      ? '<span class="status-badge offline">⛔ Suspendiran</span>'
+      : (u.status !== 'approved'
+          ? '<span class="status-badge vip">' + statusLabel[u.status] + '</span>'
+          : '<span class="status-badge online">● Aktivan</span>');
+    var pendingBtns = u.status === 'pending'
+      ? '<button type="button" class="action-btn" title="Odobri" onclick="adminApproveUser(\'' + u.nick + '\')">✅</button>' +
+        '<button type="button" class="action-btn delete" title="Odbij" onclick="adminRejectUser(\'' + u.nick + '\')">⛔</button>'
+      : '';
+    return '<tr>' +
+      '<td><div class="user-cell"><div class="user-avatar">👤</div><div><div class="user-name">' + (u.nick||'—') + '</div><div class="user-meta">' + (u.email||'—') + '</div></div></div></td>' +
+      '<td>#' + (u.nick ? u.nick.length + Date.now().toString().slice(-3) : '—') + '</td>' +
+      '<td>' + (countryFlag[u.country]||'') + ' ' + (u.country||'—') + '</td>' +
+      '<td>' + (u.city||'—') + '</td>' +
+      '<td>' + statusHtml + '</td>' +
+      '<td><span class="status-badge">' + (gmap[u.gender]||'Korisnik') + '</span></td>' +
+      '<td>' + (u.created_at ? new Date(u.created_at).toLocaleDateString('hr-HR') : '—') + '</td>' +
+      '<td><div class="action-btns">' +
+        pendingBtns +
+        '<button type="button" class="action-btn" title="Poruka" onclick="window.location.href=\'chat.html?user=' + encodeURIComponent(u.nick) + '\'">💬</button>' +
+        '<button type="button" class="action-btn" title="' + (suspended?'Ukini suspenziju':'Suspendiraj') + '" onclick="adminToggleSuspend(\'' + u.nick + '\',' + suspended + ')">' + (suspended?'✅':'⏸️') + '</button>' +
+        '<button type="button" class="action-btn delete" title="Obriši" onclick="adminDeleteUser(\'' + u.nick + '\')">🗑️</button>' +
+      '</div></td>' +
+    '</tr>';
+  }).join('');
+}
+async function adminApproveUser(nick){
+  try { await api('POST', '/admin/users/' + encodeURIComponent(nick) + '/approve'); renderUsersTable(document.getElementById('userSearchInput').value); }
+  catch(e) { alert('❌ ' + e.message); }
+}
+async function adminRejectUser(nick){
+  if(!confirm('Odbiti registraciju korisnika "' + nick + '"?')) return;
+  try { await api('POST', '/admin/users/' + encodeURIComponent(nick) + '/reject'); renderUsersTable(document.getElementById('userSearchInput').value); }
+  catch(e) { alert('❌ ' + e.message); }
+}
+async function adminToggleSuspend(nick, currentlySuspended){
+  try {
+    await api('POST', '/admin/users/' + encodeURIComponent(nick) + '/' + (currentlySuspended ? 'unsuspend' : 'suspend'));
+    renderUsersTable(document.getElementById('userSearchInput').value);
+  } catch(e) { alert('❌ ' + e.message); }
+}
+async function adminDeleteUser(nick){
+  if(!confirm('Jeste li sigurni da želite trajno obrisati korisnika "' + nick + '"?')) return;
+  try {
+    await api('DELETE', '/users/' + encodeURIComponent(nick));
+    renderUsersTable(document.getElementById('userSearchInput').value);
+  } catch(e) { alert('❌ ' + e.message); }
+}
+function exportUsersCSV(){
+  var users = _cachedAdminUsers;
+  var header = ['Nick','Email','Telefon','Spol','Drzava','Grad','Status','Suspendiran'];
+  var rows = users.map(function(u){
+    return [u.nick, u.email, u.phone||'', u.gender||'', u.country||'', u.city||'', u.status||'', u.suspended?'DA':'NE'].join(',');
+  });
+  var csv = header.join(',') + '\n' + rows.join('\n');
+  var blob = new Blob([csv], {type:'text/csv'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = 'exyu-date-korisnici.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+async function renderPhotosTable(){
+  var tbody = document.getElementById('photosBody');
+  if(!tbody) return;
+  var data;
+  try { data = await api('GET', '/admin/media'); } catch(e) { return; }
+  var rows = (data.photos || []).map(function(p){
+    var thumb = p.data_url ? '<img src="'+p.data_url+'" style="max-height:60px;border-radius:6px;">' : '📷 (bez slike)';
+    return '<tr><td>'+p.nick+'</td><td>'+thumb+'</td><td>—</td><td>'+new Date(p.created_at).toLocaleDateString('hr-HR')+'</td><td style="color:var(--green);">'+p.privacy+'</td><td><button type="button" class="btn btn-sm btn-danger" onclick="adminDeleteMedia(\'photo\','+p.id+',this)">Obriši</button></td></tr>';
+  });
+  tbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px;">Nema slika za prikaz.</td></tr>';
+}
+async function renderVideosTable(){
+  var tbody = document.getElementById('videosBody');
+  if(!tbody) return;
+  var data;
+  try { data = await api('GET', '/admin/media'); } catch(e) { return; }
+  var rows = (data.videos || []).map(function(v){
+    return '<tr><td>'+v.nick+'</td><td>Video (placeholder)</td><td>—</td><td>'+new Date(v.created_at).toLocaleDateString('hr-HR')+'</td><td style="color:var(--green);">'+v.privacy+'</td><td><button type="button" class="btn btn-sm btn-danger" onclick="adminDeleteMedia(\'video\','+v.id+',this)">Obriši</button></td></tr>';
+  });
+  tbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px;">Nema videa za prikaz.</td></tr>';
+}
+async function adminDeleteMedia(kind, id, btn){
+  try {
+    await api('DELETE', '/admin/media/' + kind + '/' + id);
+    btn.closest('tr').remove();
+  } catch(e) { alert('❌ ' + e.message); }
+}
+async function renderProfilesTable(){
+  var tbody = document.getElementById('profilesBody');
+  if(!tbody) return;
+  var users = _cachedAdminUsers.length ? _cachedAdminUsers : (await api('GET', '/admin/users')).users || [];
+  var rows = users.map(function(u){
+    var status = u.suspended ? '<span style="color:var(--red);">Suspendiran</span>' : '<span style="color:var(--green);">Aktivan</span>';
+    return '<tr><td>'+u.nick+'</td><td>'+(u.gender==='m'?'Muškarac':u.gender==='z'?'Žena':'Par')+'</td><td>'+(u.country||'—')+'</td><td>'+(u.city||'—')+'</td><td>'+(u.email||'—')+'</td><td>'+status+'</td><td><button type="button" class="btn btn-sm btn-outline" onclick="window.open(\'profil.html?user='+u.nick+'\');">Pogledaj</button></td></tr>';
+  });
+  tbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px;">Nema profila za prikaz.</td></tr>';
+}
+async function renderAllMessagesTable(){
+  var tbody = document.getElementById('allMessagesBody');
+  if(!tbody) return;
+  var data;
+  try { data = await api('GET', '/admin/messages'); } catch(e) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px;">Greška pri učitavanju.</td></tr>';
+    return;
+  }
+  var countryFlag = {hr:'🇭🇷 Hrvatska', ba:'🇧🇦 BiH', rs:'🇷🇸 Srbija'};
+  var msgs = data.messages || [];
+  if(msgs.length === 0){
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px;">Nema poruka u sustavu.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = msgs.map(function(m){
+    var statusBadge = m.read_at ? '<span class="status-badge online">✓ Pročitano</span>' : '<span class="status-badge">⏳ Nepročitano</span>';
+    return '<tr>' +
+      '<td><b>' + m.from_nick + '</b></td>' +
+      '<td><b>' + m.to_nick + '</b></td>' +
+      '<td>' + m.body.replace(/[<>&]/g,function(c){return{'<':'&lt;','>':'&gt;','&':'&amp;'}[c];}) + '</td>' +
+      '<td>' + (countryFlag[m.country]||'—') + '</td>' +
+      '<td>' + new Date(m.created_at).toLocaleString('hr-HR') + '</td>' +
+      '<td>' + statusBadge + '</td>' +
+      '<td><div class="action-btns"><button type="button" class="action-btn delete" onclick="adminDeleteMessage(' + m.id + ')">🗑️</button></div></td>' +
+    '</tr>';
+  }).join('');
+}
+async function adminDeleteMessage(id){
+  try { await api('DELETE', '/admin/messages/' + id); renderAllMessagesTable(); }
+  catch(e) { alert('❌ ' + e.message); }
+}
+async function adminClearAllMessages(){
+  if(!confirm('Obrisati SVE poruke u sustavu? Ova radnja se ne može poništiti.')) return;
+  try { await api('DELETE', '/admin/messages'); renderAllMessagesTable(); }
+  catch(e) { alert('❌ ' + e.message); }
+}
+
+window.exyuAdminReady.then(function(){
+  renderUsersTable('').then(function(){
+    renderPhotosTable();
+    renderVideosTable();
+    renderProfilesTable();
+    renderAllMessagesTable();
+  });
+  var searchInput = document.getElementById('userSearchInput');
+  if(searchInput){
+    searchInput.addEventListener('input', function(){ renderUsersTable(this.value); });
+  }
+});
+
+const navLinks = document.querySelectorAll('.sidebar-nav a[data-section]');
+const sections = document.querySelectorAll('.section');
+const topbarTitle = document.querySelector('.topbar-title');
+const breadcrumb = document.querySelector('.breadcrumb');
+
+const sectionNames = {
+  dashboard: 'Dashboard',
+  users: 'Korisnici',
+  messages: 'Poruke',
+  photos: 'Slike',
+  videos: 'Videi',
+  profiles: 'Profili',
+  ads: 'Oglasi',
+  reports: 'Prijave',
+  settings: 'Postavke',
+  usage: 'Potrošnja i upozorenja',
+  payments: 'Uplate i isplate'
+};
+
+navLinks.forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    const target = link.dataset.section;
+    if (!target) return;
+    navLinks.forEach(l => l.classList.remove('active'));
+    link.classList.add('active');
+    sections.forEach(s => s.classList.remove('active'));
+    document.getElementById(target).classList.add('active');
+    topbarTitle.textContent = sectionNames[target];
+    breadcrumb.innerHTML = 'Početna <span>›</span> ' + sectionNames[target];
+    document.getElementById('sidebar').classList.remove('open');
+  });
+});
+
+// Burger menu
+const burger = document.getElementById('burgerBtn');
+const sidebar = document.getElementById('sidebar');
+burger.addEventListener('click', () => sidebar.classList.toggle('open'));
+
+// Modal functions
+function openModal(id) {
+  document.getElementById(id).classList.add('active');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
+}
+
+// Close modal on backdrop click
+const overlays = document.querySelectorAll('.modal-overlay');
+overlays.forEach(o => o.addEventListener('click', e => {
+  if (e.target === o) o.classList.remove('active');
+}));
+</script>
+
+<script>
+(function(){
+  /* Hover prefetch — počni učitavati stranicu čim miš prijeđe na link */
+  var prefetched = {};
+  document.addEventListener('mouseover', function(e){
+    var a = e.target.closest('a[href]');
+    if (!a) return;
+    var href = a.getAttribute('href');
+    if (!href || href[0] === '#') return;
+    if (/^(javascript|mailto|tel):/.test(href)) return;
+    if (a.target === '_blank') return;
+    if (prefetched[href]) return;
+    prefetched[href] = true;
+    var l = document.createElement('link');
+    l.rel = 'prefetch'; l.href = href;
+    document.head.appendChild(l);
+  }, { passive: true });
+
+  /* Fallback za preglednike bez View Transitions API */
+  if (!document.startViewTransition) {
+    document.addEventListener('click', function(e){
+      if (e.defaultPrevented) return;
+      var a = e.target.closest('a[href]');
+      if (!a) return;
+      var href = a.getAttribute('href');
+      if (!href || href[0] === '#') return;
+      if (/^(javascript|mailto|tel):/.test(href)) return;
+      if (a.target === '_blank') return;
+      if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      document.body.style.transition = 'opacity 0.15s linear';
+      document.body.style.opacity   = '0';
+      setTimeout(function(){ window.location.href = href; }, 155);
+    });
+  }
+
+  /* Ako view transitions JEST aktivan, ugasi body animaciju —
+     preglednik već radi crossfade, dupla animacija = trzaj */
+  if (document.startViewTransition) {
+    var s = document.createElement('style');
+    s.textContent = 'body{animation:none!important;}';
+    document.head.appendChild(s);
+  }
+})();
+</script>
+</body>
+</html>

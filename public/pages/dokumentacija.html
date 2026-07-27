@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EX YU DATE — Projektni dokument</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#1a0033;
+  --purple-900:#2d0057;
+  --purple-800:#4a0a7a;
+  --purple-700:#6b1a9e;
+  --purple-600:#7b2cbf;
+  --purple-500:#a23cff;
+  --purple-300:#c57dff;
+  --purple-100:#e9c6ff;
+  --pink:#ff6b9d;
+  --text:#e9c6ff;
+  --muted:#b8a4d4;
+  --line:rgba(162,60,255,0.45);
+  --panel:rgba(45,0,87,0.4);
+  --success:#00ff88;
+  --warn:#ffcc00;
+  --danger:#ff3366;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+  font-family:'Inter',sans-serif;
+  background:linear-gradient(135deg,#1a0033 0%,#2d0057 50%,#4a0a7a 100%);
+  color:var(--text);
+  min-height:100vh;
+  padding:18px;
+}
+a{color:var(--purple-300);text-decoration:none;cursor:pointer;transition:color .2s;}
+a:hover{color:#fff;}
+
+.app{
+  min-height:calc(100vh - 36px);
+  border:1px solid rgba(162,60,255,0.25);
+  border-radius:14px;
+  overflow:hidden;
+  background:rgba(0,0,0,0.15);
+  display:flex;
+  flex-direction:column;
+}
+
+/* HEADER */
+.top{
+  display:grid;
+  grid-template-columns: 160px 1fr 220px;
+  padding:18px 22px;
+  gap:16px;
+  align-items:start;
+  border-bottom:1px solid rgba(162,60,255,0.25);
+}
+.corner-links{display:flex;flex-direction:column;gap:6px;font-size:13px;}
+.corner-links a{color:var(--purple-300);font-size:15px;}
+.corner-links a:hover{color:#fff;}
+.title-wrap{text-align:center;}
+.title{
+  font-family:'Poppins',sans-serif;
+  font-size:44px;
+  font-weight:700;
+  letter-spacing:6px;
+  background:linear-gradient(180deg,#fff 0%,var(--purple-100) 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.title-sub{font-size:11px;color:var(--muted);letter-spacing:3px;margin-top:2px;}
+.right-of-title{display:flex;flex-direction:column;gap:8px;align-items:flex-end;font-size:13px;}
+.right-of-title a{color:var(--purple-300);font-size:15px;}
+
+/* NAV BAR */
+.nav-bar{
+  display:flex;
+  align-items:stretch;
+  border-bottom:2px solid rgba(255,45,149,0.5);
+}
+.nav-bar a{
+  display:inline-block;
+  padding:14px 22px;
+  font-weight:700;
+  letter-spacing:1.5px;
+  color:var(--muted);
+  border-right:1px solid rgba(255,45,149,0.35);
+  transition:all .2s;
+  text-transform:uppercase;
+  font-size:14px;
+  cursor:pointer;
+}
+.nav-bar a:hover{color:#fff;background:rgba(255,45,149,0.16);}
+.nav-bar a.active{
+  color:#fff;
+  background:linear-gradient(180deg,#ff2d78,#c4145a);
+  box-shadow:inset 0 -3px 0 #ffb3d9;
+  text-shadow:0 0 12px rgba(255,92,173,0.85);
+}
+
+/* MAIN CONTENT */
+.doc-content{
+  flex:1;
+  padding:28px 32px 40px;
+  max-width:1100px;
+  margin:0 auto;
+  width:100%;
+  overflow-y:auto;
+}
+
+.doc-content h1{
+  font-family:'Cormorant Garamond',serif;
+  font-size:38px;
+  font-weight:700;
+  color:#fff;
+  letter-spacing:2px;
+  margin-bottom:6px;
+  text-align:center;
+}
+.doc-content .subtitle{
+  text-align:center;
+  color:var(--muted);
+  font-size:15px;
+  letter-spacing:1.5px;
+  margin-bottom:32px;
+  padding-bottom:18px;
+  border-bottom:1px solid rgba(162,60,255,0.3);
+}
+
+.section{
+  margin-bottom:40px;
+  background:var(--panel);
+  border:1px solid rgba(162,60,255,0.35);
+  border-radius:12px;
+  padding:22px 26px;
+  backdrop-filter:blur(10px);
+}
+.section h2{
+  font-family:'Cormorant Garamond',serif;
+  font-size:26px;
+  color:var(--purple-100);
+  letter-spacing:1.5px;
+  margin-bottom:14px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.section h2 .icon{font-size:22px;}
+
+.section h3{
+  font-size:16px;
+  color:var(--purple-300);
+  margin:18px 0 8px;
+  font-weight:600;
+  letter-spacing:1px;
+}
+
+.section p, .section li{
+  font-size:14px;
+  line-height:1.75;
+  color:var(--text);
+  margin-bottom:10px;
+}
+.section ul{
+  margin-left:20px;
+  margin-bottom:12px;
+}
+.section li{margin-bottom:6px;}
+
+.section strong{color:#fff;font-weight:600;}
+
+.tag-grid{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:8px;
+}
+.tag{
+  background:rgba(162,60,255,0.2);
+  border:1px solid rgba(162,60,255,0.4);
+  border-radius:20px;
+  padding:4px 14px;
+  font-size:13px;
+  color:var(--purple-100);
+}
+
+.page-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:14px;
+  margin-top:12px;
+}
+.page-card{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(162,60,255,0.35);
+  border-radius:10px;
+  padding:16px;
+  transition:all .2s;
+}
+.page-card:hover{
+  border-color:rgba(162,60,255,0.6);
+  background:rgba(162,60,255,0.1);
+}
+.page-card .name{
+  font-weight:700;
+  color:#fff;
+  font-size:15px;
+  margin-bottom:6px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.page-card .desc{font-size:13px;color:var(--muted);line-height:1.5;}
+.page-card .file{font-size:11px;color:var(--purple-300);margin-top:8px;letter-spacing:1px;}
+
+.color-strip{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+.color-swatch{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(162,60,255,0.3);
+  border-radius:8px;
+  padding:6px 12px;
+  font-size:13px;
+}
+.color-dot{width:18px;height:18px;border-radius:50%;border:1px solid rgba(255,255,255,0.2);}
+
+.tech-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:10px;
+  margin-top:10px;
+}
+.tech-card{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(162,60,255,0.3);
+  border-radius:8px;
+  padding:12px 14px;
+  text-align:center;
+}
+.tech-card .label{font-size:12px;color:var(--muted);margin-bottom:4px;}
+.tech-card .value{font-size:14px;color:#fff;font-weight:600;}
+
+.table-wrap{
+  overflow-x:auto;
+  margin-top:12px;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:13px;
+}
+th,td{
+  padding:10px 12px;
+  text-align:left;
+  border-bottom:1px solid rgba(162,60,255,0.3);
+}
+th{
+  color:var(--purple-300);
+  font-weight:600;
+  background:rgba(162,60,255,0.1);
+}
+tr:hover td{background:rgba(162,60,255,0.05);}
+
+.footer-nav{
+  padding:14px 22px;
+  border-top:1px solid rgba(162,60,255,0.35);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:rgba(0,0,0,0.22);
+  color:var(--muted);
+  font-size:12px;
+  letter-spacing:2px;
+}
+
+@media (max-width:900px){
+  .top{grid-template-columns:1fr;text-align:center;}
+  .right-of-title{align-items:center;}
+  .nav-bar{flex-wrap:wrap;}
+  .doc-content{padding:20px 16px;}
+  .section{padding:16px 18px;}
+  .page-grid{grid-template-columns:1fr;}
+  .tech-grid{grid-template-columns:1fr 1fr;}
+}
+@media (max-width:600px){
+  .doc-content h1{font-size:28px;}
+  .section h2{font-size:22px;}
+  .tech-grid{grid-template-columns:1fr;}
+}
+
+/* ===================================================
+   EX YU DATE — ANTI-TRZANJE v3 (FINALNA VERZIJA)
+   =================================================== */
+
+/* 1. Pozadina nikad ne nestaje — nema bijelog bljeska */
+html {
+  background: linear-gradient(135deg,#1a0033 0%,#2d0057 50%,#4a0a7a 100%);
+  background-attachment: fixed;
+  overflow-y: scroll; /* scrollbar uvijek prisutan → nema layout shiftova */
+}
+
+/* 2. View Transitions API (Chrome 111+) — čista crossfade, bez pokreta */
+@view-transition {
+  navigation: auto;
+}
+::view-transition-old(root) {
+  animation: 180ms linear forwards exyu-out;
+}
+::view-transition-new(root) {
+  animation: 220ms linear forwards exyu-in;
+}
+@keyframes exyu-out { to   { opacity: 0; } }
+@keyframes exyu-in  { from { opacity: 0; } }
+
+/* 3. Fallback — isti efekt za Firefox/Safari, BEZ pokreta */
+body {
+  animation: exyu-body-in 0.22s linear both;
+}
+@keyframes exyu-body-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- TOP HEADER -->
+  <div class="top">
+    <div class="corner-links">
+      <a href="pocetna.html">« Povratak</a>
+      <a href="../index.html">Odjava</a>
+    </div>
+    <div class="title-wrap">
+      <div class="title-sub">PROJEKTNA DOKUMENTACIJA</div>
+    </div>
+    <div class="right-of-title">
+      <a href="dokumentacija.html">Dokumentacija</a>
+      <a href="admin.html">Admin ploča</a>
+    </div>
+  </div>
+
+  <!-- NAV BAR -->
+  <nav class="nav-bar">
+    <a href="pocetna.html">Početna</a>
+    <a href="hrvatska.html">Hrvatska</a>
+    <a href="bosna.html">Bosna i Hercegovina</a>
+    <a href="srbija.html">Srbija</a>
+    <a href="chat.html">Chat</a>
+    <a href="video.html">Video</a>
+    <a href="galerija.html">Galerija</a>
+    <a href="oglasnik.html">Oglasnik</a>
+    <a href="profil.html">Profil</a>
+    <a class="active" href="#" id="myFriendsNav">Moji prijatelji (<span id="myFriendsCount">0</span>)</a>
+    <div class="spacer" style="flex:1"></div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <div class="doc-content">
+    <h1>EX YU DATE</h1>
+    <div class="subtitle">Projektni dokument — v1.0 &nbsp;|&nbsp; 30. lipnja 2026.</div>
+
+    <!-- OPIS PROJEKTA -->
+    <div class="section">
+      <h2><span class="icon">💡</span> 1. Opis projekta</h2>
+      <p><strong>EX YU DATE</strong> je web aplikacija za druženje i upoznavanje (dating) namijenjena korisnicima iz regije bivše Jugoslavije (Hrvatska, Bosna i Hercegovina, Srbija). Cilj platforme je omogućiti jednostavno i sigurno upoznavanje bez granica, s fokusom na lokalnu zajednicu, regionalnu pripadnost i jednostavno korištenje.</p>
+      <h3>Ciljna skupina</h3>
+      <ul>
+        <li>Osobe od 18+ godina koje traže vezu, prijateljstvo ili druženje</li>
+        <li>Korisnici iz Hrvatske, Bosne i Hercegovine, Srbije i dijaspore</li>
+        <li>Preferencija za komunikaciju na hrvatskom/bosanskom/srpskom jeziku</li>
+      </ul>
+      <h3>Glavne karakteristike</h3>
+      <div class="tag-grid">
+        <span class="tag">🌐 Regija EX YU</span>
+        <span class="tag">💬 Chat uživo</span>
+        <span class="tag">📹 Video pozivi</span>
+        <span class="tag">📍 Filtriranje po lokaciji</span>
+        <span class="tag">🎙 Glasovna registracija</span>
+        <span class="tag">📱 Responzivni dizajn</span>
+        <span class="tag">🔒 Sigurnost</span>
+        <span class="tag">👤 Moderacija</span>
+      </div>
+    </div>
+
+    <!-- STRUKTURA STRANICA -->
+    <div class="section">
+      <h2><span class="icon">📑</span> 2. Struktura stranica</h2>
+      <p>Aplikacija se sastoji od 5 javnih stranica + 2 funkcionalne stranice + 1 admin ploča + 1 dokumentacija:</p>
+      <div class="page-grid">
+        <div class="page-card">
+          <div class="name">🚪 index.html</div>
+          <div class="desc">Stranica za prijavu i registraciju. Sadrži formular za odabir spola, starosti, nadimka, lozinke, županije/države. Podržava tekstualnu i glasovnu registraciju.</div>
+          <div class="file">index.html</div>
+        </div>
+        <div class="page-card">
+          <div class="name">🏠 Početna</div>
+          <div class="desc">Glavna stranica nakon prijave. Prikazuje 4 stupca: online korisnici, chat, galerija fotografija i popis korisnika. Sadrži navigaciju, status bar, pretragu i obavijesti.</div>
+          <div class="file">pocetna.html</div>
+        </div>
+        <div class="page-card">
+          <div class="name">🇭🇷 Hrvatska</div>
+          <div class="desc">Stranica za Hrvatsku s filtrom po županijama. Sadrži 21 županiju + Grad Zagreb. Prikazuje online korisnike, chat poruke i popis korisnika prema odabranoj županiji.</div>
+          <div class="file">hrvatska.html</div>
+        </div>
+        <div class="page-card">
+          <div class="name">🇧🇦 Bosna i Hercegovina</div>
+          <div class="desc">Stranica za Bosnu i Hercegovinu s filtrom po kantonima/regijama. Sadrži 10 kantona + Distrikt Brčko. Prikazuje online korisnike, chat poruke i popis korisnika.</div>
+          <div class="file">bosna.html</div>
+        </div>
+        <div class="page-card">
+          <div class="name">🇷🇸 Srbija</div>
+          <div class="desc">Stranica za Srbiju s filtrom po okruzima. Sadrži 25 okruga + Grad Beograd. Prikazuje online korisnike, chat poruke i popis korisnika.</div>
+          <div class="file">srbija.html</div>
+        </div>
+        <div class="page-card">
+          <div class="name">💬 Chat</div>
+          <div class="desc">Integrirana stranica za privatne razgovore između korisnika. Prikazuje popis kontakata, povijest razgovora, unos poruka, emoji i obavijesti o "tipkanju".</div>
+          <div class="file">chat.html</div>
+        </div>
+        <div class="page-card">
+          <div class="name">📹 Video pozivi</div>
+          <div class="desc">Stranica za video pozive između korisnika. Prikazuje lokalni i udaljeni video feed, kontrole poziva (mute, kamera, prekid), pozivne obavijesti i lista kontakata.</div>
+          <div class="file">video.html</div>
+        </div>
+        <div class="page-card">
+          <div class="name">🛡 Admin ploča</div>
+          <div class="desc">Administratorsko sučelje za upravljanje korisnicima, pregled statistika, moderaciju sadržaja, pregled prijava i upravljanje platformom.</div>
+          <div class="file">admin.html</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DIZAJN I STIL -->
+    <div class="section">
+      <h2><span class="icon">🎨</span> 3. Dizajn i vizualni identitet</h2>
+      <h3>Tematika</h3>
+      <p>Platforma koristi <strong>tamno-ljubičastu paletu</strong> inspiriranu noćnim druženjem, tajnovitošću i romantikom. Dizajn je elegantan, modern i fokusiran na sadržaj.</p>
+      <h3>Boje</h3>
+      <div class="color-strip">
+        <div class="color-swatch"><div class="color-dot" style="background:#1a0033"></div>#1a0033 (Pozadina)</div>
+        <div class="color-swatch"><div class="color-dot" style="background:#2d0057"></div>#2d0057 (Tamna)</div>
+        <div class="color-swatch"><div class="color-dot" style="background:#4a0a7a"></div>#4a0a7a (Ljubičasta)</div>
+        <div class="color-swatch"><div class="color-dot" style="background:#a23cff"></div>#a23cff (Svijetla)</div>
+        <div class="color-swatch"><div class="color-dot" style="background:#c57dff"></div>#c57dff (Plava)</div>
+        <div class="color-swatch"><div class="color-dot" style="background:#e9c6ff"></div>#e9c6ff (Tekst)</div>
+        <div class="color-swatch"><div class="color-dot" style="background:#ff6b9d"></div>#ff6b9d (Roza)</div>
+        <div class="color-swatch"><div class="color-dot" style="background:#22c55e"></div>#22c55e (Online)</div>
+      </div>
+      <h3>Tipografija</h3>
+      <div class="tech-grid">
+        <div class="tech-card">
+          <div class="label">Naslovi</div>
+          <div class="value">Cormorant Garamond</div>
+        </div>
+        <div class="tech-card">
+          <div class="label">Tijelo teksta</div>
+          <div class="value">Inter</div>
+        </div>
+        <div class="tech-card">
+          <div class="label">Veličina naslova</div>
+          <div class="value">44px / clamp</div>
+        </div>
+        <div class="tech-card">
+          <div class="label">Veličina teksta</div>
+          <div class="value">13–14px</div>
+        </div>
+      </div>
+      <h3>Elementi dizajna</h3>
+      <ul>
+        <li><strong>Gradient pozadina:</strong> linearni gradient od #1a0033 preko #2d0057 do #4a0a7a</li>
+        <li><strong>Okviri:</strong> zaobljeni rubovi (border-radius: 14px), prozirni paneli s pozadinom</li>
+        <li><strong>Sjene:</strong> box-shadow na karticama i gumbima, text-shadow na naslovima</li>
+        <li><strong>Animacije:</strong> glow efekt na pozadinskim elementima, tranzicije na hover</li>
+        <li><strong>Emoji ikone:</strong> profil avatari, status indikatori, dekorativni elementi</li>
+      </ul>
+    </div>
+
+    <!-- RESPONZIVNOST -->
+    <div class="section">
+      <h2><span class="icon">📱</span> 4. Responzivnost</h2>
+      <p>Aplikacija je potpuno responzivna i prilagođena za:</p>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Breakpoint</th><th>Širina</th><th>Promjene</th></tr>
+          <tr><td>Desktop</td><td>1100px+</td><td>4 stupca, puna navigacija, 3-dio zaglavlje</td></tr>
+          <tr><td>Tablet</td><td>700px – 1099px</td><td>2 stupca, umotana navigacija, prilagođeno zaglavlje</td></tr>
+          <tr><td>Mobilni</td><td>do 699px</td><td>1 stupac, vertikalno zaglavlje, horizontalni scroll za županije</td></tr>
+        </table>
+      </div>
+      <h3>Prilagodbe na mobilnim uređajima</h3>
+      <ul>
+        <li>Zaglavlje se reorganizira u jedan stupac s centriranjim elementima</li>
+        <li>Četiri stupca se spajaju u jedan vertikalni niz</li>
+        <li>Navigacija se omotava (flex-wrap) u više redova</li>
+        <li>Status bar postaje vertikalan (flex-direction: column)</li>
+        <li>Lista županija/kantona/okruga dobiva horizontalni scroll (overflow-x: auto)</li>
+        <li>Profil kartice se povećavaju za lakši dodir</li>
+      </ul>
+    </div>
+
+    <!-- INTERAKTIVNE FUNKCIJE -->
+    <div class="section">
+      <h2><span class="icon">⚡</span> 5. Interaktivne funkcije</h2>
+      <div class="page-grid">
+        <div class="page-card">
+          <div class="name">🔍 Filtriranje po lokaciji</div>
+          <div class="desc">Korisnici mogu filtrirati profile prema županiji (HR), kantonu (BiH) ili okrugu (SRB). Klik na lokaciju ažurira prikaz u stvarnom vremenu.</div>
+        </div>
+        <div class="page-card">
+          <div class="name">👤 Prikaz online korisnika</div>
+          <div class="desc">Zelena točka pokazuje tko je trenutno online. Lista se ažurira dinamički prema odabranom filteru.</div>
+        </div>
+        <div class="page-card">
+          <div class="name">💬 Chat / Poruke</div>
+          <div class="desc">Javni chat prikazuje najnovije poruke. Svaka poruka pokazuje nadimak, lokaciju i tekst. Privatni chat između korisnika.</div>
+        </div>
+        <div class="page-card">
+          <div class="name">📹 Video pozivi</div>
+          <div class="desc">WebRTC video pozivi između korisnika. Podrška za lokalni i udaljeni video feed, mute, isključivanje kamere, prekid poziva.</div>
+        </div>
+        <div class="page-card">
+          <div class="name">🎙 Glasovna registracija</div>
+          <div class="desc">Na stranici za registraciju, korisnik može koristiti mikrofon za diktiranje nadimka umjesto tipkanja.</div>
+        </div>
+        <div class="page-card">
+          <div class="name">🔎 Pretraga po nicku</div>
+          <div class="desc">Pretraga korisnika po nadimku na glavnoj stranici. Rezultati se filtriraju u stvarnom vremenu.</div>
+        </div>
+        <div class="page-card">
+          <div class="name">📨 Zahtjevi za prijateljstvom</div>
+          <div class="desc">Brojač zahtjeva za prijateljstvom prikazan u zaglavlju. Klik otvara listu zahtjeva.</div>
+        </div>
+        <div class="page-card">
+          <div class="name">📊 Admin statistike</div>
+          <div class="desc">Pregled broja korisnika, online korisnika, novih registracija današnjeg dana, prijava i aktivnosti.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NAVIGACIJA -->
+    <div class="section">
+      <h2><span class="icon">🔗</span> 6. Navigacija i povezivanje stranica</h2>
+      <p>Sve stranice imaju jedinstvenu navigacijsku traku koja omogućuje brzo prebacivanje između sekcija. Stranice su međusobno povezane na sljedeći način:</p>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Iz stranice</th><th>Prema</th><th>Tip</th></tr>
+          <tr><td>index.html (prijava)</td><td>pocetna.html</td><td>Nakon uspješne prijave</td></tr>
+          <tr><td>index.html</td><td>chat.html</td><td>Link u navigaciji</td></tr>
+          <tr><td>index.html</td><td>video.html</td><td>Link u navigaciji</td></tr>
+          <tr><td>pocetna.html</td><td>hrvatska.html, bosna.html, srbija.html</td><td>Link u navigaciji</td></tr>
+          <tr><td>hrvatska.html</td><td>pocetna.html, bosna.html, srbija.html</td><td>Link u navigaciji</td></tr>
+          <tr><td>bosna.html</td><td>pocetna.html, hrvatska.html, srbija.html</td><td>Link u navigaciji</td></tr>
+          <tr><td>srbija.html</td><td>pocetna.html, hrvatska.html, bosna.html</td><td>Link u navigaciji</td></tr>
+          <tr><td>chat.html</td><td>pocetna.html, video.html</td><td>Link u navigaciji</td></tr>
+          <tr><td>video.html</td><td>pocetna.html, chat.html</td><td>Link u navigaciji</td></tr>
+          <tr><td>Sve stranice</td><td>index.html</td><td>Odjava (corner-links)</td></tr>
+          <tr><td>Sve stranice</td><td>dokumentacija.html</td><td>Link u zaglavlju</td></tr>
+          <tr><td>Sve stranice</td><td>admin.html</td><td>Link u zaglavlju</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- TEHNIČKA SPECIFIKACIJA -->
+    <div class="section">
+      <h2><span class="icon">🛠</span> 7. Tehnička specifikacija</h2>
+      <div class="tech-grid">
+        <div class="tech-card">
+          <div class="label">Frontend</div>
+          <div class="value">HTML5, CSS3, JavaScript</div>
+        </div>
+        <div class="tech-card">
+          <div class="label">Responzivnost</div>
+          <div class="value">CSS Grid, Flexbox, Media Queries</div>
+        </div>
+        <div class="tech-card">
+          <div class="label">Tipografija</div>
+          <div class="value">Google Fonts (Inter, Cormorant Garamond)</div>
+        </div>
+        <div class="tech-card">
+          <div class="label">Video</div>
+          <div class="value">WebRTC API</div>
+        </div>
+        <div class="tech-card">
+          <div class="label">Glas</div>
+          <div class="value">Web Speech API</div>
+        </div>
+        <div class="tech-card">
+          <div class="label">Chat</div>
+          <div class="value">WebSocket / EventSource</div>
+        </div>
+        <div class="tech-card">
+          <div class="label">Ikonice</div>
+          <div class="value">Emoji (Unicode)</div>
+        </div>
+        <div class="tech-card">
+          <div class="label">Verzija</div>
+          <div class="value">v1.0</div>
+        </div>
+      </div>
+      <h3>Struktura datoteka</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Datoteka</th><th>Opis</th><th>Broj redaka</th></tr>
+          <tr><td>index.html</td><td>Prijava / registracija</td><td>~440</td></tr>
+          <tr><td>pocetna.html</td><td>Glavna stranica</td><td>~441</td></tr>
+          <tr><td>hrvatska.html</td><td>Hrvatska + županije</td><td>~476</td></tr>
+          <tr><td>bosna.html</td><td>Bosna + kantoni</td><td>~466</td></tr>
+          <tr><td>srbija.html</td><td>Srbija + okruzi</td><td>~480</td></tr>
+          <tr><td>chat.html</td><td>Chat između korisnika</td><td>~500</td></tr>
+          <tr><td>video.html</td><td>Video pozivi</td><td>~480</td></tr>
+          <tr><td>admin.html</td><td>Admin ploča</td><td>~600</td></tr>
+          <tr><td>dokumentacija.html</td><td>Projektni dokument</td><td>~500</td></tr>
+        </table>
+      </div>
+      <h3>Buduće nadogradnje</h3>
+      <ul>
+        <li>Backend integracija (Node.js / Firebase) za spremanje korisnika i poruka</li>
+        <li>Push obavijesti za nove poruke i video pozive</li>
+        <li>Dark / light mode prebacivanje</li>
+        <li>Dodavanje Slovenije, Crne Gore i Sjeverne Makedonije</li>
+        <li>Mobile aplikacija (React Native / Flutter)</li>
+        <li>AI preporuke za uparivanje korisnika</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer-nav">
+    EX YU DATE — UPOZNAVANJE BEZ GRANICA &nbsp;|&nbsp; Projektni dokument v1.0
+  </div>
+
+</div>
+<script>
+const API_BASE = '/api';
+async function api(method, path, body) {
+  const opts = { method, headers: {}, credentials: 'include' };
+  if (body) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
+  const res = await fetch(API_BASE + path, opts);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'Greška.');
+  return data;
+}
+api('GET', '/users/friends-count').then(function(fc){
+  var cnt = document.getElementById("myFriendsCount");
+  if(cnt) cnt.textContent = fc.count;
+}).catch(function(){});
+</script>
+
+<!-- OBRATI SE ADMINU + PORUKE WIDGET -->
+<style>
+.exyu-fab-wrap{position:fixed;right:16px;bottom:16px;z-index:9998;display:flex;flex-direction:column;gap:10px;align-items:flex-end;}
+.exyu-fab{background:linear-gradient(45deg,#a23cff,#c57dff);color:#fff;border:none;padding:12px 18px;border-radius:30px;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 8px 25px rgba(162,60,255,0.5);font-family:inherit;letter-spacing:.5px;}
+.exyu-fab:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(162,60,255,0.7);}
+.exyu-fab.msg{background:linear-gradient(45deg,#ff6b9d,#a23cff);}
+.exyu-fab .badge{background:#fff;color:#a23cff;border-radius:12px;padding:2px 8px;margin-left:6px;font-size:11px;font-weight:800;}
+.exyu-modal{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px);}
+.exyu-modal.on{display:flex;}
+.exyu-modal-box{background:linear-gradient(135deg,#2d0057,#4a0a7a);border:2px solid rgba(162,60,255,0.5);border-radius:20px;padding:30px;max-width:480px;width:100%;color:#e9c6ff;box-shadow:0 25px 70px rgba(0,0,0,0.7);}
+.exyu-modal-box h3{font-family:'Cormorant Garamond',serif;font-size:1.8em;color:#fff;margin-bottom:14px;letter-spacing:1px;}
+.exyu-modal-box textarea{width:100%;min-height:120px;padding:12px;border-radius:12px;border:2px solid rgba(162,60,255,0.4);background:rgba(255,255,255,0.08);color:#fff;font-family:inherit;font-size:15px;margin-bottom:14px;resize:vertical;}
+.exyu-modal-box textarea:focus{outline:none;border-color:#c57dff;}
+.exyu-modal-actions{display:flex;gap:10px;}
+.exyu-btn-send{flex:1;background:linear-gradient(45deg,#a23cff,#c57dff);color:#fff;border:none;padding:14px;border-radius:12px;font-weight:700;cursor:pointer;font-family:inherit;font-size:15px;}
+.exyu-btn-cancel{flex:1;background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(162,60,255,0.4);padding:14px;border-radius:12px;font-weight:700;cursor:pointer;font-family:inherit;font-size:15px;}
+.exyu-msg-item{background:rgba(0,0,0,0.3);border-left:3px solid #a23cff;padding:12px;border-radius:8px;margin-bottom:10px;}
+.exyu-msg-item .from{color:#c57dff;font-weight:700;font-size:13px;}
+.exyu-msg-item .txt{margin-top:6px;font-size:14px;color:#e9c6ff;}
+.exyu-msg-item .time{font-size:11px;color:#b8a4d4;margin-top:4px;}
+.exyu-empty{text-align:center;color:#b8a4d4;padding:30px;font-style:italic;}
+@media(max-width:600px){.exyu-fab{padding:10px 14px;font-size:13px;}}
+</style>
+
+<script>
+(function(){
+  /* Hover prefetch — počni učitavati stranicu čim miš prijeđe na link */
+  var prefetched = {};
+  document.addEventListener('mouseover', function(e){
+    var a = e.target.closest('a[href]');
+    if (!a) return;
+    var href = a.getAttribute('href');
+    if (!href || href[0] === '#') return;
+    if (/^(javascript|mailto|tel):/.test(href)) return;
+    if (a.target === '_blank') return;
+    if (prefetched[href]) return;
+    prefetched[href] = true;
+    var l = document.createElement('link');
+    l.rel = 'prefetch'; l.href = href;
+    document.head.appendChild(l);
+  }, { passive: true });
+
+  /* Fallback za preglednike bez View Transitions API */
+  if (!document.startViewTransition) {
+    document.addEventListener('click', function(e){
+      if (e.defaultPrevented) return;
+      var a = e.target.closest('a[href]');
+      if (!a) return;
+      var href = a.getAttribute('href');
+      if (!href || href[0] === '#') return;
+      if (/^(javascript|mailto|tel):/.test(href)) return;
+      if (a.target === '_blank') return;
+      if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      document.body.style.transition = 'opacity 0.15s linear';
+      document.body.style.opacity   = '0';
+      setTimeout(function(){ window.location.href = href; }, 155);
+    });
+  }
+
+  /* Ako view transitions JEST aktivan, ugasi body animaciju —
+     preglednik već radi crossfade, dupla animacija = trzaj */
+  if (document.startViewTransition) {
+    var s = document.createElement('style');
+    s.textContent = 'body{animation:none!important;}';
+    document.head.appendChild(s);
+  }
+})();
+</script>
+</body>
+</html>

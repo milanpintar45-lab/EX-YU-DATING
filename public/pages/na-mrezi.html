@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EX YU DATE — Na mreži</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#1a0033;--purple-900:#2d0057;--purple-800:#4a0a7a;--purple-700:#6b1a9e;
+  --purple-600:#7b2cbf;--purple-500:#a23cff;--purple-300:#c57dff;--purple-100:#e9c6ff;
+  --pink:#ff6b9d;--text:#e9c6ff;--muted:#b8a4d4;--line:rgba(162,60,255,0.45);
+  --panel:rgba(45,0,87,0.4);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+  font-family:'Inter',sans-serif;
+  background:linear-gradient(135deg,#1a0033 0%,#2d0057 50%,#4a0a7a 100%);
+  color:var(--text);min-height:100vh;padding:18px;
+}
+a{color:inherit;text-decoration:none;cursor:pointer;}
+.app{
+  min-height:calc(100vh - 36px);
+  border:1px solid rgba(162,60,255,0.25);border-radius:14px;
+  overflow:hidden;background:rgba(0,0,0,0.15);display:flex;flex-direction:column;
+}
+.top{display:grid;grid-template-columns:160px 1fr 220px;padding:18px 22px;gap:16px;align-items:start;}
+.corner-links{display:flex;flex-direction:column;gap:6px;font-size:13px;}
+.corner-links a{color:var(--purple-300);font-size:15px;}
+.corner-links a:hover{color:#fff;}
+.title-wrap{text-align:center;}
+.title{font-family:'Poppins',sans-serif;font-size:44px;font-weight:700;letter-spacing:6px;background:linear-gradient(180deg,#fff 0%,var(--purple-100) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.title-sub{font-size:11px;color:var(--muted);letter-spacing:3px;margin-top:2px;}
+.right-of-title{display:flex;flex-direction:column;gap:8px;align-items:flex-end;font-size:13px;}
+.right-of-title a{color:var(--purple-300);font-size:15px;}
+.nav-bar{display:flex;align-items:stretch;border-bottom:2px solid rgba(255,45,149,0.5);}
+.nav-bar a{display:inline-block;padding:14px 22px;font-weight:700;letter-spacing:1.5px;color:var(--muted);border-right:1px solid rgba(255,45,149,0.35);transition:all .2s;text-transform:uppercase;font-size:14px;cursor:pointer;}
+.nav-bar a:hover{color:#fff;background:rgba(255,45,149,0.16);}
+.nav-bar a.active{color:#fff;background:linear-gradient(180deg,#ff2d78,#c4145a);box-shadow:inset 0 -3px 0 #ffb3d9;text-shadow:0 0 12px rgba(255,92,173,0.85);}
+.nav-bar .spacer{flex:1;}
+.filter-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:10px 22px;border-bottom:1px solid rgba(162,60,255,0.25);background:rgba(0,0,0,0.1);}
+.filter-bar .fb-group{display:flex;align-items:center;gap:6px;}
+.filter-bar label{color:var(--muted);font-size:12px;letter-spacing:.5px;white-space:nowrap;}
+.filter-bar select,.filter-bar input{background:rgba(255,255,255,0.06);border:1px solid rgba(162,60,255,0.4);border-radius:8px;padding:6px 10px;color:#fff;font-family:inherit;font-size:13px;outline:none;}
+.filter-bar select:focus,.filter-bar input:focus{border-color:#c57dff;}
+.users-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;padding:18px 22px;flex:1;align-content:start;}
+.profile-card{background:rgba(255,255,255,0.04);border:1px solid rgba(162,60,255,0.35);border-radius:8px;padding:12px;display:flex;align-items:center;gap:12px;position:relative;flex-wrap:wrap;}
+.profile-card .avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--purple-500),var(--purple-300));flex-shrink:0;border:1px solid rgba(255,224,236,0.4);display:flex;align-items:center;justify-content:center;font-size:18px;}
+.profile-card .info{flex:1;min-width:0;}
+.profile-card .info .name{color:#ffe27a;font-weight:700;font-size:15px;text-shadow:0 0 6px rgba(255,226,122,0.5);}
+.profile-card .info .meta{color:var(--muted);font-size:11px;}
+.dot-online{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 6px #22c55e;}
+.card-actions{display:flex;gap:6px;width:100%;margin-top:8px;justify-content:flex-end;}
+.act-btn{background:rgba(255,255,255,0.08);border:1px solid rgba(162,60,255,0.35);color:#fff;border-radius:8px;width:30px;height:30px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.act-btn:hover{transform:translateY(-2px);}
+.act-like:hover{background:linear-gradient(45deg,#a23cff,#c57dff);}
+.act-pass:hover{background:rgba(255,255,255,0.2);}
+.act-report:hover{background:#f59e0b;}
+.act-block:hover{background:#ef4444;}
+.empty{text-align:center;color:var(--muted);font-style:italic;padding:30px 8px;font-size:13px;}
+.footer-nav{padding:14px 22px;border-top:1px solid rgba(162,60,255,0.35);display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,0.22);}
+.btn{background:linear-gradient(180deg,var(--purple-500),var(--purple-600));color:#fff;padding:10px 18px;border-radius:8px;font-weight:600;letter-spacing:1px;border:1px solid var(--purple-300);font-size:13px;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:8px;}
+.btn:hover{background:linear-gradient(180deg,var(--purple-600),var(--purple-700));box-shadow:0 0 14px rgba(199,155,255,0.4);}
+.current-filter{color:var(--muted);font-size:13px;letter-spacing:.5px;}
+.current-filter b{color:var(--purple-100);}
+@media(max-width:900px){
+  .top{grid-template-columns:1fr;text-align:center;}
+  .right-of-title{align-items:center;}
+}
+@media(max-width:600px){
+  body{padding:8px;}
+  .app{min-height:calc(100vh - 16px);border-radius:10px;}
+  .top{grid-template-columns:1fr;text-align:center;gap:8px;padding:12px 14px;}
+  .title{font-size:26px;letter-spacing:2px;}
+  .nav-bar{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .nav-bar a{padding:10px 12px;font-size:11px;letter-spacing:1px;border-right:none;border-bottom:1px solid rgba(162,60,255,0.2);white-space:nowrap;flex-shrink:0;}
+  .users-grid{grid-template-columns:1fr;padding:12px 14px;}
+  .filter-bar{padding:8px 14px;}
+  .footer-nav{padding:10px 14px;}
+}
+
+/* ===================================================
+   EX YU DATE — ANTI-TRZANJE v3 (FINALNA VERZIJA)
+   =================================================== */
+
+/* 1. Pozadina nikad ne nestaje — nema bijelog bljeska */
+html {
+  background: linear-gradient(135deg,#1a0033 0%,#2d0057 50%,#4a0a7a 100%);
+  background-attachment: fixed;
+  overflow-y: scroll; /* scrollbar uvijek prisutan → nema layout shiftova */
+}
+
+/* 2. View Transitions API (Chrome 111+) — čista crossfade, bez pokreta */
+@view-transition {
+  navigation: auto;
+}
+::view-transition-old(root) {
+  animation: 180ms linear forwards exyu-out;
+}
+::view-transition-new(root) {
+  animation: 220ms linear forwards exyu-in;
+}
+@keyframes exyu-out { to   { opacity: 0; } }
+@keyframes exyu-in  { from { opacity: 0; } }
+
+/* 3. Fallback — isti efekt za Firefox/Safari, BEZ pokreta */
+body {
+  animation: exyu-body-in 0.22s linear both;
+}
+@keyframes exyu-body-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div class="corner-links">
+      <a href="../index.html">Odjava</a>
+      <a href="pocetna.html">Početna</a>
+      <a href="settings.html">⚙️ Postavke</a>
+    </div>
+    <div class="title-wrap">
+      <div class="title" id="pageTitle">NA MREŽI</div>
+      <div class="title-sub" id="pageSub">Svi online korisnici</div>
+    </div>
+    <div class="right-of-title" id="rightLinks"></div>
+  </div>
+  <nav class="nav-bar">
+    <a href="#" class="active">NA MREŽI</a>
+    <a href="prosireni-chat.html" id="navChat">CHAT</a>
+    <a href="svi-korisnici.html" id="navUsers">SVI KORISNICI</a>
+    <div class="spacer"></div>
+  </nav>
+  <div class="filter-bar">
+    <div class="fb-group">
+      <label>Spol</label>
+      <select id="genderFilter"><option value="svi">Svi</option><option value="M">Muškarci</option><option value="Z">Žene</option></select>
+    </div>
+    <div class="fb-group">
+      <label>Godine</label>
+      <select id="ageFilter"><option value="svi">Sve</option><option value="18-25">18–25</option><option value="26-35">26–35</option><option value="36-45">36–45</option><option value="46-99">46+</option></select>
+    </div>
+    <div class="fb-group">
+      <label>Sortiraj</label>
+      <select id="sortFilter"><option value="ime">Ime A–Ž</option><option value="godine">Godine</option></select>
+    </div>
+    <div class="fb-group">
+      <label>Traži</label>
+      <input type="text" id="nickSearch" placeholder="Nick..." style="width:140px;">
+    </div>
+  </div>
+  <div class="users-grid" id="usersGrid"></div>
+  <div class="footer-nav">
+    <a class="btn" id="backBtn" href="hrvatska.html">← Natrag</a>
+    <div class="current-filter">Prikaz: <b id="currentFilter">—</b></div>
+  </div>
+</div>
+<script>
+const API_BASE = '/api';
+async function api(method, path, body) {
+  const opts = { method, headers: {}, credentials: 'include' };
+  if (body) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
+  const res = await fetch(API_BASE + path, opts);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'Greška.');
+  return data;
+}
+
+var params=new URLSearchParams(window.location.search);
+var COUNTRY=params.get('country')||'hr';
+var COUNTY=params.get('county')||'SVI'; // NAPOMENA: "county" (županija) trenutno se NE poklapa sa
+                                         // stvarnim podatkom "city" (grad) iz registracije - vidi
+                                         // README napomenu o geografskoj neusklađenosti. Filter po
+                                         // županiji je za sada onemogućen dok se to ne uskladi.
+var countryNames={hr:'Hrvatska',ba:'Bosna i Hercegovina',rs:'Srbija'};
+var countryPage={hr:'hrvatska.html',ba:'bosna.html',rs:'srbija.html'};
+var genderMapBack={M:'m',Z:'z',P:'p'};
+
+function escHtml(t){return String(t).replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]);});}
+
+function profileCard(p){
+  var giMap={m:'👨',z:'👩',p:'💑'};
+  var gi=giMap[p.gender]||'👤';
+  var metaText = p.city ? (p.city.charAt(0).toUpperCase()+p.city.slice(1)) : '';
+  if (p.region && p.region.toLowerCase() !== metaText.toLowerCase()) metaText += ' · ' + p.region;
+  return '<div class="profile-card"><div class="avatar">'+gi+'</div><div class="info"><div class="name"><a href="profil.html?user='+encodeURIComponent(p.nick)+'" style="color:#ffd700;text-decoration:none;font-weight:700;">'+escHtml(p.nick)+'</a>'+(p.age?', '+p.age:'')+'</div><div class="meta">'+escHtml(metaText)+'</div></div>'+(p.is_online?'<div class="dot-online" title="online"></div>':'')+'<div class="card-actions"><button type="button" class="act-btn act-like" title="Sviđa mi se">💗</button><button type="button" class="act-btn act-pass" title="Preskoči">✖</button><button type="button" class="act-btn act-report" title="Prijavi profil">🚩</button><button type="button" class="act-btn act-block" title="Blokiraj">🚫</button></div></div>';
+}
+
+async function render(){
+  var grid=document.getElementById('usersGrid');
+  grid.innerHTML='<div class="empty">Učitavam...</div>';
+
+  var gq=document.getElementById('genderFilter').value;
+  var aq=document.getElementById('ageFilter').value;
+  var nq=(document.getElementById('nickSearch').value||'').trim();
+  var sq=document.getElementById('sortFilter').value;
+
+  var qs = new URLSearchParams({ country: COUNTRY, onlineOnly: 'true' });
+  if (COUNTY !== 'SVI') qs.set('region', COUNTY);
+  if (gq !== 'svi') qs.set('gender', genderMapBack[gq] || gq);
+  if (nq) qs.set('search', nq);
+  if (sq === 'ime') qs.set('sort', 'ime');
+  if (aq !== 'svi') {
+    var pts = aq.split('-');
+    qs.set('ageMin', pts[0]);
+    qs.set('ageMax', pts[1]);
+  }
+
+  try {
+    var data = await api('GET', '/users?' + qs.toString());
+    var list = data.users || [];
+    grid.innerHTML = list.length ? list.map(profileCard).join('') : '<div class="empty">Nema korisnika online</div>';
+    var label = COUNTY==='SVI' ? countryNames[COUNTRY] : COUNTY;
+    document.getElementById('currentFilter').textContent = label + ' — ' + list.length + ' online';
+  } catch (err) {
+    grid.innerHTML = '<div class="empty">Greška pri učitavanju korisnika (jeste li prijavljeni?)</div>';
+  }
+}
+
+document.getElementById('pageTitle').textContent='NA MREŽI — '+countryNames[COUNTRY];
+document.getElementById('pageSub').textContent=COUNTY==='SVI'?'Svi online korisnici':COUNTY;
+document.getElementById('backBtn').href=countryPage[COUNTRY]||'hrvatska.html';
+document.getElementById('navChat').href='prosireni-chat.html?country='+COUNTRY+'&county='+COUNTY;
+document.getElementById('navUsers').href='svi-korisnici.html?country='+COUNTRY+'&county='+COUNTY;
+document.title='EX YU DATE — Na mreži — '+countryNames[COUNTRY];
+
+document.getElementById('genderFilter').addEventListener('change',render);
+document.getElementById('ageFilter').addEventListener('change',render);
+document.getElementById('sortFilter').addEventListener('change',render);
+document.getElementById('nickSearch').addEventListener('input',render);
+render();
+</script>
+
+<script>
+(function(){
+  /* Hover prefetch — počni učitavati stranicu čim miš prijeđe na link */
+  var prefetched = {};
+  document.addEventListener('mouseover', function(e){
+    var a = e.target.closest('a[href]');
+    if (!a) return;
+    var href = a.getAttribute('href');
+    if (!href || href[0] === '#') return;
+    if (/^(javascript|mailto|tel):/.test(href)) return;
+    if (a.target === '_blank') return;
+    if (prefetched[href]) return;
+    prefetched[href] = true;
+    var l = document.createElement('link');
+    l.rel = 'prefetch'; l.href = href;
+    document.head.appendChild(l);
+  }, { passive: true });
+
+  /* Fallback za preglednike bez View Transitions API */
+  if (!document.startViewTransition) {
+    document.addEventListener('click', function(e){
+      if (e.defaultPrevented) return;
+      var a = e.target.closest('a[href]');
+      if (!a) return;
+      var href = a.getAttribute('href');
+      if (!href || href[0] === '#') return;
+      if (/^(javascript|mailto|tel):/.test(href)) return;
+      if (a.target === '_blank') return;
+      if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      document.body.style.transition = 'opacity 0.15s linear';
+      document.body.style.opacity   = '0';
+      setTimeout(function(){ window.location.href = href; }, 155);
+    });
+  }
+
+  /* Ako view transitions JEST aktivan, ugasi body animaciju —
+     preglednik već radi crossfade, dupla animacija = trzaj */
+  if (document.startViewTransition) {
+    var s = document.createElement('style');
+    s.textContent = 'body{animation:none!important;}';
+    document.head.appendChild(s);
+  }
+})();
+</script>
+</body>
+</html>

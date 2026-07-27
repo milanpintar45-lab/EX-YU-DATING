@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EX YU DATE — Naplata</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#1a0033;
+  --purple-900:#2d0057;
+  --purple-800:#4a0a7a;
+  --purple-700:#6b1a9e;
+  --purple-600:#7b2cbf;
+  --purple-500:#a23cff;
+  --purple-300:#c57dff;
+  --purple-100:#e9c6ff;
+  --panel:rgba(255,255,255,0.04);
+  --muted:#b8a4d4;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{font-family:'Inter',sans-serif;}
+body{
+  background:linear-gradient(135deg,#1a0033 0%,#2d0057 50%,#4a0a7a 100%);
+  color:var(--purple-100);min-height:100vh;
+}
+.app{max-width:900px;margin:0 auto;padding:24px;}
+.top-links{display:flex;justify-content:space-between;font-size:13px;margin-bottom:20px;}
+.top-links a{color:var(--purple-300);}
+.top-links a:hover{color:#fff;}
+h1{
+  font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:700;color:#fff;
+  letter-spacing:1px;margin-bottom:6px;
+}
+.subtitle{color:var(--muted);font-size:13px;margin-bottom:28px;}
+.card{
+  background:var(--panel);border:1px solid rgba(162,60,255,0.3);border-radius:16px;
+  padding:24px;margin-bottom:22px;
+}
+.card h3{font-family:'Cormorant Garamond',serif;font-size:22px;color:#fff;margin-bottom:6px;}
+.card p.desc{color:var(--muted);font-size:13px;margin-bottom:16px;}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;}
+.stat-box{
+  background:var(--panel);border:1px solid rgba(162,60,255,0.3);border-radius:12px;
+  padding:18px;text-align:center;
+}
+.stat-box .num{font-size:28px;font-weight:800;color:#fff;font-family:'Poppins',sans-serif;}
+.stat-box .lbl{font-size:12px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:4px;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th,td{padding:10px;text-align:left;border-bottom:1px solid rgba(162,60,255,0.15);}
+th{color:var(--purple-300);font-weight:700;letter-spacing:.5px;text-transform:uppercase;font-size:11px;}
+.empty-row{text-align:center;color:var(--muted);padding:30px;font-style:italic;}
+.access-denied{text-align:center;padding:80px 20px;}
+.access-denied h2{font-family:'Cormorant Garamond',serif;font-size:32px;color:#fff;margin-bottom:10px;}
+.access-denied p{color:var(--muted);}
+.access-denied a{color:var(--purple-300);display:inline-block;margin-top:16px;}
+</style>
+</head>
+<body>
+
+<div class="app" id="appRoot" style="display:none;">
+  <div class="top-links">
+    <a href="pocetna.html">« Povratak na Početnu</a>
+    <a href="admin.html">🛠️ Admin panel</a>
+  </div>
+  <h1>💰 Naplata</h1>
+  <div class="subtitle">Vidljivo isključivo administratoru</div>
+
+  <div class="stats-row">
+    <div class="stat-box"><div class="num" id="statMonthRevenue">0 €</div><div class="lbl">Prihod ovaj mjesec</div></div>
+    <div class="stat-box"><div class="num" id="statActiveSubs">0</div><div class="lbl">Aktivnih pretplata</div></div>
+    <div class="stat-box"><div class="num" id="statTotalRevenue">0 €</div><div class="lbl">Ukupan prihod</div></div>
+  </div>
+
+  <div class="card" id="stripeStatusCard">
+    <h3 id="stripeStatusTitle">⏳ Provjeravam status naplate...</h3>
+    <p class="desc" id="stripeStatusDesc"></p>
+  </div>
+
+  <div class="card">
+    <h3>Pretplate i uplate</h3>
+    <p class="desc">Prikazuje stvarne podatke iz baze — trenutno prazno jer platforma još ne naplaćuje korisnicima. Čim se aktivira Stripe (vidi gore), stvarne uplate će se ovdje pojaviti automatski.</p>
+    <table>
+      <thead>
+        <tr><th>Korisnik</th><th>Iznos</th><th>Opis</th><th>Datum</th><th>Status</th></tr>
+      </thead>
+      <tbody id="paymentsBody">
+        <tr><td colspan="5" class="empty-row">Učitavam...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Planovi pretplate</h3>
+    <p class="desc">Planovi koje admin definira (npr. "VIP mjesečno" za 9.99 €). Kad dodaš plan ovdje i poveže se sa stvarnim Stripe Price ID-om (vidi src/services/payments.js), korisnici ga mogu kupiti.</p>
+    <table>
+      <thead>
+        <tr><th>Naziv</th><th>Cijena</th><th>Interval</th><th>Status</th><th></th></tr>
+      </thead>
+      <tbody id="plansBody">
+        <tr><td colspan="5" class="empty-row">Učitavam...</td></tr>
+      </tbody>
+    </table>
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <input type="text" id="planName" placeholder="Naziv plana (npr. VIP mjesečno)" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(162,60,255,0.4);background:rgba(255,255,255,0.06);color:#fff;">
+      <input type="number" id="planPrice" placeholder="Cijena (npr. 9.99)" step="0.01" style="width:140px;padding:10px;border-radius:8px;border:1px solid rgba(162,60,255,0.4);background:rgba(255,255,255,0.06);color:#fff;">
+      <select id="planInterval" style="padding:10px;border-radius:8px;border:1px solid rgba(162,60,255,0.4);background:rgba(255,255,255,0.06);color:#fff;">
+        <option value="month">Mjesečno</option>
+        <option value="year">Godišnje</option>
+      </select>
+      <button type="button" onclick="addPlan()" style="background:linear-gradient(45deg,#a23cff,#c57dff);color:#fff;border:none;padding:10px 20px;border-radius:8px;font-weight:700;cursor:pointer;">+ Dodaj</button>
+    </div>
+  </div>
+</div>
+
+<div class="access-denied" id="accessDenied" style="display:none;">
+  <h2>🚫 Nemate pristup ovoj stranici</h2>
+  <p>Ova stranica je vidljiva isključivo administratoru.</p>
+  <a href="pocetna.html">« Povratak na Početnu</a>
+</div>
+
+<script>
+const API_BASE = '/api';
+async function api(method, path, body) {
+  const opts = { method, headers: {}, credentials: 'include' };
+  if (body) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
+  const res = await fetch(API_BASE + path, opts);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'Greška.');
+  return data;
+}
+
+(async function(){
+  let me = { loggedIn: false };
+  try { me = await api('GET', '/auth/me'); } catch(e){}
+
+  if (!me.loggedIn || !me.isAdmin) {
+    document.getElementById('accessDenied').style.display = 'block';
+    return;
+  }
+  document.getElementById('appRoot').style.display = 'block';
+
+  function fmtMoney(cents, currency){
+    return (cents / 100).toFixed(2) + ' ' + (currency === 'EUR' ? '€' : currency);
+  }
+
+  async function loadStatus(){
+    try {
+      var data = await api('GET', '/naplata/status');
+      var title = document.getElementById('stripeStatusTitle');
+      var desc = document.getElementById('stripeStatusDesc');
+      if (data.stripeEnabled) {
+        title.textContent = '✅ Naplata je aktivirana';
+        desc.textContent = 'Stripe je povezan i spreman za primanje uplata.';
+      } else {
+        title.textContent = '⏳ Naplata još nije aktivirana';
+        desc.textContent = 'Nema STRIPE_SECRET_KEY u postavkama servera. Sve ispod (baza, API, tablice) je već spremno - samo treba dodati Stripe ključ kad se odlučiš. Upute su u src/services/payments.js.';
+      }
+    } catch(e){}
+  }
+
+  async function loadStats(){
+    try {
+      var s = await api('GET', '/naplata/stats');
+      document.getElementById('statMonthRevenue').textContent = fmtMoney(s.monthRevenueCents, 'EUR');
+      document.getElementById('statActiveSubs').textContent = s.activeSubscriptions;
+      document.getElementById('statTotalRevenue').textContent = fmtMoney(s.totalRevenueCents, 'EUR');
+    } catch(e){}
+  }
+
+  async function loadPayments(){
+    var tbody = document.getElementById('paymentsBody');
+    try {
+      var data = await api('GET', '/naplata/payments');
+      var payments = data.payments || [];
+      tbody.innerHTML = payments.length ? payments.map(function(p){
+        return '<tr><td>' + (p.nick || '—') + '</td><td>' + fmtMoney(p.amount_cents, p.currency) + '</td>' +
+          '<td>' + (p.description || '—') + '</td><td>' + new Date(p.created_at).toLocaleString('hr-HR') + '</td>' +
+          '<td>' + p.status + '</td></tr>';
+      }).join('') : '<tr><td colspan="5" class="empty-row">Nema uplata za prikaz.</td></tr>';
+    } catch(e) {
+      tbody.innerHTML = '<tr><td colspan="5" class="empty-row">Greška pri učitavanju.</td></tr>';
+    }
+  }
+
+  async function loadPlans(){
+    var tbody = document.getElementById('plansBody');
+    try {
+      var data = await api('GET', '/naplata/plans');
+      var plans = data.plans || [];
+      tbody.innerHTML = plans.length ? plans.map(function(p){
+        return '<tr><td>' + p.name + '</td><td>' + fmtMoney(p.price_cents, p.currency) + '</td>' +
+          '<td>' + (p.interval === 'month' ? 'Mjesečno' : 'Godišnje') + '</td>' +
+          '<td>' + (p.active ? '✅ Aktivan' : '⏸️ Neaktivan') + '</td>' +
+          '<td><button type="button" onclick="deletePlan(' + p.id + ')" style="background:rgba(239,68,68,0.2);color:#ff8080;border:1px solid #ef4444;padding:6px 12px;border-radius:6px;cursor:pointer;">Obriši</button></td></tr>';
+      }).join('') : '<tr><td colspan="5" class="empty-row">Nema definiranih planova.</td></tr>';
+    } catch(e) {
+      tbody.innerHTML = '<tr><td colspan="5" class="empty-row">Greška pri učitavanju.</td></tr>';
+    }
+  }
+
+  window.addPlan = async function(){
+    var name = document.getElementById('planName').value.trim();
+    var price = parseFloat(document.getElementById('planPrice').value);
+    var interval = document.getElementById('planInterval').value;
+    if (!name || !price || price <= 0) { alert('Upišite naziv i ispravnu cijenu.'); return; }
+    try {
+      await api('POST', '/naplata/plans', { name: name, priceCents: Math.round(price * 100), currency: 'EUR', interval: interval });
+      document.getElementById('planName').value = '';
+      document.getElementById('planPrice').value = '';
+      loadPlans();
+    } catch(e) { alert('❌ ' + e.message); }
+  };
+  window.deletePlan = async function(id){
+    if (!confirm('Obrisati ovaj plan?')) return;
+    try { await api('DELETE', '/naplata/plans/' + id); loadPlans(); }
+    catch(e) { alert('❌ ' + e.message); }
+  };
+
+  loadStatus();
+  loadStats();
+  loadPayments();
+  loadPlans();
+})();
+</script>
+
+</body>
+</html>

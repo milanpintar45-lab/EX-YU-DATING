@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EX YU DATE — Uvjeti korištenja</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#1a0033;
+  --purple-900:#2d0057;
+  --purple-800:#4a0a7a;
+  --purple-500:#a23cff;
+  --purple-300:#c57dff;
+  --text:#e9c6ff;
+  --line:rgba(162,60,255,0.45);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+  font-family:'Inter',sans-serif;
+  background:linear-gradient(135deg,#1a0033 0%,#2d0057 50%,#4a0a7a 100%);
+  color:var(--text);
+  min-height:100vh;
+  padding:18px;
+}
+a{color:var(--purple-300);text-decoration:none;}
+a:hover{color:#fff;}
+.app{
+  max-width:900px;margin:0 auto;
+  border:1px solid rgba(162,60,255,0.25);
+  border-radius:14px;
+  background:rgba(0,0,0,0.15);
+  padding:34px 30px;
+}
+.title{font-family:'Cormorant Garamond',serif;font-size:2em;color:#fff;margin-bottom:6px;}
+.subtitle{color:var(--purple-300);margin-bottom:24px;font-size:0.95em;}
+h2{font-family:'Cormorant Garamond',serif;font-size:1.4em;color:#fff;margin:26px 0 10px;}
+p, li{line-height:1.7;margin-bottom:10px;font-size:0.98em;}
+ul{padding-left:22px;margin-bottom:12px;}
+.back{display:inline-block;margin-bottom:18px;font-size:0.9em;}
+
+/* ===================================================
+   EX YU DATE — ANTI-TRZANJE v3 (FINALNA VERZIJA)
+   =================================================== */
+
+/* 1. Pozadina nikad ne nestaje — nema bijelog bljeska */
+html {
+  background: linear-gradient(135deg,#1a0033 0%,#2d0057 50%,#4a0a7a 100%);
+  background-attachment: fixed;
+  overflow-y: scroll; /* scrollbar uvijek prisutan → nema layout shiftova */
+}
+
+/* 2. View Transitions API (Chrome 111+) — čista crossfade, bez pokreta */
+@view-transition {
+  navigation: auto;
+}
+::view-transition-old(root) {
+  animation: 180ms linear forwards exyu-out;
+}
+::view-transition-new(root) {
+  animation: 220ms linear forwards exyu-in;
+}
+@keyframes exyu-out { to   { opacity: 0; } }
+@keyframes exyu-in  { from { opacity: 0; } }
+
+/* 3. Fallback — isti efekt za Firefox/Safari, BEZ pokreta */
+body {
+  animation: exyu-body-in 0.22s linear both;
+}
+@keyframes exyu-body-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@media(max-width:600px){
+  body{padding:10px;}
+  .app{padding:22px 14px;border-radius:10px;}
+  .title{font-size:1.6em;}
+  h2{font-size:1.2em;margin:18px 0 8px;}
+  p,li{font-size:0.95em;}
+  ul{padding-left:16px;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <a class="back" href="../index.html">← Natrag na registraciju</a>
+  <div class="title">Uvjeti korištenja</div>
+  <div class="subtitle">EX YU DATE — Upoznavanje bez granica</div>
+
+  <h2>1. Prihvaćanje uvjeta</h2>
+  <p>Korištenjem platforme EX YU DATE ("Platforma") potvrđujete da ste pročitali, razumjeli i prihvatili ove Uvjete korištenja u cijelosti. Ako se ne slažete s bilo kojim dijelom ovih uvjeta, molimo vas da ne koristite Platformu.</p>
+
+  <h2>2. Dobna granica</h2>
+  <p>Platforma je namijenjena isključivo osobama starijim od 18 godina. Registracijom potvrđujete da imate navršenih 18 godina. Ako se utvrdi da korisnik ne ispunjava ovaj uvjet, njegov profil bit će trajno uklonjen.</p>
+
+  <h2>3. Registracija i provjera profila</h2>
+  <p>Svi novi profili prolaze proces provjere prije nego što postanu vidljivi drugim korisnicima. Cilj provjere je smanjenje broja lažnih profila i povećanje sigurnosti zajednice. Provjera može uključivati glasovnu potvrdu identiteta, potvrdu email adrese i/ili potvrdu broja mobitela putem SMS koda.</p>
+
+  <h2>4. Sadržaj profila</h2>
+  <ul>
+    <li>Na Platformi su dopuštene različite vrste slika i videa (selfiji, portreti, grupne fotografije, umjetničke obrade i drugi video materijali), uključujući sadržaj eksplicitne prirode.</li>
+    <li>Korisnik se mora predstavljati istinito. Zabranjeno je korištenje tuđih fotografija, deepfake sadržaja ili bilo kojeg materijala koji dovodi druge korisnike u zabludu o identitetu korisnika.</li>
+    <li>Korisnik je isključivo odgovoran za sav sadržaj koji objavljuje (slike, video, tekst).</li>
+  </ul>
+
+  <h2>5. Nulta tolerancija na sadržaj koji uključuje maloljetne osobe</h2>
+  <p>Platforma ima nultu toleranciju prema bilo kakvom sadržaju koji uključuje, prikazuje ili implicira maloljetne osobe, u bilo kojem obliku ili kontekstu. Takav sadržaj i pripadajući račun bit će odmah i trajno uklonjeni bez prethodne najave, a slučaj će, gdje je to zakonski primjenjivo, biti prijavljen nadležnim tijelima za provedbu zakona. Svaki korisnik dužan je odmah prijaviti takav sadržaj administratorima Platforme.</p>
+
+  <h2>6. Odgovornost korisnika</h2>
+  <p>Korisnik snosi punu odgovornost za interakcije s drugim korisnicima Platforme, uključujući, ali ne ograničavajući se na, dopisivanje, video pozive, razmjenu privatnih podataka i sastanke uživo. EX YU DATE ne posreduje niti jamči za ponašanje korisnika izvan same Platforme.</p>
+
+  <h2>7. Ograničenje odgovornosti</h2>
+  <p>EX YU DATE ne snosi odgovornost za lažne profile, netočne informacije koje su unijeli korisnici, ili zlouporabu osobnih podataka od strane trećih osoba. Platforma ulaže razumne napore u sprječavanje zlouporabe, no ne može jamčiti apsolutnu točnost svih podataka na profilima.</p>
+
+  <h2>8. Moderacija sadržaja</h2>
+  <p>Administratori Platforme zadržavaju pravo pregleda, moderacije i uklanjanja bilo kojeg sadržaja koji krši ove Uvjete, Pravila zajednice ili važeće zakone, bez prethodne najave. Administratori također zadržavaju pravo suspenzije ili trajnog ukidanja korisničkog računa u slučaju kršenja ovih Uvjeta.</p>
+
+  <h2>9. Prekid, pauza i brisanje računa</h2>
+  <p>Korisnik može u bilo kojem trenutku, putem postavki računa, privremeno pauzirati svoj profil (profil postaje skriven, podaci ostaju sačuvani do povratka) ili trajno obrisati svoj račun (svi osobni podaci i sadržaj se trajno uklanjaju). EX YU DATE zadržava pravo suspendirati ili ukinuti račun korisnika koji krši ove Uvjete, Pravila zajednice ili važeće zakone, uz ili bez prethodne najave, ovisno o ozbiljnosti kršenja.</p>
+
+  <h2>10. Mjerodavno pravo i rješavanje sporova</h2>
+  <p>Ovi Uvjeti tumače se u skladu sa zakonima zemlje sjedišta pružatelja usluge Platforme <b>[UPISATI: npr. Republike Hrvatske]</b>. Svaki spor koji proizlazi iz korištenja Platforme rješavat će se pred nadležnim sudom prema sjedištu pružatelja usluge, osim ako važeći propisi o zaštiti potrošača ne određuju drugačije. <i>(Napomena vlasniku platforme: potrebno je odrediti stvarnu zemlju sjedišta i po potrebi konzultirati pravnika s obzirom da platforma posluje u tri različite jurisdikcije - HR/BA/RS.)</i></p>
+
+  <h2>11. Izmjene uvjeta</h2>
+  <p>EX YU DATE zadržava pravo izmjene ovih Uvjeta korištenja u bilo kojem trenutku. Nastavak korištenja Platforme nakon objave izmjena smatra se prihvaćanjem novih uvjeta.</p>
+
+  <h2>12. Kontakt</h2>
+  <p>Za sva pitanja vezana uz ove Uvjete korištenja, možete nas kontaktirati putem: exyu.upoznavanje@gmail.com</p>
+</div>
+<script>
+(function(){
+  /* Hover prefetch — počni učitavati stranicu čim miš prijeđe na link */
+  var prefetched = {};
+  document.addEventListener('mouseover', function(e){
+    var a = e.target.closest('a[href]');
+    if (!a) return;
+    var href = a.getAttribute('href');
+    if (!href || href[0] === '#') return;
+    if (/^(javascript|mailto|tel):/.test(href)) return;
+    if (a.target === '_blank') return;
+    if (prefetched[href]) return;
+    prefetched[href] = true;
+    var l = document.createElement('link');
+    l.rel = 'prefetch'; l.href = href;
+    document.head.appendChild(l);
+  }, { passive: true });
+
+  /* Fallback za preglednike bez View Transitions API */
+  if (!document.startViewTransition) {
+    document.addEventListener('click', function(e){
+      if (e.defaultPrevented) return;
+      var a = e.target.closest('a[href]');
+      if (!a) return;
+      var href = a.getAttribute('href');
+      if (!href || href[0] === '#') return;
+      if (/^(javascript|mailto|tel):/.test(href)) return;
+      if (a.target === '_blank') return;
+      if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      document.body.style.transition = 'opacity 0.15s linear';
+      document.body.style.opacity   = '0';
+      setTimeout(function(){ window.location.href = href; }, 155);
+    });
+  }
+
+  /* Ako view transitions JEST aktivan, ugasi body animaciju —
+     preglednik već radi crossfade, dupla animacija = trzaj */
+  if (document.startViewTransition) {
+    var s = document.createElement('style');
+    s.textContent = 'body{animation:none!important;}';
+    document.head.appendChild(s);
+  }
+})();
+</script>
+</body>
+</html>

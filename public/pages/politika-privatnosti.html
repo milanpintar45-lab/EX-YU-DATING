@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EX YU DATE — Politika privatnosti</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --purple-300:#c57dff;
+  --text:#e9c6ff;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+  font-family:'Inter',sans-serif;
+  background:linear-gradient(135deg,#1a0033 0%,#2d0057 50%,#4a0a7a 100%);
+  color:var(--text);
+  min-height:100vh;
+  padding:18px;
+}
+a{color:var(--purple-300);text-decoration:none;}
+a:hover{color:#fff;}
+.app{
+  max-width:900px;margin:0 auto;
+  border:1px solid rgba(162,60,255,0.25);
+  border-radius:14px;
+  background:rgba(0,0,0,0.15);
+  padding:34px 30px;
+}
+.title{font-family:'Cormorant Garamond',serif;font-size:2em;color:#fff;margin-bottom:6px;}
+.subtitle{color:var(--purple-300);margin-bottom:24px;font-size:0.95em;}
+h2{font-family:'Cormorant Garamond',serif;font-size:1.4em;color:#fff;margin:26px 0 10px;}
+p, li{line-height:1.7;margin-bottom:10px;font-size:0.98em;}
+ul{padding-left:22px;margin-bottom:12px;}
+.back{display:inline-block;margin-bottom:18px;font-size:0.9em;}
+
+/* ===================================================
+   EX YU DATE — ANTI-TRZANJE v3 (FINALNA VERZIJA)
+   =================================================== */
+
+/* 1. Pozadina nikad ne nestaje — nema bijelog bljeska */
+html {
+  background: linear-gradient(135deg,#1a0033 0%,#2d0057 50%,#4a0a7a 100%);
+  background-attachment: fixed;
+  overflow-y: scroll; /* scrollbar uvijek prisutan → nema layout shiftova */
+}
+
+/* 2. View Transitions API (Chrome 111+) — čista crossfade, bez pokreta */
+@view-transition {
+  navigation: auto;
+}
+::view-transition-old(root) {
+  animation: 180ms linear forwards exyu-out;
+}
+::view-transition-new(root) {
+  animation: 220ms linear forwards exyu-in;
+}
+@keyframes exyu-out { to   { opacity: 0; } }
+@keyframes exyu-in  { from { opacity: 0; } }
+
+/* 3. Fallback — isti efekt za Firefox/Safari, BEZ pokreta */
+body {
+  animation: exyu-body-in 0.22s linear both;
+}
+@keyframes exyu-body-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@media(max-width:600px){
+  body{padding:10px;}
+  .app{padding:22px 14px;border-radius:10px;}
+  .title{font-size:1.6em;}
+  h2{font-size:1.2em;margin:18px 0 8px;}
+  p,li{font-size:0.95em;}
+  ul{padding-left:16px;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <a class="back" href="../index.html">← Natrag na registraciju</a>
+  <div class="title">Politika privatnosti</div>
+  <div class="subtitle">EX YU DATE — Upoznavanje bez granica</div>
+
+  <h2>1. Voditelj obrade podataka</h2>
+  <p>Za sva pitanja vezana uz obradu osobnih podataka na platformi EX YU DATE možete nas kontaktirati na: <b>exyu.upoznavanje@gmail.com</b>.</p>
+
+  <h2>2. Koje podatke prikupljamo</h2>
+  <p>Prilikom registracije prikupljamo: nadimak (nick), email adresu, broj mobitela (radi SMS potvrde i oporavka lozinke), lozinku (pohranjenu isključivo u hashiranom obliku), datum rođenja (radi provjere punoljetnosti), spol, državu i grad/regiju, te podatke koje sami dodate na svoj profil (slike, video, opis, osobna poruka).</p>
+
+  <h2>3. Pravni temelj obrade</h2>
+  <p>Podatke obrađujemo na temelju: (a) vaše privole dane prilikom registracije, (b) izvršenja ugovora (pružanja usluge Platforme koju ste zatražili), i (c) našeg legitimnog interesa za sigurnost zajednice i sprječavanje zlouporabe (npr. moderacija, sprječavanje lažnih profila).</p>
+
+  <h2>4. Svrha korištenja podataka</h2>
+  <p>Vaši podaci koriste se isključivo u svrhu funkcioniranja Platforme: prijave i autentifikacije, prikaza vašeg profila drugim korisnicima, filtriranja korisnika po regiji, slanja sigurnosnih kodova (email/SMS) te komunikacije vezane uz vaš nalog.</p>
+
+  <h2>5. Rok čuvanja podataka</h2>
+  <p>Podatke čuvamo dok god je vaš račun aktivan. Ako pauzirate račun, podaci ostaju sačuvani do vašeg povratka. Ako trajno obrišete račun, osobni podaci (email, telefon, sadržaj profila) brišu se iz sustava odmah, osim podataka koje smo zakonski obavezni čuvati dulje (npr. u slučaju aktivne prijave, spora ili zakonske obveze).</p>
+
+  <h2>6. Kolačići (cookies)</h2>
+  <p>Platforma koristi isključivo tehnički nužan kolačić za prijavu (sesijski, httpOnly) koji omogućuje da ostanete prijavljeni. Ovaj kolačić ne koristimo za praćenje ili oglašavanje, pa prema važećim propisima ne zahtijeva prethodnu privolu, no ovime vas o njemu transparentno obavještavamo.</p>
+
+  <h2>7. Vidljivost profila</h2>
+  <p>Registracijom pristajete da vaš profil, uključujući objavljene slike, video i osnovne podatke, bude javno vidljiv drugim registriranim korisnicima Platforme, osim ako u postavkama ograničite vidljivost samo na matcheve.</p>
+
+  <h2>8. Sigurnosne mjere</h2>
+  <p>Koristimo glasovnu provjeru, potvrdu email adrese, potvrdu broja mobitela i provjeru datuma rođenja kao mjere za smanjenje broja lažnih profila i maloljetnih korisnika. Lozinke se čuvaju isključivo u hashiranom obliku (bcrypt). Unatoč tome, ne možemo jamčiti apsolutnu točnost podataka koje unose drugi korisnici.</p>
+
+  <h2>9. Dijeljenje podataka s trećim stranama i prijenos izvan zemlje</h2>
+  <p>Ne prodajemo niti iznajmljujemo vaše osobne podatke trećim stranama. Podaci se ne dijele izvan Platforme, osim kada je to zakonski obavezno. Ako se podaci obrađuju putem poslužitelja izvan vaše zemlje (npr. hosting u EU/EEA ili SAD-u), takav prijenos vršimo isključivo uz odgovarajuće zaštitne mjere u skladu s važećim propisima o zaštiti podataka.</p>
+
+  <h2>10. Pristup administratora</h2>
+  <p>Administratori Platforme mogu pristupiti podacima i sadržaju profila, uključujući privatne poruke, u svrhu moderacije, provjere profila, istrage prijava i osiguravanja poštivanja Uvjeta korištenja i Pravila zajednice.</p>
+
+  <h2>11. Vaša prava</h2>
+  <p>U skladu s važećim propisima o zaštiti podataka imate pravo na: uvid u svoje podatke, ispravak netočnih podataka, brisanje podataka ("pravo na zaborav"), ograničenje obrade, prenosivost podataka, te prigovor na obradu temeljenu na legitimnom interesu. Ova prava možete ostvariti izravno kroz postavke računa (izvoz podataka, brisanje računa) ili obraćanjem administratorima Platforme. Ako smatrate da su vaša prava povrijeđena, imate pravo podnijeti pritužbu nadležnom tijelu za zaštitu osobnih podataka u svojoj zemlji (npr. Agenciji za zaštitu osobnih podataka u Hrvatskoj).</p>
+
+  <h2>12. Maloljetne osobe</h2>
+  <p>Platforma je namijenjena isključivo osobama starijim od 18 godina. Ne prikupljamo svjesno podatke maloljetnih osoba. Ako saznamo da je maloljetna osoba otvorila račun, taj račun i pripadajući podaci bit će odmah uklonjeni.</p>
+
+  <h2>13. Kontakt</h2>
+  <p>Za pitanja vezana uz privatnost podataka: exyu.upoznavanje@gmail.com</p>
+</div>
+<script>
+(function(){
+  /* Hover prefetch — počni učitavati stranicu čim miš prijeđe na link */
+  var prefetched = {};
+  document.addEventListener('mouseover', function(e){
+    var a = e.target.closest('a[href]');
+    if (!a) return;
+    var href = a.getAttribute('href');
+    if (!href || href[0] === '#') return;
+    if (/^(javascript|mailto|tel):/.test(href)) return;
+    if (a.target === '_blank') return;
+    if (prefetched[href]) return;
+    prefetched[href] = true;
+    var l = document.createElement('link');
+    l.rel = 'prefetch'; l.href = href;
+    document.head.appendChild(l);
+  }, { passive: true });
+
+  /* Fallback za preglednike bez View Transitions API */
+  if (!document.startViewTransition) {
+    document.addEventListener('click', function(e){
+      if (e.defaultPrevented) return;
+      var a = e.target.closest('a[href]');
+      if (!a) return;
+      var href = a.getAttribute('href');
+      if (!href || href[0] === '#') return;
+      if (/^(javascript|mailto|tel):/.test(href)) return;
+      if (a.target === '_blank') return;
+      if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      document.body.style.transition = 'opacity 0.15s linear';
+      document.body.style.opacity   = '0';
+      setTimeout(function(){ window.location.href = href; }, 155);
+    });
+  }
+
+  /* Ako view transitions JEST aktivan, ugasi body animaciju —
+     preglednik već radi crossfade, dupla animacija = trzaj */
+  if (document.startViewTransition) {
+    var s = document.createElement('style');
+    s.textContent = 'body{animation:none!important;}';
+    document.head.appendChild(s);
+  }
+})();
+</script>
+</body>
+</html>

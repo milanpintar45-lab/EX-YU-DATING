@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EX YU DATE — Projektni dokument</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#1a0033; --purple-900:#2d0057; --purple-800:#4a0a7a; --purple-700:#6b1a9e;
+    --purple-600:#7b2cbf; --purple-500:#a23cff; --purple-300:#c57dff; --purple-100:#e9c6ff;
+    --pink:#ff6b9d; --text:#e9c6ff; --muted:#b8a4d4; --line:rgba(162,60,255,0.45);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:'Inter',sans-serif;
+    background:linear-gradient(135deg,#1a0033 0%,#2d0057 50%,#4a0a7a 100%);
+    color:var(--text); min-height:100vh; padding:24px;
+  }
+  a{color:var(--purple-300);text-decoration:none;}
+  a:hover{color:#fff;}
+
+  .app{
+    max-width:1100px; margin:0 auto;
+    border:1px solid rgba(162,60,255,0.25); border-radius:14px;
+    background:rgba(0,0,0,0.15); overflow:hidden;
+  }
+
+  /* Header */
+  .header{
+    text-align:center; padding:40px 24px 30px;
+    border-bottom:2px solid var(--line);
+    background:rgba(0,0,0,0.22);
+  }
+  .header h1{
+    font-family:'Cormorant Garamond',serif;
+    font-size:clamp(2.2em,5vw,3.2em); font-weight:700;
+    letter-spacing:6px; color:#fff;
+    text-shadow:0 0 25px rgba(162,60,255,0.8);
+  }
+  .header .sub{
+    font-size:14px; color:var(--muted); letter-spacing:4px; margin-top:6px;
+  }
+  .header .badge{
+    display:inline-block; margin-top:16px;
+    padding:6px 18px; border-radius:20px;
+    background:linear-gradient(45deg,var(--purple-500),var(--purple-300));
+    color:#fff; font-weight:700; font-size:13px; letter-spacing:1px;
+  }
+
+  /* Section */
+  .section{padding:28px 32px; border-bottom:1px solid rgba(162,60,255,0.35);}
+  .section:last-child{border-bottom:none;}
+  .section-title{
+    font-family:'Cormorant Garamond',serif; font-size:26px; font-weight:700;
+    color:var(--purple-100); letter-spacing:2px; margin-bottom:14px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .section-title .icon{font-size:22px;}
+
+  p{line-height:1.7; color:var(--text); margin-bottom:10px; font-size:14.5px;}
+  .note{
+    background:rgba(162,60,255,0.12); border:1px solid rgba(162,60,255,0.35);
+    border-radius:8px; padding:12px 16px; margin:12px 0;
+    font-size:13.5px; color:var(--muted);
+  }
+  .note strong{color:var(--purple-100);}
+
+  /* Table */
+  table{width:100%; border-collapse:collapse; margin:14px 0; font-size:13.5px;}
+  th,td{padding:10px 12px; text-align:left; border-bottom:1px solid rgba(162,60,255,0.25);}
+  th{background:rgba(162,60,255,0.15); color:var(--purple-100); font-weight:600; font-size:13px;}
+  td{color:var(--text);}
+  tr:hover td{background:rgba(162,60,255,0.08);}
+
+  /* Code block */
+  .code{
+    background:rgba(0,0,0,0.35); border:1px solid rgba(162,60,255,0.35);
+    border-radius:8px; padding:14px 16px; margin:12px 0;
+    font-family:monospace; font-size:12.5px; color:var(--purple-300);
+    overflow-x:auto; line-height:1.6;
+  }
+  .code .tag{color:#ff6b9d;}
+  .code .attr{color:#c57dff;}
+  .code .val{color:#22c55e;}
+  .code .comment{color:#b8a4d4; font-style:italic;}
+
+  /* Feature list */
+  .features{display:flex; flex-wrap:wrap; gap:10px; margin:12px 0;}
+  .feature-tag{
+    background:rgba(162,60,255,0.15); border:1px solid rgba(162,60,255,0.35);
+    border-radius:20px; padding:5px 14px; font-size:12.5px; color:var(--purple-100);
+    font-weight:500;
+  }
+
+  /* Color palette */
+  .colors{display:flex; flex-wrap:wrap; gap:12px; margin:14px 0;}
+  .color-chip{
+    display:flex; align-items:center; gap:8px;
+    background:rgba(255,255,255,0.04); border:1px solid rgba(162,60,255,0.35);
+    border-radius:8px; padding:8px 12px; font-size:12.5px;
+  }
+  .color-dot{width:22px;height:22px;border-radius:50%;border:1px solid rgba(255,255,255,0.2);}
+
+  /* Grid */
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  @media(max-width:700px){.grid-2{grid-template-columns:1fr;}}
+
+  .card{
+    background:rgba(255,255,255,0.04); border:1px solid rgba(162,60,255,0.35);
+    border-radius:10px; padding:16px;
+  }
+  .card h3{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--purple-100);margin-bottom:8px;}
+  .card p{font-size:13px;color:var(--muted);}
+
+  /* Footer */
+  .footer{
+    text-align:center; padding:20px; color:var(--muted); font-size:12px; letter-spacing:1px;
+    border-top:1px solid rgba(162,60,255,0.35);
+  }
+
+/* ===================================================
+   EX YU DATE — ANTI-TRZANJE v3 (FINALNA VERZIJA)
+   =================================================== */
+
+/* 1. Pozadina nikad ne nestaje — nema bijelog bljeska */
+html {
+  background: linear-gradient(135deg,#1a0033 0%,#2d0057 50%,#4a0a7a 100%);
+  background-attachment: fixed;
+  overflow-y: scroll; /* scrollbar uvijek prisutan → nema layout shiftova */
+}
+
+/* 2. View Transitions API (Chrome 111+) — čista crossfade, bez pokreta */
+@view-transition {
+  navigation: auto;
+}
+::view-transition-old(root) {
+  animation: 180ms linear forwards exyu-out;
+}
+::view-transition-new(root) {
+  animation: 220ms linear forwards exyu-in;
+}
+@keyframes exyu-out { to   { opacity: 0; } }
+@keyframes exyu-in  { from { opacity: 0; } }
+
+/* 3. Fallback — isti efekt za Firefox/Safari, BEZ pokreta */
+body {
+  animation: exyu-body-in 0.22s linear both;
+}
+@keyframes exyu-body-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <div class="header">
+    <h1>EX YU DATE</h1>
+    <div class="sub">UPOZNAVANJE BEZ GRANICA</div>
+    <div class="badge">📋 PROJEKTNA DOKUMENTACIJA</div>
+  </div>
+
+  <!-- 1. OPIS PROJEKTA -->
+  <div class="section">
+    <div class="section-title"><span class="icon">🎯</span> OPIS PROJEKTA</div>
+    <p><strong>EX YU DATE</strong> je web-aplikacija za upoznavanje (dating platforma) namijenjena korisnicima s područja bivše Jugoslavije — Hrvatske, Bosne i Hercegovine i Srbije.</p>
+    <p>Koncept platforme je jednostavan: korisnik se registrira / prijavljuje, bira zemlju i regiju (županiju/kanton/okrug), pregledava profile online korisnika, šalje poruke i upoznaje nove ljude bez granica.</p>
+    <p>Platforma je dizajnirana s modernim, ljubičastim (purple) neonskim estetikom koja podsjeća na noćni klub / urbanu atmosferu, s naglaskom na vizualni doživljaj i lakoću korištenja.</p>
+    <div class="note">
+      <strong>Ciljna skupina:</strong> Odrasli korisnici (18+) s područja Ex-Yu zemalja koji traže nova upoznavanja, prijateljstva ili veze.<br>
+      <strong>Jezik:</strong> Hrvatski / srpski (latinica) — lokalizirano za domaće tržište.
+    </div>
+  </div>
+
+  <!-- 2. STRUKTURA STRANICA -->
+  <div class="section">
+    <div class="section-title"><span class="icon">📁</span> STRUKTURA STRANICA</div>
+    <p>Projekt se sastoji od <strong>5 HTML datoteka</strong> koje čine cjelovitu web-aplikaciju:</p>
+    <table>
+      <tr><th>DATOTEKA</th><th>NAZIV</th><th>OPIS</th><th>LINKOVI</th></tr>
+      <tr><td><strong>index.html</strong></td><td>Login / Registracija</td><td>Početna stranica za prijavu i registraciju novih korisnika. Sadrži login formu, opcije registracije, glasovnu verifikaciju i validaciju.</td><td>→ pocetna.html</td></tr>
+      <tr><td><strong>pocetna.html</strong></td><td>Glavna stranica</td><td>Dashboard nakon prijave. Prikazuje online korisnike, chat, nove profile, galeriju i oglase. Sadrži navigaciju za sve zemlje.</td><td>→ hrvatska.html<br>→ bosna.html<br>→ srbija.html</td></tr>
+      <tr><td><strong>hrvatska.html</strong></td><td>Hrvatska</td><td>Stranica specifična za Hrvatsku s filtriranjem po županijama (21 županija + Grad Zagreb). Prikazuje online korisnike, chat i profile po odabranoj županiji.</td><td>→ pocetna.html<br>→ bosna.html<br>→ srbija.html</td></tr>
+      <tr><td><strong>bosna.html</strong></td><td>Bosna i Hercegovina</td><td>Stranica specifična za BiH s filtriranjem po kantonima (10 kantona + Brčko Distrikt). Ista funkcionalnost kao Hrvatska.</td><td>→ pocetna.html<br>→ hrvatska.html<br>→ srbija.html</td></tr>
+      <tr><td><strong>srbija.html</strong></td><td>Srbija</td><td>Stranica specifična za Srbiju s filtriranjem po okruzima (25 okruga + Grad Beograd). Ista funkcionalnost kao Hrvatska.</td><td>→ pocetna.html<br>→ hrvatska.html<br>→ bosna.html</td></tr>
+    </table>
+  </div>
+
+  <!-- 3. DIZAJN I STIL -->
+  <div class="section">
+    <div class="section-title"><span class="icon">🎨</span> DIZAJN I VIZUALNI IDENTITET</div>
+
+    <p><strong>Tema:</strong> Ljubičasti / neonski noćni klub estetika</p>
+    <p><strong>Atmosfera:</strong> Tamna, elegantna, moderna, upoznavanje bez granica</p>
+
+    <div class="colors">
+      <div class="color-chip"><div class="color-dot" style="background:#1a0033"></div><span>#1a0033 (Bg dark)</span></div>
+      <div class="color-chip"><div class="color-dot" style="background:#2d0057"></div><span>#2d0057 (Purple-900)</span></div>
+      <div class="color-chip"><div class="color-dot" style="background:#4a0a7a"></div><span>#4a0a7a (Purple-800)</span></div>
+      <div class="color-chip"><div class="color-dot" style="background:#6b1a9e"></div><span>#6b1a9e (Purple-700)</span></div>
+      <div class="color-chip"><div class="color-dot" style="background:#7b2cbf"></div><span>#7b2cbf (Purple-600)</span></div>
+      <div class="color-chip"><div class="color-dot" style="background:#a23cff"></div><span>#a23cff (Purple-500)</span></div>
+      <div class="color-chip"><div class="color-dot" style="background:#c57dff"></div><span>#c57dff (Purple-300)</span></div>
+      <div class="color-chip"><div class="color-dot" style="background:#e9c6ff"></div><span>#e9c6ff (Purple-100)</span></div>
+      <div class="color-chip"><div class="color-dot" style="background:#ff6b9d"></div><span>#ff6b9d (Pink accent)</span></div>
+      <div class="color-chip"><div class="color-dot" style="background:#22c55e"></div><span>#22c55e (Online status)</span></div>
+    </div>
+
+    <p><strong>Tipografija:</strong></p>
+    <table>
+      <tr><th>ELEMENT</th><th>FONT</th><th>VELIČINA</th></tr>
+      <tr><td>Logo / Naslovi</td><td>Cormorant Garamond (serif)</td><td>28px – 44px</td></tr>
+      <tr><td>Tijelo teksta</td><td>Inter (sans-serif)</td><td>13px – 14.5px</td></tr>
+      <tr><td>Navigacija</td><td>Inter</td><td>14px, uppercase, letter-spacing 1.5px</td></tr>
+      <tr><td>Podnaslovi</td><td>Inter</td><td>11px – 12px, letter-spacing 2px – 4px</td></tr>
+      <tr><td>Forme / Input</td><td>Inter</td><td>13px – 16px</td></tr>
+    </table>
+  </div>
+
+  <!-- 4. LAYOUT STRANICA -->
+  <div class="section">
+    <div class="section-title"><span class="icon">📐</span> LAYOUT I STRUKTURA STRANICA</div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>🚪 index.html — Login</h3>
+        <p>• Fiksirana dekorativna ženska silueta (lijevo)<br>
+        • Vertikalni logo (desno, rotiran)<br>
+        • Centrirana forma za login<br>
+        • Glasovna verifikacija (simulacija)<br>
+        • Validacija unosa<br>
+        • Animirani success overlay</p>
+      </div>
+      <div class="card">
+        <h3>🏠 pocetna.html — Dashboard</h3>
+        <p>• Top header s linkovima<br>
+        • Naslov EX YU DATE + subtitle<br>
+        • Poruke + pretraga po nicku<br>
+        • Navigacijska traka (5 linkova)<br>
+        • Status bar (statistike)<br>
+        • 4 stupca: Online, Chat, Novi, Galerija</p>
+      </div>
+      <div class="card">
+        <h3>🇭🇷 hrvatska.html</h3>
+        <p>• 4 stupca: Županije, Online, Chat, Svi korisnici<br>
+        • 21 županija + Grad Zagreb<br>
+        • Filter klikom na županiju<br>
+        • JavaScript dinamički prikaz</p>
+      </div>
+      <div class="card">
+        <h3>🇧🇦 bosna.html</h3>
+        <p>• 4 stupca: Kantoni, Online, Chat, Svi korisnici<br>
+        • 10 kantona + Brčko Distrikt<br>
+        • Identična funkcionalnost kao Hrvatska</p>
+      </div>
+      <div class="card">
+        <h3>🇷🇸 srbija.html</h3>
+        <p>• 4 stupca: Okruzi, Online, Chat, Svi korisnici<br>
+        • 25 okruga + Grad Beograd<br>
+        • Identična funkcionalnost kao Hrvatska</p>
+      </div>
+      <div class="card">
+        <h3>🔄 Zajednički elementi</h3>
+        <p>• Top header (3-dijelni grid)<br>
+        • Middle row (poruke + pretraga)<br>
+        • Navigacijska traka<br>
+        • Status bar (statistike)<br>
+        • Footer s nazivom projekta</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. RESPONZIVNOST -->
+  <div class="section">
+    <div class="section-title"><span class="icon">📱</span> RESPONZIVNOST (MOBILNI, TABLET, DESKTOP)</div>
+    <p>Sve stranice su potpuno responzivne i prilagođene različitim veličinama ekrana:</p>
+    <table>
+      <tr><th>BREAKPOINT</th><th>VELIČINA</th><th>PONAŠANJE</th></tr>
+      <tr><td><strong>Desktop</strong></td><td>1100px+</td><td>4 stupca, puni layout, sve vidljivo</td></tr>
+      <tr><td><strong>Tablet</strong></td><td>700px – 1100px</td><td>2 stupca, manji padding, top header u jedan red</td></tr>
+      <tr><td><strong>Mobilni</strong></td><td>do 700px</td><td>1 stupac, navigacija se lomi, županije horizontalno scrollaju</td></tr>
+    </table>
+    <div class="note">
+      <strong>index.html posebnosti:</strong> Na mobilnom, dekorativna ženska silueta i vertikalni logo postaju horizontalni i centrirani. Forma zauzima 100% širine.
+    </div>
+  </div>
+
+  <!-- 6. INTERAKTIVNE FUNKCIJE -->
+  <div class="section">
+    <div class="section-title"><span class="icon">⚡</span> INTERAKTIVNE FUNKCIJE (JavaScript)</div>
+
+    <p>Svaka zemaljska stranica (hrvatska.html, bosna.html, srbija.html) sadrži JavaScript koji omogućava:</p>
+    <div class="features">
+      <span class="feature-tag">🔍 Filtriranje po regiji</span>
+      <span class="feature-tag">💬 Prikaz chat poruka</span>
+      <span class="feature-tag">👤 Prikaz online korisnika</span>
+      <span class="feature-tag">📋 Prikaz svih korisnika</span>
+      <span class="feature-tag">🟢 Online status indikator</span>
+      <span class="feature-tag">📊 Dinamički brojači</span>
+      <span class="feature-tag">🎙️ Glasovna verifikacija</span>
+      <span class="feature-tag">✅ Validacija forme</span>
+      <span class="feature-tag">🎭 Success overlay</span>
+      <span class="feature-tag">📝 Pretraga po nicku</span>
+    </div>
+
+    <p><strong>Primjer logike filtriranja (hrvatska.html):</strong></p>
+    <div class="code">
+<span class="comment">// Klik na županiju aktivira filter</span><br>
+document.querySelectorAll(<span class="val">'#countyList a'</span>).forEach(a => {<br>
+&nbsp;&nbsp;a.addEventListener(<span class="val">'click'</span>, e => {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;e.preventDefault();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;render(a.dataset.county); <span class="comment">// Prikazi samo tu županiju</span><br>
+&nbsp;&nbsp;});<br>
+});<br><br>
+<span class="comment">// Funkcija render prima filter i ažurira sve 3 kolone</span><br>
+<span class="tag">function</span> render(filter) {<br>
+&nbsp;&nbsp;<span class="tag">const</span> list = filter === <span class="val">"SVI"</span> ? profiles : profiles.filter(p => p.county === filter);<br>
+&nbsp;&nbsp;<span class="tag">const</span> online = list.filter(p => p.online);<br>
+&nbsp;&nbsp;<span class="tag">const</span> chatList = filter === <span class="val">"SVI"</span> ? chats : chats.filter(c => c.county === filter);<br>
+&nbsp;&nbsp;<span class="comment">// Ažurira DOM elemente...</span><br>
+}
+    </div>
+  </div>
+
+  <!-- 7. NAVIGACIJA -->
+  <div class="section">
+    <div class="section-title"><span class="icon">🔗</span> NAVIGACIJSKA STRUKTURA</div>
+    <p>Korisnik se kreće kroz aplikaciju na sljedeći način:</p>
+    <div class="code">
+<span class="comment">/* Tok korisnika */</span><br>
+index.html (Login/Registracija) <br>
+&nbsp;&nbsp;&nbsp;&nbsp;↓ <span class="comment">// Uspješna prijava</span><br>
+pocetna.html (Dashboard)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;↓ ↓ ↓ <span class="comment">// Klik na zemlju u navigaciji</span><br>
+hrvatska.html &nbsp;&nbsp; bosna.html &nbsp;&nbsp; srbija.html<br>
+&nbsp;&nbsp;&nbsp;&nbsp;↕️ ↕️ ↕️ <span class="comment">// Slobodno kretanje između zemalja</span><br>
+index.html <span class="comment">// Odjava (natrag na login)</span>
+    </div>
+    <div class="note">
+      <strong>Navigacijska traka</strong> na svim unutarnjim stranicama sadrži: <strong>POČETNA | HRVATSKA | BOSNA | SRBIJA | PLUS</strong> (VIP zona). Aktivna stranica je istaknuta ljubičastom pozadinom.
+    </div>
+  </div>
+
+  <!-- 8. TEHNIČKA SPECIFIKACIJA -->
+  <div class="section">
+    <div class="section-title"><span class="icon">🛠️</span> TEHNIČKA SPECIFIKACIJA</div>
+    <table>
+      <tr><th>TEHNOLOGIJA</th><th>OPIS</th></tr>
+      <tr><td>HTML5</td><td>Semantička struktura, meta tagovi, viewport</td></tr>
+      <tr><td>CSS3</td><td>Grid layout, Flexbox, Custom properties (:root), Gradients, Media queries, Backdrop-filter</td></tr>
+      <tr><td>JavaScript (Vanilla)</td><td>DOM manipulacija, Event listeneri, Filter funkcije, Glasovna API simulacija</td></tr>
+      <tr><td>Google Fonts</td><td>Inter (400-700) + Cormorant Garamond (500-700)</td></tr>
+      <tr><td>Responsive</td><td>3 breakpointa: 1100px, 900px, 600px / 700px</td></tr>
+      <tr><td>Emoji</td><td>Dekorativni elementi (👤 💬 💃 🫦 💋 🔥)</td></tr>
+      <tr><td>Backend</td><td>Nije uključen (frontend-only mockup)</td></tr>
+    </table>
+    <div class="note">
+      <strong>Važno:</strong> Trenutna verzija je <strong>frontend-only demonstracija</strong> (mockup). Nema stvarnog backend servera, baze podataka niti API-ja. Svi korisnici, poruke i podaci su hardkodirani u JavaScriptu za vizualnu prezentaciju. Za produkcijsku verziju potrebno je dodati Node.js/PHP backend, MySQL/MongoDB bazu, autentikaciju i WebSocket za chat.
+    </div>
+  </div>
+
+  <!-- 9. SADRŽAJ PO ZEMLJAMA -->
+  <div class="section">
+    <div class="section-title"><span class="icon">🌍</span> REGIJE I ADMINISTRATIVNA PODJELA</div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>🇭🇷 Hrvatska (22 regije)</h3>
+        <p>Grad Zagreb, Bjelovarsko-bilogorska, Brodsko-posavska, Dubrovačko-neretvanska, Istarska, Karlovačka, Koprivničko-križevačka, Krapinsko-zagorska, Ličko-senjska, Međimurska, Osječko-baranjska, Požeško-slavonska, Primorsko-goranska, Sisačko-moslavačka, Splitsko-dalmatinska, Šibensko-kninska, Varaždinska, Virovitičko-podravska, Vukovarsko-srijemska, Zadarska, Zagrebačka.</p>
+      </div>
+      <div class="card">
+        <h3>🇧🇦 Bosna i Hercegovina (11 regija)</h3>
+        <p>Unsko-sanski, Posavski, Tuzlanski, Zeničko-dobojski, Bosansko-podrinjski, Srednjobosanski, Hercegovačko-neretvanski, Zapadnohercegovački, Sarajevo, Zapadnobosanski, Brčko Distrikt.</p>
+      </div>
+      <div class="card">
+        <h3>🇷🇸 Srbija (26 regija)</h3>
+        <p>Grad Beograd, Severnobački, Srednjebanatski, Severnobanatski, Južnobanatski, Zapadnobački, Južnobački, Sjevernobački, Mačvanski, Kolubarski, Podunavski, Braničevski, Šumadijski, Pomoravski, Borski, Zaječarski, Zlatiborski, Moravički, Raški, Rasinski, Nišavski, Toplički, Pirotski, Jablanički, Pčinjski, Kosovski.</p>
+      </div>
+      <div class="card">
+        <h3>📊 Demo podaci</h3>
+        <p>Svaka zemlja sadrži hardkodirane profile korisnika (ime, dob, grad, online status) i primjere chat poruka. Podaci su fiktivni i služe isključivo za demonstraciju dizajna i funkcionalnosti.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10. INSTALACIJA I KORIŠTENJE -->
+  <div class="section">
+    <div class="section-title"><span class="icon">💻</span> KAKO POKRENUTI PROJEKT</div>
+    <p>Projekt je jednostavan za pokretanje — ne zahtijeva server, instalaciju niti build proces:</p>
+    <div class="code">
+<span class="comment"># 1. Raspakiraj ZIP datoteku na desktop</span><br>
+<span class="comment"># 2. Otvori mapu EX_YU_DATE</span><br>
+<span class="comment"># 3. Dvoklikni na index.html (pokreće se u pregledniku)</span><br><br>
+<span class="tag">Folder struktura:</span><br>
+EX_YU_DATE/<br>
+├── index.html &nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># Login stranica</span><br>
+├── pocetna.html &nbsp;&nbsp;<span class="comment"># Dashboard</span><br>
+├── hrvatska.html &nbsp;<span class="comment"># Hrvatska</span><br>
+├── bosna.html &nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># Bosna i Hercegovina</span><br>
+└── srbija.html &nbsp;&nbsp;&nbsp;<span class="comment"># Srbija</span>
+    </div>
+    <div class="note">
+      <strong>Preporučeni preglednici:</strong> Google Chrome, Mozilla Firefox, Microsoft Edge, Safari (najnovije verzije). Sve stranice koriste moderne CSS3 značajke poput <code>grid</code>, <code>flexbox</code>, <code>backdrop-filter</code> i <code>CSS custom properties</code>.
+    </div>
+  </div>
+
+  <!-- 11. MOGUĆA PROŠIRENJA -->
+  <div class="section">
+    <div class="section-title"><span class="icon">🚀</span> MOGUĆA BUDUĆA PROŠIRENJA</div>
+    <div class="features">
+      <span class="feature-tag">🔐 Backend autentikacija (Node.js/PHP)</span>
+      <span class="feature-tag">🗄️ Baza podataka (MySQL/MongoDB)</span>
+      <span class="feature-tag">💬 Pravi chat (WebSocket/Socket.io)</span>
+      <span class="feature-tag">📸 Upload profilnih slika</span>
+      <span class="feature-tag">🔔 Push notifikacije</span>
+      <span class="feature-tag">💳 Plaćanje (VIP / Premium)</span>
+      <span class="feature-tag">📱 PWA (Progressive Web App)</span>
+      <span class="feature-tag">🌐 Višejezičnost (HR/BS/SR/EN)</span>
+      <span class="feature-tag">📍 Geolokacija</span>
+      <span class="feature-tag">🤖 AI preporuke partnera</span>
+    </div>
+  </div>
+
+  <div class="footer">
+    EX YU DATE — UPOZNAVANJE BEZ GRANICA &nbsp;|&nbsp; Projektni dokument v1.0 &nbsp;|&nbsp; 2026
+  </div>
+
+</div>
+
+
+<!-- OBRATI SE ADMINU + PORUKE WIDGET -->
+<style>
+.exyu-fab-wrap{position:fixed;right:16px;bottom:16px;z-index:9998;display:flex;flex-direction:column;gap:10px;align-items:flex-end;}
+.exyu-fab{background:linear-gradient(45deg,#a23cff,#c57dff);color:#fff;border:none;padding:12px 18px;border-radius:30px;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 8px 25px rgba(162,60,255,0.5);font-family:inherit;letter-spacing:.5px;}
+.exyu-fab:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(162,60,255,0.7);}
+.exyu-fab.msg{background:linear-gradient(45deg,#ff6b9d,#a23cff);}
+.exyu-fab .badge{background:#fff;color:#a23cff;border-radius:12px;padding:2px 8px;margin-left:6px;font-size:11px;font-weight:800;}
+.exyu-modal{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px);}
+.exyu-modal.on{display:flex;}
+.exyu-modal-box{background:linear-gradient(135deg,#2d0057,#4a0a7a);border:2px solid rgba(162,60,255,0.5);border-radius:20px;padding:30px;max-width:480px;width:100%;color:#e9c6ff;box-shadow:0 25px 70px rgba(0,0,0,0.7);}
+.exyu-modal-box h3{font-family:'Cormorant Garamond',serif;font-size:1.8em;color:#fff;margin-bottom:14px;letter-spacing:1px;}
+.exyu-modal-box textarea{width:100%;min-height:120px;padding:12px;border-radius:12px;border:2px solid rgba(162,60,255,0.4);background:rgba(255,255,255,0.08);color:#fff;font-family:inherit;font-size:15px;margin-bottom:14px;resize:vertical;}
+.exyu-modal-box textarea:focus{outline:none;border-color:#c57dff;}
+.exyu-modal-actions{display:flex;gap:10px;}
+.exyu-btn-send{flex:1;background:linear-gradient(45deg,#a23cff,#c57dff);color:#fff;border:none;padding:14px;border-radius:12px;font-weight:700;cursor:pointer;font-family:inherit;font-size:15px;}
+.exyu-btn-cancel{flex:1;background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(162,60,255,0.4);padding:14px;border-radius:12px;font-weight:700;cursor:pointer;font-family:inherit;font-size:15px;}
+.exyu-msg-item{background:rgba(0,0,0,0.3);border-left:3px solid #a23cff;padding:12px;border-radius:8px;margin-bottom:10px;}
+.exyu-msg-item .from{color:#c57dff;font-weight:700;font-size:13px;}
+.exyu-msg-item .txt{margin-top:6px;font-size:14px;color:#e9c6ff;}
+.exyu-msg-item .time{font-size:11px;color:#b8a4d4;margin-top:4px;}
+.exyu-empty{text-align:center;color:#b8a4d4;padding:30px;font-style:italic;}
+@media(max-width:600px){.exyu-fab{padding:10px 14px;font-size:13px;}}
+</style>
+
+<script>
+(function(){
+  /* Hover prefetch — počni učitavati stranicu čim miš prijeđe na link */
+  var prefetched = {};
+  document.addEventListener('mouseover', function(e){
+    var a = e.target.closest('a[href]');
+    if (!a) return;
+    var href = a.getAttribute('href');
+    if (!href || href[0] === '#') return;
+    if (/^(javascript|mailto|tel):/.test(href)) return;
+    if (a.target === '_blank') return;
+    if (prefetched[href]) return;
+    prefetched[href] = true;
+    var l = document.createElement('link');
+    l.rel = 'prefetch'; l.href = href;
+    document.head.appendChild(l);
+  }, { passive: true });
+
+  /* Fallback za preglednike bez View Transitions API */
+  if (!document.startViewTransition) {
+    document.addEventListener('click', function(e){
+      if (e.defaultPrevented) return;
+      var a = e.target.closest('a[href]');
+      if (!a) return;
+      var href = a.getAttribute('href');
+      if (!href || href[0] === '#') return;
+      if (/^(javascript|mailto|tel):/.test(href)) return;
+      if (a.target === '_blank') return;
+      if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      document.body.style.transition = 'opacity 0.15s linear';
+      document.body.style.opacity   = '0';
+      setTimeout(function(){ window.location.href = href; }, 155);
+    });
+  }
+
+  /* Ako view transitions JEST aktivan, ugasi body animaciju —
+     preglednik već radi crossfade, dupla animacija = trzaj */
+  if (document.startViewTransition) {
+    var s = document.createElement('style');
+    s.textContent = 'body{animation:none!important;}';
+    document.head.appendChild(s);
+  }
+})();
+</script>
+</body>
+</html>

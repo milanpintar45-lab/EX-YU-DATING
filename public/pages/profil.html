@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EX YU DATE — Moj Profil</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#1a0033;
+  --purple-900:#2d0057;
+  --purple-800:#4a0a7a;
+  --purple-700:#6b1a9e;
+  --purple-600:#7b2cbf;
+  --purple-500:#a23cff;
+  --purple-300:#c57dff;
+  --purple-100:#e9c6ff;
+  --pink:#ff6b9d;
+  --text:#e9c6ff;
+  --muted:#b8a4d4;
+  --line:rgba(162,60,255,0.45);
+  --panel:rgba(45,0,87,0.4);
+  --green:#22c55e;
+  --red:#ef4444;
+  --orange:#f59e0b;
+  --blue:#3b82f6;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+  font-family:'Inter',sans-serif;
+  background:linear-gradient(135deg,#1a0033 0%,#2d0057 50%,#4a0a7a 100%);
+  color:var(--text);
+  min-height:100vh;
+  padding:18px;
+}
+a{color:inherit;text-decoration:none;cursor:pointer;}
+
+.app{
+  min-height:calc(100vh - 36px);
+  border:1px solid rgba(162,60,255,0.25);
+  border-radius:14px;
+  overflow:hidden;
+  background:rgba(0,0,0,0.15);
+  display:flex;
+  flex-direction:column;
+}
+
+/* TOP HEADER */
+.top{
+  display:grid;
+  grid-template-columns: 160px 1fr 220px;
+  padding:18px 22px;
+  gap:16px;
+  align-items:start;
+}
+.corner-links{display:flex;flex-direction:column;gap:6px;font-size:13px;}
+.corner-links a{color:var(--purple-300);font-size:15px;}
+.corner-links a:hover{color:#fff;}
+.exyu-notif-badge{background:#a23cff;color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;font-weight:800;margin-left:3px;display:none;vertical-align:top;}
+.exyu-notif-panel{position:fixed;top:60px;right:16px;width:320px;max-width:92vw;max-height:70vh;overflow-y:auto;background:linear-gradient(135deg,#2d0057,#4a0a7a);border:2px solid rgba(162,60,255,0.5);border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,0.6);z-index:9997;display:none;}
+.exyu-notif-panel.on{display:block;}
+.exyu-notif-head{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;font-weight:700;color:#fff;border-bottom:1px solid rgba(162,60,255,0.3);font-size:13px;}
+.exyu-notif-head a{color:var(--purple-300);font-size:11px;font-weight:600;}
+.exyu-notif-item{padding:10px 14px;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.06);color:var(--muted);display:flex;gap:8px;}
+.exyu-notif-item.unread{background:rgba(162,60,255,0.12);color:#fff;}
+
+.title-wrap{text-align:center;}
+.title{
+  font-family:'Poppins',sans-serif;
+  font-size:44px;
+  font-weight:700;
+  letter-spacing:6px;
+  background:linear-gradient(180deg,#fff 0%,var(--purple-100) 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  cursor:pointer;
+}
+.title-sub{font-size:11px;color:var(--muted);letter-spacing:3px;margin-top:2px;}
+
+.right-of-title{display:flex;flex-direction:column;gap:8px;align-items:flex-end;font-size:13px;}
+.right-of-title a{color:var(--purple-300);font-size:15px;}
+.right-of-title .with-count{display:flex;align-items:center;gap:6px;}
+.count-box{
+  min-width:32px;padding:2px 8px;text-align:center;
+  background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.6);border-radius:10px;font-size:13px;color:#ff5c5c;font-weight:700;
+}
+
+/* NAV BAR */
+.nav-bar{
+  display:flex;
+  align-items:stretch;
+  border-bottom:2px solid rgba(255,45,149,0.5);
+  flex-wrap:wrap;
+}
+.nav-bar a{
+  display:inline-block;
+  padding:14px 22px;
+  font-weight:700;
+  letter-spacing:1.5px;
+  color:var(--muted);
+  border-right:1px solid rgba(255,45,149,0.35);
+  transition:all .2s;
+  text-transform:uppercase;
+  font-size:14px;
+  cursor:pointer;
+}
+.nav-bar a:hover{color:#fff;background:rgba(255,45,149,0.16);}
+.nav-bar a.active{
+  color:#fff;
+  background:linear-gradient(180deg,#ff2d78,#c4145a);
+  box-shadow:inset 0 -3px 0 #ffb3d9;
+  text-shadow:0 0 12px rgba(255,92,173,0.85);
+}
+.nav-bar .spacer{flex:1;}
+
+/* PROFILE MAIN */
+.profile-main{
+  display:flex;
+  flex:1;
+  min-height:0;
+}
+
+/* LEFT SIDEBAR */
+.left-sidebar{
+  width:200px;
+  border-right:1px solid rgba(162,60,255,0.35);
+  padding:16px 10px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  background:rgba(0,0,0,0.12);
+}
+.left-sidebar a{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:8px;
+  font-size:13px;font-weight:500;color:var(--muted);
+  transition:all .2s;border:1px solid transparent;
+}
+.left-sidebar a:hover{
+  background:rgba(162,60,255,0.15);color:#fff;border-color:rgba(255,224,236,0.25);
+}
+.left-sidebar a.active{
+  background:linear-gradient(90deg,var(--purple-500),var(--purple-600));
+  color:#fff;font-weight:600;border-color:var(--purple-100);
+  box-shadow:0 0 15px rgba(162,60,255,0.4);
+}
+.left-sidebar a .icon{font-size:18px;width:22px;text-align:center;}
+
+/* PROFILE CONTENT */
+.profile-content{
+  flex:1;
+  padding:20px 24px;
+  overflow-y:auto;
+}
+
+/* PROFILE HEADER */
+.profile-header{
+  display:flex;align-items:center;gap:20px;
+  margin-bottom:24px;
+  padding-bottom:20px;
+  border-bottom:1px solid rgba(162,60,255,0.35);
+}
+.profile-avatar{
+  width:100px;height:100px;border-radius:50%;
+  background:linear-gradient(135deg,var(--purple-500),var(--pink));
+  border:3px solid rgba(255,224,236,0.5);
+  display:flex;align-items:center;justify-content:center;
+  font-size:40px;box-shadow:0 0 25px rgba(162,60,255,0.5);
+  flex-shrink:0;
+}
+.profile-header-info h2{
+  font-family:'Cormorant Garamond',serif;
+  font-size:28px;color:#fff;letter-spacing:2px;
+}
+.profile-header-info .profile-meta{
+  font-size:14px;color:var(--muted);margin-top:4px;
+}
+.profile-actions-top{
+  display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;
+}
+.profile-actions-top button{
+  padding:8px 16px;border-radius:8px;border:none;
+  font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;
+  transition:all .2s;
+}
+.btn-msg{background:var(--green);color:#fff;}
+.btn-msg:hover{background:#16a34a;box-shadow:0 0 15px rgba(34,197,94,0.4);}
+.btn-video{background:var(--blue);color:#fff;}
+.btn-video:hover{background:#2563eb;box-shadow:0 0 15px rgba(59,130,246,0.4);}
+.btn-poke{background:var(--orange);color:#fff;}
+.btn-poke:hover{background:#d97706;box-shadow:0 0 15px rgba(245,158,11,0.4);}
+.btn-block{background:var(--red);color:#fff;}
+.btn-block:hover{background:#dc2626;box-shadow:0 0 15px rgba(239,68,68,0.4);}
+
+/* SHARE PROFILE */
+.btn-share{
+  padding:8px 16px;border-radius:8px;border:1px solid rgba(162,60,255,0.5);
+  background:rgba(162,60,255,0.15);color:#fff;font-family:inherit;font-size:13px;
+  font-weight:600;cursor:pointer;transition:all .2s;margin-left:8px;
+}
+.btn-share:hover{background:rgba(162,60,255,0.3);box-shadow:0 0 15px rgba(162,60,255,0.4);}
+.share-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);
+  z-index:200;align-items:center;justify-content:center;padding:16px;
+}
+.share-overlay.on{display:flex;}
+.share-box{
+  background:linear-gradient(135deg,#2d0057,#1a0033);
+  border:1px solid rgba(162,60,255,0.5);border-radius:16px;
+  padding:24px;max-width:420px;width:100%;
+  box-shadow:0 20px 60px rgba(0,0,0,0.6);
+}
+.share-box h3{font-family:'Cormorant Garamond',serif;font-size:22px;color:#fff;margin-bottom:14px;text-align:center;}
+.share-link-row{display:flex;gap:8px;margin-bottom:18px;}
+.share-link-row input{
+  flex:1;padding:10px 12px;border-radius:10px;border:1px solid rgba(162,60,255,0.4);
+  background:rgba(255,255,255,0.08);color:#fff;font-size:13px;font-family:inherit;
+}
+.share-link-row button{
+  padding:10px 14px;border-radius:10px;border:none;background:var(--purple-500);
+  color:#fff;font-weight:700;cursor:pointer;font-size:13px;white-space:nowrap;
+}
+.share-link-row button:hover{background:var(--purple-600);}
+.share-icons-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:14px;}
+.share-icon-btn{
+  display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:10px;
+  border:none;color:#fff;font-weight:600;font-size:13px;cursor:pointer;
+  text-decoration:none;flex:1;min-width:110px;justify-content:center;
+}
+.share-icon-btn.fb{background:#1877f2;}
+.share-icon-btn.fb:hover{background:#0d5fcb;}
+.share-icon-btn.wa{background:#25d366;}
+.share-icon-btn.wa:hover{background:#1da851;}
+.share-icon-btn.li{background:#0a66c2;}
+.share-icon-btn.li:hover{background:#084e96;}
+.share-icon-btn.native{background:rgba(162,60,255,0.4);border:1px solid rgba(162,60,255,0.6);}
+.share-icon-btn.native:hover{background:rgba(162,60,255,0.6);}
+.share-close-btn{
+  display:block;width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.2);
+  background:transparent;color:var(--muted);font-family:inherit;font-size:13px;cursor:pointer;margin-top:4px;
+}
+.share-close-btn:hover{color:#fff;border-color:rgba(255,255,255,0.4);}
+@media (max-width:480px){
+  .share-icon-btn{min-width:100%;}
+}
+
+/* SECTION BOX */
+.section-box{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(162,60,255,0.35);
+  border-radius:12px;
+  padding:18px 20px;
+  margin-bottom:20px;
+}
+.section-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:20px;color:var(--purple-100);font-weight:700;
+  letter-spacing:2px;margin-bottom:16px;
+  display:flex;align-items:center;gap:10px;
+  border-bottom:1px solid rgba(162,60,255,0.3);
+  padding-bottom:10px;
+}
+
+/* FORM ROWS */
+.form-row{
+  display:grid;
+  grid-template-columns: 200px 1fr;
+  gap:16px;
+  align-items:center;
+  padding:10px 0;
+  border-bottom:1px solid rgba(162,60,255,0.15);
+}
+.form-row:last-child{border-bottom:none;}
+.form-label{
+  font-size:13px;font-weight:600;color:var(--purple-100);
+  letter-spacing:1px;
+}
+.form-select, .form-input{
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(162,60,255,0.4);
+  border-radius:8px;
+  padding:8px 12px;
+  color:#fff;
+  font-family:inherit;font-size:13px;
+  width:100%;
+}
+.form-select:focus, .form-input:focus{
+  outline:none;border-color:var(--purple-500);box-shadow:0 0 10px rgba(162,60,255,0.3);
+}
+.form-select option{background:var(--bg);color:#fff;}
+
+/* COUPLE ROWS */
+.couple-row{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:16px;
+}
+.couple-field{
+  display:flex;flex-direction:column;gap:6px;
+}
+.couple-field label{
+  font-size:12px;color:var(--purple-300);font-weight:600;
+}
+
+/* TEXTAREA */
+.textarea-box{
+  width:100%;min-height:120px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(162,60,255,0.4);
+  border-radius:8px;
+  padding:12px;
+  color:#fff;font-family:inherit;font-size:13px;
+  resize:vertical;
+}
+.textarea-box:focus{
+  outline:none;border-color:var(--purple-500);box-shadow:0 0 10px rgba(162,60,255,0.3);
+}
+.textarea-box.personal-msg{
+  min-height:200px;font-size:14px;line-height:1.6;
+}
+
+/* GALLERY + VIDEO COLUMNS */
+.media-row{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:20px;
+  margin-bottom:20px;
+}
+.media-box{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(162,60,255,0.35);
+  border-radius:12px;
+  padding:18px 20px;
+}
+.media-box-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:18px;color:var(--purple-100);font-weight:700;
+  letter-spacing:2px;margin-bottom:14px;
+  display:flex;align-items:center;gap:10px;
+  justify-content:space-between;
+}
+.media-grid{
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;
+  margin-bottom:12px;
+}
+.media-thumb{
+  aspect-ratio:1/1;
+  background:linear-gradient(135deg,var(--purple-700),var(--purple-500));
+  border-radius:8px;border:1px solid rgba(162,60,255,0.3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;cursor:pointer;transition:all .2s;
+}
+.media-thumb:hover{transform:scale(1.05);box-shadow:0 0 15px rgba(162,60,255,0.5);}
+.media-thumb.add{
+  background:rgba(255,255,255,0.06);
+  border-style:dashed;font-size:28px;color:var(--purple-300);
+}
+.media-thumb.add:hover{background:rgba(162,60,255,0.15);}
+
+.video-list{display:flex;flex-direction:column;gap:8px;}
+.video-item{
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(162,60,255,0.3);
+  border-radius:8px;padding:10px 12px;
+  display:flex;align-items:center;gap:10px;
+  cursor:pointer;transition:all .2s;
+}
+.video-item:hover{background:rgba(162,60,255,0.15);}
+.video-item .v-icon{font-size:20px;}
+.video-item .v-info{flex:1;}
+.video-item .v-title{font-size:13px;color:#fff;font-weight:600;}
+.video-item .v-meta{font-size:11px;color:var(--muted);}
+.video-item .v-add{
+  background:rgba(255,255,255,0.06);border-style:dashed;
+  justify-content:center;color:var(--purple-300);font-weight:600;
+}
+
+/* PRIVACY SELECT */
+.privacy-bar{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 0;border-top:1px solid rgba(162,60,255,0.2);
+  margin-top:8px;
+}
+.privacy-bar label{
+  font-size:12px;color:var(--purple-300);font-weight:600;
+}
+
+/* EDIT BUTTON */
+.edit-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 20px;border-radius:10px;
+  background:linear-gradient(90deg,var(--purple-500),var(--purple-600));
+  color:#fff;font-weight:700;font-size:14px;letter-spacing:1px;
+  border:none;cursor:pointer;transition:all .2s;
+  margin-bottom:20px;
+}
+.edit-btn:hover{box-shadow:0 0 20px rgba(162,60,255,0.5);transform:translateY(-2px);}
+
+/* BLOCK POKE SETTING */
+.block-poke-row{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 0;border-top:1px solid rgba(162,60,255,0.2);
+  margin-top:10px;
+}
+.toggle-switch{
+  width:44px;height:24px;border-radius:12px;
+  background:var(--purple-900);border:1px solid rgba(162,60,255,0.4);
+  position:relative;cursor:pointer;transition:all .2s;
+}
+.toggle-switch::after{
+  content:'';position:absolute;width:18px;height:18px;
+  border-radius:50%;background:var(--purple-300);top:2px;left:2px;
+  transition:all .2s;
+}
+.toggle-switch.active{background:var(--green);}
+.toggle-switch.active::after{left:22px;background:#fff;}
+
+/* FOOTER */
+.footer-nav{
+  text-align:center;padding:14px;
+  border-top:2px solid var(--line);
+  font-size:11px;color:var(--muted);letter-spacing:1.5px;
+}
+
+/* RESPONSIVE */
+@media (max-width:900px){
+  .left-sidebar{width:60px;padding:10px 4px;}
+  .left-sidebar a span{display:none;}
+  .left-sidebar a{justify-content:center;padding:10px 6px;}
+  .media-row{grid-template-columns:1fr;}
+  .form-row{grid-template-columns:1fr;}
+  .couple-row{grid-template-columns:1fr;}
+  .profile-header{flex-direction:column;align-items:flex-start;}
+}
+@media (max-width:600px){
+  .top{grid-template-columns:1fr;text-align:center;}
+  .right-of-title{align-items:center;}
+  .nav-bar a{padding:10px 12px;font-size:12px;}
+  .media-grid{grid-template-columns:1fr 1fr;}
+}
+
+/* READONLY MODE */
+.readonly .form-select, .readonly .form-input, .readonly .textarea-box{
+  background:transparent;border:none;padding-left:0;
+  pointer-events:none;appearance:none;
+  -webkit-appearance:none;
+}
+.readonly .edit-btn{display:none;}
+.edit-active .readonly .form-select, .edit-active .readonly .form-input, .edit-active .readonly .textarea-box{
+  background:rgba(255,255,255,0.06);border:1px solid rgba(162,60,255,0.4);
+  pointer-events:auto;appearance:auto;-webkit-appearance:auto;
+  padding:8px 12px;
+}
+
+body{opacity:1;transition:opacity .15s;}
+
+/* ===================================================
+   EX YU DATE — ANTI-TRZANJE v3 (FINALNA VERZIJA)
+   =================================================== */
+
+/* 1. Pozadina nikad ne nestaje — nema bijelog bljeska */
+html {
+  background: linear-gradient(135deg,#1a0033 0%,#2d0057 50%,#4a0a7a 100%);
+  background-attachment: fixed;
+  overflow-y: scroll; /* scrollbar uvijek prisutan → nema layout shiftova */
+}
+
+/* 2. View Transitions API (Chrome 111+) — čista crossfade, bez pokreta */
+@view-transition {
+  navigation: auto;
+}
+::view-transition-old(root) {
+  animation: 180ms linear forwards exyu-out;
+}
+::view-transition-new(root) {
+  animation: 220ms linear forwards exyu-in;
+}
+@keyframes exyu-out { to   { opacity: 0; } }
+@keyframes exyu-in  { from { opacity: 0; } }
+
+/* 3. Fallback — isti efekt za Firefox/Safari, BEZ pokreta */
+body {
+  animation: exyu-body-in 0.22s linear both;
+}
+@keyframes exyu-body-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* MALI "TV" VIDEO U PRAZNOM SREDNJEM PROSTORU ZAGLAVLJA */
+.title-wrap-tv{
+  width:100%;
+  max-width:220px;
+  margin:0 auto;
+  aspect-ratio:16/9;
+  border-radius:10px;
+  overflow:hidden;
+  border:2px solid rgba(162,60,255,0.5);
+  box-shadow:0 6px 20px rgba(162,60,255,0.4);
+  background:#000;
+}
+.title-wrap-tv video{width:100%;height:100%;object-fit:cover;display:block;}
+
+/* HERO BANNER - puna širina, video na vrhu stranice */
+.hero-banner{
+  position:relative;
+  width:100%;
+  height:220px;
+  background:linear-gradient(135deg, #2d0057, #4a0a7a);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  border-bottom:2px solid rgba(255,255,255,0.15);
+}
+.hero-banner video{
+  position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:0;
+}
+.hero-banner .hero-overlay{
+  position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.2)); z-index:1;
+}
+@media(max-width:600px){ .hero-banner{ height:140px; } }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <div class="hero-banner">
+    <video autoplay muted loop playsinline src="media/hero-banner-2.mp4"></video>
+    <div class="hero-overlay"></div>
+  </div>
+
+  <!-- TOP HEADER -->
+  <div class="top">
+    <div class="corner-links">
+      <a href="pocetna.html">« Povratak</a>
+      <a href="#" id="exyuBellBtn">🔔<span id="exyuNotifBadge" class="exyu-notif-badge"></span></a>
+      <a href="settings.html">⚙️ Postavke</a>
+      <a href="../index.html">Odjava</a>
+    </div>
+    <div class="title-wrap"></div>
+    <div class="right-of-title">
+      <a href="profil.html" title="Moj profil">👤</a>
+      <div class="with-count"><a href="#">Poruke</a><span class="count-box">0</span></div>
+    </div>
+  </div>
+
+  <!-- NAV BAR -->
+  <div class="nav-bar">
+    <a href="pocetna.html">Početna</a>
+    <a href="hrvatska.html">Hrvatska</a>
+    <a href="bosna.html">Bosna i Hercegovina</a>
+    <a href="srbija.html">Srbija</a>
+    <a href="chat.html">Chat</a>
+    <a href="video.html">Video pozivi</a>
+    <a href="galerija.html">Galerija</a>
+    <a href="oglasnik.html">Oglasnik</a>
+    <a class="active" href="profil.html">Profil</a>
+    <a href="#" id="myFriendsNav">Moji prijatelji (<span id="myFriendsCount">0</span>)</a>
+  </div>
+
+  <!-- PROFILE MAIN -->
+  <div class="profile-main">
+
+    <!-- LEFT SIDEBAR -->
+    <div class="left-sidebar">
+      <a href="pocetna.html"><span class="icon">🏠</span><span>Početna</span></a>
+      <a class="active" href="profil.html"><span class="icon">👤</span><span>Moj profil</span></a>
+      <a href="chat.html"><span class="icon">💬</span><span>Poruke</span></a>
+      <a href="video.html"><span class="icon">📹</span><span>Video pozivi</span></a>
+      <a href="oglasnik.html"><span class="icon">📢</span><span>Oglasnik</span></a>
+      <a href="#" id="menuBlock"><span class="icon">🚫</span><span>Blokirani</span></a>
+      <a href="#" id="menuPoke"><span class="icon">👉</span><span>Bockanja</span></a>
+      <a href="settings.html" id="menuSettings"><span class="icon">⚙️</span><span>Postavke</span></a>
+      <a href="../index.html"><span class="icon">🚪</span><span>Odjava</span></a>
+    </div>
+
+    <!-- PROFILE CONTENT -->
+    <div class="profile-content" id="profileContent">
+
+      <!-- EDIT TOGGLE -->
+      <button type="button" class="edit-btn" id="editToggle" onclick="toggleEdit()">
+        ✏️ UREDI PROFIL
+      </button>
+      <button type="button" class="btn-share" id="shareProfileBtn" onclick="openShareModal()">
+        📤 Podijeli
+      </button>
+
+      <!-- PROFILE HEADER -->
+      <div class="profile-header">
+        <div class="profile-avatar" id="profileAvatar" onclick="openAvatarPicker()" style="cursor:pointer;position:relative;overflow:hidden;" title="Kliknite za promjenu profilne slike">👤
+          <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.55);font-size:10px;padding:2px 0;text-align:center;">✏️ Promijeni</div>
+          <button type="button" id="btnDeleteUser" onclick="event.stopPropagation();deleteOtherUser()" title="Izbaci korisnika (samo admin)" style="display:none;position:absolute;top:-8px;right:-8px;width:30px;height:30px;border-radius:50%;background:#dc2626;color:#fff;border:2px solid #1a0033;cursor:pointer;font-size:14px;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.5);z-index:5;">🛑</button>
+        </div>
+        <input type="file" id="avatarUploadInput" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)">
+        <div class="profile-header-info">
+          <h2 id="profileNick">Korisnik</h2>
+          <div class="profile-meta" id="profileMeta">
+            <span id="profileGender">Muškarac</span> • <span id="profileAge">30</span> godina
+            <span id="coupleInfo" style="display:none;"> • Par (M: <span id="mAge"></span> / Ž: <span id="zAge"></span>)</span>
+          </div>
+          <div class="profile-actions-top" id="profileActionsTop">
+            <button type="button" class="btn-video" onclick="openVideo()">📹 Video</button>
+            <button type="button" class="btn-poke" onclick="pokeUser()">👉 Bockaj</button>
+            <button type="button" class="btn-block" onclick="blockUser()">🚫 Blokiraj</button>
+            <button type="button" class="btn-block" id="btnReportOther" onclick="reportOtherUser()" style="background:#f59e0b;">🚩 Prijavi</button>
+          </div>
+          <div class="block-poke-row">
+            <label>Blokiraj bockanja:</label>
+            <div class="toggle-switch" id="blockPokeToggle" onclick="toggleBlockPoke()"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FORMA U KORACIMA (strelice) -->
+      <div class="section-box">
+        <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+          <button type="button" id="stepPrevBtn" onclick="profileStep(-1)" title="Prethodno" style="background:rgba(162,60,255,0.2);border:1px solid rgba(162,60,255,0.5);color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;flex-shrink:0;">◀</button>
+          <span id="stepTitle">👤 IME I KONTAKT</span>
+          <button type="button" id="stepNextBtn" onclick="profileStep(1)" title="Sljedeće" style="background:rgba(162,60,255,0.2);border:1px solid rgba(162,60,255,0.5);color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;flex-shrink:0;">▶</button>
+        </div>
+        <div style="display:flex;justify-content:center;gap:6px;padding:8px 0 2px;" id="stepDots">
+          <span class="step-dot" data-i="0" style="width:8px;height:8px;border-radius:50%;background:#a23cff;"></span>
+          <span class="step-dot" data-i="1" style="width:8px;height:8px;border-radius:50%;background:rgba(162,60,255,0.3);"></span>
+          <span class="step-dot" data-i="2" style="width:8px;height:8px;border-radius:50%;background:rgba(162,60,255,0.3);"></span>
+          <span class="step-dot" data-i="3" style="width:8px;height:8px;border-radius:50%;background:rgba(162,60,255,0.3);"></span>
+        </div>
+
+        <!-- KORAK 0: IME I KONTAKT -->
+        <div class="step-panel" data-step="0">
+          <div class="form-row">
+            <div class="form-label">IME</div>
+            <input type="text" class="form-select" id="imeKorisnika" placeholder="Vaše ime" style="width:100%;">
+          </div>
+          <div class="form-row">
+            <div class="form-label">EMAIL</div>
+            <input type="email" class="form-select" id="emailKorisnika" placeholder="vaš@email.com" style="width:100%;">
+          </div>
+        </div>
+
+        <!-- KORAK 1: LOKACIJA -->
+        <div class="step-panel" data-step="1" style="display:none;">
+          <div class="form-row">
+            <div class="form-label">GRAD</div>
+            <input type="text" class="form-select" id="gradKorisnika" placeholder="Grad" style="width:100%;">
+          </div>
+          <div class="form-row">
+            <div class="form-label">ŽUPANIJA / KANTON / OKRUG</div>
+            <input type="text" class="form-select" id="regijaKorisnika" placeholder="Županija / Kanton / Okrug" style="width:100%;">
+          </div>
+        </div>
+
+        <!-- KORAK 2: OSNOVNI PODACI -->
+        <div class="step-panel" data-step="2" style="display:none;">
+          <div class="form-row">
+            <div class="form-label">SPOL</div>
+            <select class="form-select" id="spol">
+              <option value="m">Muškarac</option>
+              <option value="z">Žena</option>
+              <option value="par">Par (muškarac + žena)</option>
+              <option value="par-mm">Par (muškarac + muškarac)</option>
+              <option value="par-zz">Par (žena + žena)</option>
+            </select>
+          </div>
+          <div class="form-row" id="soloAgeRow">
+            <div class="form-label">GODINE</div>
+            <select class="form-select" id="godine">
+              <option value="18">18</option><option value="19">19</option>
+              <option value="20">20</option><option value="21">21</option><option value="22">22</option>
+              <option value="23">23</option><option value="24">24</option><option value="25">25</option>
+              <option value="26">26</option><option value="27">27</option><option value="28">28</option>
+              <option value="29">29</option><option value="30" selected>30</option>
+              <option value="31">31</option><option value="32">32</option><option value="33">33</option>
+              <option value="34">34</option><option value="35">35</option><option value="36">36</option>
+              <option value="37">37</option><option value="38">38</option><option value="39">39</option>
+              <option value="40">40</option><option value="41">41</option><option value="42">42</option>
+              <option value="43">43</option><option value="44">44</option><option value="45">45</option>
+              <option value="46">46</option><option value="47">47</option><option value="48">48</option>
+              <option value="49">49</option><option value="50">50</option><option value="51">51</option>
+              <option value="52">52</option><option value="53">53</option><option value="54">54</option>
+              <option value="55">55</option><option value="56">56</option><option value="57">57</option>
+              <option value="58">58</option><option value="59">59</option><option value="60">60</option>
+              <option value="61">61</option><option value="62">62</option><option value="63">63</option>
+              <option value="64">64</option><option value="65">65</option><option value="66">66</option>
+              <option value="67">67</option><option value="68">68</option><option value="69">69</option>
+              <option value="70">70+</option>
+            </select>
+          </div>
+          <div class="form-row" id="coupleAgeRow" style="display:none;">
+            <div class="form-label">GODINE PARA</div>
+            <div class="couple-row">
+              <div class="couple-field">
+                <label>Muškarac</label>
+                <select class="form-select" id="godineM">
+                  <option value="18">18</option><option value="20">20</option><option value="25">25</option>
+                  <option value="30" selected>30</option><option value="35">35</option><option value="40">40</option>
+                  <option value="45">45</option><option value="50">50</option><option value="55">55</option>
+                  <option value="60">60+</option>
+                </select>
+              </div>
+              <div class="couple-field">
+                <label>Žena</label>
+                <select class="form-select" id="godineZ">
+                  <option value="18">18</option><option value="20">20</option><option value="25" selected>25</option>
+                  <option value="30">30</option><option value="35">35</option><option value="40">40</option>
+                  <option value="45">45</option><option value="50">50</option><option value="55">55</option>
+                  <option value="60">60+</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">TRAŽIM</div>
+            <select class="form-select" id="trazim">
+              <option value="z">Ženu</option>
+              <option value="m">Muškarca</option>
+              <option value="par">Par</option>
+              <option value="svi">Sve / Bez razlike</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- KORAK 3: DETALJI -->
+        <div class="step-panel" data-step="3" style="display:none;">
+          <div class="form-row">
+            <div class="form-label">VISINA</div>
+            <select class="form-select" id="visina">
+              <option value="">Odaberi...</option>
+              <option value="150-160">150-160 cm</option>
+              <option value="160-165">160-165 cm</option>
+              <option value="165-170">165-170 cm</option>
+              <option value="170-175">170-175 cm</option>
+              <option value="175-180">175-180 cm</option>
+              <option value="180-185">180-185 cm</option>
+              <option value="185-190">185-190 cm</option>
+              <option value="190-195">190-195 cm</option>
+              <option value="195+">195+ cm</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-label">TEŽINA</div>
+            <select class="form-select" id="tezina">
+              <option value="">Odaberi...</option>
+              <option value="50-55">50-55 kg</option>
+              <option value="55-60">55-60 kg</option>
+              <option value="60-65">60-65 kg</option>
+              <option value="65-70">65-70 kg</option>
+              <option value="70-75">70-75 kg</option>
+              <option value="75-80">75-80 kg</option>
+              <option value="80-90">80-90 kg</option>
+              <option value="90-100">90-100 kg</option>
+              <option value="100+">100+ kg</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-label">BOJA KOSE</div>
+            <select class="form-select" id="bojaKose">
+              <option value="">Odaberi...</option>
+              <option value="plava">Plava</option>
+              <option value="smeda">Smeđa</option>
+              <option value="crna">Crna</option>
+              <option value="crvena">Crvena</option>
+              <option value="siva">Siva / Sijeda</option>
+              <option value="riza">Riča / Osvijetljena</option>
+              <option value="nema">Bez kose / Ćelav</option>
+              <option value="drugo">Drugo</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-label">BOJA OČIJU</div>
+            <select class="form-select" id="bojaOciju">
+              <option value="">Odaberi...</option>
+              <option value="plave">Plave</option>
+              <option value="zelene">Zelene</option>
+              <option value="smede">Smeđe</option>
+              <option value="sive">Sive</option>
+              <option value="ljubicaste">Ljubičaste</option>
+              <option value="crne">Crne</option>
+              <option value="drugo">Drugo</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-label">SEKSUALNA ORIJENTACIJA</div>
+            <select class="form-select" id="seksOrijentacija">
+              <option value="">Odaberi...</option>
+              <option value="hetero">Heteroseksualna</option>
+              <option value="homo">Homoseksualna</option>
+              <option value="biseksualna">Biseksualna</option>
+              <option value="bicurious">Bi-curious</option>
+              <option value="pan">Panseksualna</option>
+              <option value="asexual">Aseksualna</option>
+              <option value="drugo">Drugo / Ne želim reći</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-label">STATUS</div>
+            <select class="form-select" id="status">
+              <option value="">Odaberi...</option>
+              <option value="slobodan">Slobodan / Slobodna</option>
+              <option value="u-vezi">U vezi</option>
+              <option value="brak">U braku</option>
+              <option value="razveden">Razveden / Razvedena</option>
+              <option value="udovac">Udovac / Udovica</option>
+              <option value="komplikovano">Komplikovano</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- KRATKI OPIS -->
+      <div class="section-box">
+        <div class="section-title">📝 KRATKI OPIS</div>
+        <textarea class="textarea-box" id="kratkiOpis" placeholder="Jedna kratka rečenica o sebi..." style="min-height:60px;display:block;"></textarea>
+        <button type="button" class="edit-btn" id="kratkiOpisDoneBtn" onclick="saveOneField('bio', 'kratkiOpis', 'kratkiOpisDoneBtn')" style="display:block;margin-top:14px;">✅ Gotovo</button>
+      </div>
+
+      <!-- OSOBNA PORUKA -->
+      <div class="section-box">
+        <div class="section-title">📢 OSOBNA PORUKA — PORUKA SVIM KORISNICIMA</div>
+        <textarea class="textarea-box personal-msg" id="osobnaPoruka" placeholder="Poruka koju će svi korisnici vidjeti na vašem profilu..." style="display:block;"></textarea>
+        <button type="button" class="edit-btn" id="osobnaPorukaDoneBtn" onclick="saveOneField('personalMessage', 'osobnaPoruka', 'osobnaPorukaDoneBtn')" style="display:block;margin-top:14px;">✅ Gotovo</button>
+      </div>
+
+      <!-- GALERIJA + VIDEO -->
+      <div class="media-row">
+        <!-- GALERIJA -->
+        <div class="media-box">
+          <div class="media-box-title">
+            <span>🖼️ GALERIJA</span>
+            <span style="font-size:11px;color:var(--muted);">Privatnost se bira za SVAKU sliku posebno</span>
+          </div>
+          <div class="media-grid" id="galleryGrid">
+            <div class="media-thumb add" onclick="addPhoto()" title="Dodaj fotografiju">+</div>
+          </div>
+        </div>
+
+        <!-- VIDEO -->
+        <div class="media-box">
+          <div class="media-box-title">
+            <span>🎥 VIDEO</span>
+            <span style="font-size:11px;color:var(--muted);">Privatnost se bira za SVAKI video posebno</span>
+          </div>
+          <div class="video-list" id="videoList">
+            <div class="video-item v-add" onclick="addVideo()">
+              <span style="font-size:24px;margin-right:8px;">+</span>
+              <span>Dodaj video</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer-nav">EX YU DATE — UPOZNAVANJE BEZ GRANICA</div>
+</div>
+
+<script>
+const API_BASE = '/api';
+async function api(method, path, body) {
+  const opts = { method, headers: {}, credentials: 'include' };
+  if (body) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
+  const res = await fetch(API_BASE + path, opts);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'Greška.');
+  return data;
+}
+
+let myProfile = null;   // vlastiti profil (iz /api/profile/me), popunjeno pri učitavanju
+let myPhotos = [];
+let myVideos = [];
+
+// KORAČNA NAVIGACIJA (strelice) - IME I KONTAKT / LOKACIJA / OSNOVNI PODACI / DETALJI
+var currentStep = 0;
+var STEP_TITLES = ['👤 IME I KONTAKT', '📍 LOKACIJA', '📋 OSNOVNI PODACI', '📊 DETALJI'];
+function showStep(i){
+  currentStep = (i + 4) % 4; // kruži: s koraka 0 prethodno ide na 3, s koraka 3 sljedeće ide na 0
+  document.querySelectorAll('.step-panel').forEach(function(p){
+    p.style.display = (parseInt(p.dataset.step, 10) === currentStep) ? 'block' : 'none';
+  });
+  document.getElementById('stepTitle').textContent = STEP_TITLES[currentStep];
+  document.querySelectorAll('.step-dot').forEach(function(d){
+    d.style.background = (parseInt(d.dataset.i, 10) === currentStep) ? '#a23cff' : 'rgba(162,60,255,0.3)';
+  });
+  // Strelice su UVIJEK vidljive i aktivne (nema zaglavljivanja na prvom/zadnjem koraku)
+  document.getElementById('stepPrevBtn').style.visibility = 'visible';
+  document.getElementById('stepNextBtn').style.visibility = 'visible';
+}
+function profileStep(dir){
+  showStep(currentStep + dir);
+}
+
+// Spremanje pojedinačnog polja (kratki opis / osobna poruka) s gumbom "Gotovo",
+// neovisno o glavnom UREDI/SPREMI PROFIL prekidaču
+async function saveOneField(apiField, inputId, btnId){
+  var val = document.getElementById(inputId).value;
+  var btn = document.getElementById(btnId);
+  var original = btn.textContent;
+  var body = {};
+  body[apiField] = val;
+  try {
+    await api('PUT', '/profile/me', body);
+    btn.textContent = '✅ Spremljeno!';
+    setTimeout(function(){ btn.textContent = original; }, 1800);
+  } catch (err) {
+    alert('❌ ' + err.message);
+  }
+}
+
+// EDIT MODE
+var editMode = false;
+function toggleEdit(){
+  editMode = !editMode;
+  var btn = document.getElementById('editToggle');
+  var content = document.getElementById('profileContent');
+  if(editMode){
+    btn.innerHTML = '💾 SPREMI PROMJENE';
+    content.classList.add('edit-active');
+    document.querySelectorAll('.form-select, .form-input, .textarea-box').forEach(function(el){
+      el.disabled = false;
+      el.style.pointerEvents = 'auto';
+      el.style.background = 'rgba(255,255,255,0.06)';
+      el.style.border = '1px solid rgba(162,60,255,0.4)';
+    });
+  } else {
+    btn.innerHTML = '✏️ UREDI PROFIL';
+    content.classList.remove('edit-active');
+    saveProfile();
+    document.querySelectorAll('.form-select, .form-input, .textarea-box').forEach(function(el){
+      if (el.id === 'kratkiOpis' || el.id === 'osobnaPoruka') return;
+      el.disabled = true;
+      el.style.pointerEvents = 'none';
+      el.style.background = 'transparent';
+      el.style.border = 'none';
+      el.style.color = '#fff';
+      el.style.opacity = '1';
+      el.style.webkitTextFillColor = '#fff';
+    });
+  }
+}
+
+// SPOL CHANGE - show/hide couple rows
+document.getElementById('spol').addEventListener('change', function(){
+  var v = this.value;
+  var soloRow = document.getElementById('soloAgeRow');
+  var coupleRow = document.getElementById('coupleAgeRow');
+  var coupleInfo = document.getElementById('coupleInfo');
+  if(v === 'par' || v === 'par-mm' || v === 'par-zz'){
+    soloRow.style.display = 'none';
+    coupleRow.style.display = 'grid';
+    coupleInfo.style.display = 'inline';
+    updateCoupleLabels(v);
+  } else {
+    soloRow.style.display = 'grid';
+    coupleRow.style.display = 'none';
+    coupleInfo.style.display = 'none';
+  }
+});
+
+function updateCoupleLabels(v){
+  var mLabel = document.querySelector('#coupleAgeRow .couple-field:nth-child(1) label');
+  var zLabel = document.querySelector('#coupleAgeRow .couple-field:nth-child(2) label');
+  if(v === 'par-mm'){
+    mLabel.textContent = 'Muškarac 1';
+    zLabel.textContent = 'Muškarac 2';
+  } else if(v === 'par-zz'){
+    mLabel.textContent = 'Žena 1';
+    zLabel.textContent = 'Žena 2';
+  } else {
+    mLabel.textContent = 'Muškarac';
+    zLabel.textContent = 'Žena';
+  }
+}
+
+// SAVE PROFILE
+// NAPOMENA: dob (polje "godine") se NE šalje - stvarna dob se uvijek računa na serveru iz
+// datuma rođenja unesenog kod registracije, da se ne zaobiđe provjera punoljetnosti.
+// Isto vrijedi za email/grad/županiju - to su podaci provjereni kod registracije;
+// ovdje se prikazuju informativno, ali se ne mogu prepisati preko ove forme.
+async function saveProfile(){
+  var data = {
+    displayName: document.getElementById('imeKorisnika').value,
+    profileGender: document.getElementById('spol').value,
+    partnerAge: (document.getElementById('spol').value.indexOf('par') === 0 || document.getElementById('spol').value.indexOf('par-') === 0)
+      ? parseInt(document.getElementById('godineZ').value, 10) : null,
+    seeking: document.getElementById('trazim').value,
+    heightRange: document.getElementById('visina').value,
+    weightRange: document.getElementById('tezina').value,
+    hairColor: document.getElementById('bojaKose').value,
+    eyeColor: document.getElementById('bojaOciju').value,
+    orientation: document.getElementById('seksOrijentacija').value,
+    relationshipStatus: document.getElementById('status').value,
+    blockPokes: document.getElementById('blockPokeToggle').classList.contains('active'),
+  };
+  try {
+    await api('PUT', '/profile/me', data);
+    alert('Profil spremljen!');
+    updateHeaderDisplay();
+  } catch (err) {
+    alert('❌ ' + err.message);
+  }
+}
+
+// ======================
+// PROMJENA PROFILNE SLIKE
+// ======================
+function openAvatarPicker(){
+  var choice = prompt('Odaberi izvor nove profilne slike:\n1 = Iz galerije\n2 = Učitaj s uređaja\n\nUpiši 1 ili 2:');
+  if (choice === '1') {
+    window.location.href = 'galerija.html?pickAvatar=1';
+  } else if (choice === '2') {
+    document.getElementById('avatarUploadInput').click();
+  }
+}
+function handleAvatarUpload(event){
+  var file = event.target.files && event.target.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { alert('Molimo odaberite sliku!'); return; }
+  var reader = new FileReader();
+  reader.onload = async function(e){
+    setProfileAvatar(e.target.result);
+    try { await api('POST', '/profile/avatar', { avatarUrl: e.target.result }); }
+    catch(err) { alert('❌ Spremanje slike nije uspjelo: ' + err.message); }
+  };
+  reader.readAsDataURL(file);
+}
+function setProfileAvatar(dataUrl){
+  var avatarEl = document.getElementById('profileAvatar');
+  avatarEl.style.backgroundImage = 'url(' + dataUrl + ')';
+  avatarEl.style.backgroundSize = 'cover';
+  avatarEl.style.backgroundPosition = 'center';
+  avatarEl.childNodes[0].textContent = '';
+}
+
+// ===== PODIJELI PROFIL =====
+function getShareTargetNick(){
+  return window.exyuTargetUser || window.exyuMeNick || (myProfile && myProfile.nick) || '';
+}
+function buildShareUrl(){
+  var nick = getShareTargetNick();
+  var base = window.location.origin + window.location.pathname;
+  return base + '?user=' + encodeURIComponent(nick);
+}
+function openShareModal(){
+  var url = buildShareUrl();
+  var nick = getShareTargetNick();
+  var text = 'Pogledaj profil korisnika ' + nick + ' na EX YU DATE!';
+
+  document.getElementById('shareLinkInput').value = url;
+  document.getElementById('shareFbBtn').href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
+  document.getElementById('shareWaBtn').href = 'https://wa.me/?text=' + encodeURIComponent(text + ' ' + url);
+  document.getElementById('shareLiBtn').href = 'https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(url);
+
+  var nativeBtn = document.getElementById('shareNativeBtn');
+  nativeBtn.style.display = (navigator.share) ? 'flex' : 'none';
+
+  document.getElementById('shareOverlay').classList.add('on');
+}
+function closeShareModal(){
+  document.getElementById('shareOverlay').classList.remove('on');
+}
+async function copyShareLink(){
+  var input = document.getElementById('shareLinkInput');
+  var btn = document.getElementById('shareCopyBtn');
+  var url = input.value;
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(url);
+    } else {
+      input.select();
+      input.setSelectionRange(0, 99999);
+      document.execCommand('copy');
+    }
+    var old = btn.textContent;
+    btn.textContent = '✅ Kopirano!';
+    setTimeout(function(){ btn.textContent = old; }, 1800);
+  } catch (err) {
+    input.select();
+    alert('Nije uspjelo automatsko kopiranje - link je označen, kopirajte ga ručno (Ctrl+C / Cmd+C).');
+  }
+}
+async function nativeShareProfile(){
+  var url = buildShareUrl();
+  var nick = getShareTargetNick();
+  try {
+    await navigator.share({
+      title: 'EX YU DATE — ' + nick,
+      text: 'Pogledaj profil korisnika ' + nick + ' na EX YU DATE!',
+      url: url
+    });
+  } catch (err) {
+    // Korisnik je otkazao dijeljenje ili share nije podržan - nema potrebe za greškom
+  }
+}
+
+// LOAD PROFILE (own profile, editable)
+async function loadProfile(){
+  try {
+    myProfile = await api('GET', '/profile/me');
+  } catch (err) {
+    alert('❌ Greška pri učitavanju profila: ' + err.message);
+    return;
+  }
+  var d = myProfile;
+  myPhotos = d.photos || [];
+  myVideos = d.videos || [];
+
+  document.getElementById('profileNick').textContent = d.nick;
+  document.getElementById('profileAvatar').textContent = d.nick.charAt(0).toUpperCase();
+  if (d.avatarUrl) setProfileAvatar(d.avatarUrl);
+
+  if (d.displayName) document.getElementById('imeKorisnika').value = d.displayName;
+  document.getElementById('emailKorisnika').value = d.email || '';
+  document.getElementById('gradKorisnika').value = d.city ? (d.city.charAt(0).toUpperCase()+d.city.slice(1)) : '';
+  document.getElementById('regijaKorisnika').value = d.region || '';
+
+  var spolValue = d.profileGender || d.gender;
+  document.getElementById('spol').value = spolValue;
+  document.getElementById('godine').value = d.age;
+  if (d.partnerAge) document.getElementById('godineZ').value = d.partnerAge;
+  document.getElementById('godineM').value = d.age;
+
+  if (d.seeking || d.seekGender) document.getElementById('trazim').value = d.seeking || d.seekGender;
+  if (d.heightRange) document.getElementById('visina').value = d.heightRange;
+  if (d.weightRange) document.getElementById('tezina').value = d.weightRange;
+  if (d.hairColor) document.getElementById('bojaKose').value = d.hairColor;
+  if (d.eyeColor) document.getElementById('bojaOciju').value = d.eyeColor;
+  if (d.orientation) document.getElementById('seksOrijentacija').value = d.orientation;
+  if (d.relationshipStatus) document.getElementById('status').value = d.relationshipStatus;
+  if (d.bio) document.getElementById('kratkiOpis').value = d.bio;
+  if (d.personalMessage) document.getElementById('osobnaPoruka').value = d.personalMessage;
+  if (d.blockPokes) document.getElementById('blockPokeToggle').classList.add('active');
+
+  document.getElementById('spol').dispatchEvent(new Event('change'));
+  updateHeaderDisplay();
+}
+
+// LOAD OTHER USER'S PROFILE (read-only view)
+async function loadOtherProfile(nick){
+  document.getElementById('profileNick').textContent = nick;
+  document.getElementById('profileAvatar').textContent = nick.charAt(0).toUpperCase();
+  var editBtn = document.getElementById('editToggle');
+  if(editBtn) editBtn.style.display = 'none';
+  var gmap = {m:'Muškarac', z:'Žena', par:'Par', 'par-mm':'Par (M+M)', 'par-zz':'Par (Ž+Ž)'};
+
+  var data;
+  try {
+    data = await api('GET', '/profile/' + encodeURIComponent(nick));
+  } catch (err) {
+    alert('❌ ' + err.message);
+    return;
+  }
+
+  if (data.avatarUrl) setProfileAvatar(data.avatarUrl);
+  var spolValue = data.profileGender || data.gender;
+  document.getElementById('spol').value = spolValue;
+  document.getElementById('profileGender').textContent = gmap[spolValue] || 'Korisnik';
+  document.getElementById('godine').value = data.age;
+  document.getElementById('profileAge').textContent = data.age;
+  if (data.seeking) document.getElementById('trazim').value = data.seeking;
+  if (data.heightRange) document.getElementById('visina').value = data.heightRange;
+  if (data.weightRange) document.getElementById('tezina').value = data.weightRange;
+  if (data.hairColor) document.getElementById('bojaKose').value = data.hairColor;
+  if (data.eyeColor) document.getElementById('bojaOciju').value = data.eyeColor;
+  if (data.orientation) document.getElementById('seksOrijentacija').value = data.orientation;
+  if (data.relationshipStatus) document.getElementById('status').value = data.relationshipStatus;
+  if (data.bio) document.getElementById('kratkiOpis').value = data.bio;
+  if (data.personalMessage) document.getElementById('osobnaPoruka').value = data.personalMessage;
+
+  document.querySelectorAll('.form-select, .form-input, .textarea-box').forEach(function(el){
+    el.disabled = true;
+    el.style.pointerEvents = 'none';
+    el.style.background = 'transparent';
+    el.style.border = 'none';
+    el.style.color = '#fff';
+    el.style.opacity = '1';
+  });
+  ['menuBlock','menuPoke','menuSettings'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.style.display = 'none';
+  });
+
+  applyContactRestrictions(data);
+  renderOtherMedia(data);
+}
+
+function updateHeaderDisplay(){
+  var spol = document.getElementById('spol').value;
+  var spolText = {m:'Muškarac', z:'Žena', par:'Par', 'par-mm':'Par (M+M)', 'par-zz':'Par (Ž+Ž)'};
+  document.getElementById('profileGender').textContent = spolText[spol] || 'Korisnik';
+  if(spol === 'par' || spol === 'par-mm' || spol === 'par-zz'){
+    document.getElementById('mAge').textContent = document.getElementById('godineM').value;
+    document.getElementById('zAge').textContent = document.getElementById('godineZ').value;
+  } else {
+    document.getElementById('profileAge').textContent = document.getElementById('godine').value;
+  }
+}
+
+// BLOCK POKE TOGGLE
+function toggleBlockPoke(){
+  document.getElementById('blockPokeToggle').classList.toggle('active');
+}
+
+// ACTIONS
+function openChat(){
+  if(window.exyuTargetUser) window.location.href = 'chat.html?user=' + encodeURIComponent(window.exyuTargetUser);
+  else alert('Ovo je vaš profil — otvorite Chat iz izbornika da razgovarate s drugima.');
+}
+function openVideo(){
+  if(window.exyuTargetUser) window.location.href = 'video.html?user=' + encodeURIComponent(window.exyuTargetUser);
+  else alert('Ovo je vaš profil — otvorite Video iz izbornika da nazovete druge.');
+}
+function pokeUser(){
+  if(!window.exyuTargetUser){ alert('Ovo je vaš profil.'); return; }
+  if(window.exyuPoke) window.exyuPoke(window.exyuTargetUser);
+}
+function blockUser(){
+  if(!window.exyuTargetUser){ alert('Ovo je vaš profil.'); return; }
+  if(window.exyuBlock) window.exyuBlock(window.exyuTargetUser);
+}
+function reportOtherUser(){
+  if(!window.exyuTargetUser){ alert('Ovo je vaš profil.'); return; }
+  if(window.exyuReport) window.exyuReport(window.exyuTargetUser);
+}
+async function deleteOtherUser(){
+  if(!window.exyuTargetUser){ alert('Ovo je vaš profil.'); return; }
+  if(!confirm('Jeste li sigurni da želite IZBRISATI korisnika "'+window.exyuTargetUser+'"? Ova radnja se ne može poništiti.')) return;
+  try{
+    await api('DELETE', '/users/' + encodeURIComponent(window.exyuTargetUser));
+    alert('🗑️ Korisnik "'+window.exyuTargetUser+'" je izbrisan.');
+    window.location.href = 'hrvatska.html';
+  }catch(e){ alert('❌ ' + e.message); }
+}
+
+// ======================
+// GALERIJA I VIDEO — PRIVATNOST PO SVAKOJ STAVCI POSEBNO
+// Opcije: javno (svi vide), matchevi (samo moji matchevi), privatno (samo ja)
+// NAPOMENA: ovo su i dalje samo placeholder stavke (bez stvarnog uploada slike/videa),
+// isto kao u originalu - pravi upload datoteka bio bi sljedeći korak.
+// ======================
+var PRIVACY_LABELS = { javno: '👁️ Javno', matchevi: '💞 Samo matchevi', privatno: '🔒 Privatno' };
+
+async function cyclePrivacy(kind, id){
+  try {
+    var path = (kind === 'photo' ? '/profile/photos/' : '/profile/videos/') + id;
+    var res = await api('PATCH', path);
+    var arr = kind === 'photo' ? myPhotos : myVideos;
+    var item = arr.find(function(x){ return x.id == id; });
+    if(item) item.privacy = res.privacy;
+    renderGallery();
+    renderVideos();
+  } catch(e) { alert('❌ ' + e.message); }
+}
+var PRIVACY_BORDER = { javno: '#22c55e', matchevi: '#f59e0b', privatno: '#ef4444' };
+
+function renderGallery(){
+  var g = document.getElementById('galleryGrid');
+  var addBtn = g.querySelector('.media-thumb.add');
+  g.querySelectorAll('.media-thumb:not(.add)').forEach(function(el){ el.remove(); });
+  myPhotos.forEach(function(item){
+    var div = document.createElement('div');
+    div.className = 'media-thumb';
+    div.style.position = 'relative';
+    div.style.border = '2px solid ' + PRIVACY_BORDER[item.privacy];
+    var thumb = item.data_url ? '<img src="'+item.data_url+'" style="width:100%;height:100%;object-fit:cover;' + (item.privacy==='privatno' ? 'filter:brightness(0.5);' : '') + '">' : '📷';
+    div.innerHTML = thumb +
+      '<div onclick="event.stopPropagation();cyclePrivacy(\'photo\','+item.id+')" title="Klikni za promjenu privatnosti" style="position:absolute;bottom:2px;left:2px;right:2px;font-size:10px;background:rgba(0,0,0,0.65);border-radius:6px;padding:2px 0;text-align:center;cursor:pointer;">' + PRIVACY_LABELS[item.privacy] + '</div>';
+    g.insertBefore(div, addBtn);
+  });
+}
+function renderVideos(){
+  var v = document.getElementById('videoList');
+  var addBtn = v.querySelector('.video-item.v-add');
+  v.querySelectorAll('.video-item:not(.v-add)').forEach(function(el){ el.remove(); });
+  myVideos.forEach(function(item, i){
+    var div = document.createElement('div');
+    div.className = 'video-item';
+    div.style.borderLeft = '3px solid ' + PRIVACY_BORDER[item.privacy];
+    div.innerHTML = '<span class="v-icon">▶️</span><div class="v-info"><div class="v-title">Video ' + (i+1) + '</div>' +
+      '<div class="v-meta">0:00 • Dodano</div></div>' +
+      '<div onclick="event.stopPropagation();cyclePrivacy(\'video\','+item.id+')" title="Klikni za promjenu privatnosti" style="margin-left:auto;font-size:11px;background:rgba(162,60,255,0.2);border-radius:8px;padding:4px 8px;cursor:pointer;white-space:nowrap;">' + PRIVACY_LABELS[item.privacy] + '</div>';
+    v.insertBefore(div, addBtn);
+  });
+}
+async function addPhoto(){
+  if(myPhotos.length >= 8){ alert('Maksimalno 8 fotografija!'); return; }
+  try {
+    var res = await api('POST', '/profile/photos');
+    myPhotos.push(res.photo);
+    renderGallery();
+  } catch(e) { alert('❌ ' + e.message); }
+}
+async function addVideo(){
+  if(myVideos.length >= 5){ alert('Maksimalno 5 video zapisa!'); return; }
+  try {
+    var res = await api('POST', '/profile/videos');
+    myVideos.push(res.video);
+    renderVideos();
+  } catch(e) { alert('❌ ' + e.message); }
+}
+
+// INIT
+(async function(){
+  let me = { loggedIn: false };
+  try { me = await api('GET', '/auth/me'); } catch(e){}
+  if (!me.loggedIn) { window.location.href = '../index.html'; return; }
+  window.exyuMeNick = me.nick;
+  window.exyuMeIsAdmin = me.isAdmin;
+
+  var params = new URLSearchParams(window.location.search);
+  var viewedUser = params.get('user');
+  var viewingSelf = !viewedUser || viewedUser === me.nick;
+  window.exyuTargetUser = viewingSelf ? null : viewedUser;
+
+  var actionsRow = document.getElementById('profileActionsTop');
+
+  if(viewingSelf){
+    if(actionsRow) actionsRow.style.display = 'none';
+    await loadProfile();
+    renderGallery();
+    renderVideos();
+    showStep(0);
+    document.querySelectorAll('.form-select, .form-input, .textarea-box').forEach(function(el){
+      if (el.id === 'kratkiOpis' || el.id === 'osobnaPoruka') return;
+      el.disabled = true;
+      el.style.pointerEvents = 'none';
+      el.style.background = 'transparent';
+      el.style.border = 'none';
+      el.style.color = '#fff';
+      el.style.opacity = '1';
+      el.style.webkitTextFillColor = '#fff';
+    });
+  } else {
+    if(actionsRow) actionsRow.style.display = 'flex';
+    if(me.isAdmin){
+      var delBtn = document.getElementById('btnDeleteUser');
+      if(delBtn) delBtn.style.display = 'flex';
+    }
+    await loadOtherProfile(viewedUser);
+    showStep(2); // ime/kontakt/lokacija se ne prikazuju za tuđi profil - kreni od osnovnih podataka
+  }
+})();
+
+// Prikaz tuđe galerije/videa - server je već primijenio privatnost po stavci
+var RESTRICTED_LABELS = { matchevi: '💞 Samo matchevi', privatno: '🔒 Privatno' };
+
+function otherMediaThumb(item, isVideo){
+  var div = document.createElement('div');
+  div.className = isVideo ? 'video-item' : 'media-thumb';
+  div.style.position = 'relative';
+  if(item.visible){
+    if(isVideo){
+      div.innerHTML = '<span class="v-icon">▶️</span><div class="v-info"><div class="v-title">Video</div><div class="v-meta">0:00</div></div>' +
+        '<span title="Javno" style="margin-left:auto;font-size:11px;color:#8fffb0;">👁️</span>';
+    } else {
+      var thumb = item.data_url ? '<img src="'+item.data_url+'" style="width:100%;height:100%;object-fit:cover;">' : '📷';
+      div.innerHTML = thumb + '<span title="Javno" style="position:absolute;top:4px;right:4px;font-size:12px;background:rgba(0,0,0,0.5);border-radius:50%;padding:2px 4px;">👁️</span>';
+    }
+  } else {
+    // Zatamnjeno - vidljivo da sadržaj postoji, ali ne i sam sadržaj
+    div.style.background = 'rgba(0,0,0,0.55)';
+    div.style.backdropFilter = 'blur(6px)';
+    div.style.display = 'flex';
+    div.style.flexDirection = 'column';
+    div.style.alignItems = 'center';
+    div.style.justifyContent = 'center';
+    div.style.color = '#b8a4d4';
+    div.style.fontSize = '11px';
+    div.style.textAlign = 'center';
+    div.style.gap = '4px';
+    div.innerHTML = '<span style="font-size:20px;">🔒</span><span>' + (RESTRICTED_LABELS[item.privacy] || 'Skriveno') + '</span>';
+  }
+  return div;
+}
+
+function renderOtherMedia(data){
+  var gallery = data.photos || [];
+  var g = document.getElementById('galleryGrid');
+  var addBtn = g.querySelector('.media-thumb.add');
+  if(addBtn) addBtn.style.display = 'none';
+  g.querySelectorAll('.media-thumb:not(.add)').forEach(function(el){ el.remove(); });
+  gallery.forEach(function(item){
+    g.insertBefore(otherMediaThumb(item, false), addBtn);
+  });
+  if(gallery.length === 0){ g.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:10px;">Korisnik nema fotografija.</div>'; }
+
+  var videos = data.videos || [];
+  var v = document.getElementById('videoList');
+  var vAddBtn = v.querySelector('.video-item.v-add');
+  if(vAddBtn) vAddBtn.style.display = 'none';
+  v.querySelectorAll('.video-item:not(.v-add)').forEach(function(el){ el.remove(); });
+  videos.forEach(function(item){
+    v.insertBefore(otherMediaThumb(item, true), vAddBtn);
+  });
+  if(videos.length === 0){ v.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:10px;">Korisnik nema videa.</div>'; }
+}
+
+// Sakrij "Pošalji poruku" i "Video poziv" ako je korisnik blokiran ili kontakt ograničen na matcheve
+function applyContactRestrictions(data){
+  var msgBtn = document.querySelector('.btn-msg');
+  var vidBtn = document.querySelector('.btn-video');
+  if(!data.canContact){
+    if(msgBtn) msgBtn.style.display = 'none';
+    if(vidBtn) vidBtn.style.display = 'none';
+  }
+}
+
+</script>
+<script>
+api('GET', '/users/friends-count').then(function(fc){
+  var cnt = document.getElementById("myFriendsCount");
+  if(cnt) cnt.textContent = fc.count;
+}).catch(function(){});
+</script>
+
+<!-- PODIJELI PROFIL -->
+<div class="share-overlay" id="shareOverlay">
+  <div class="share-box">
+    <h3>📤 Podijeli profil</h3>
+    <div class="share-link-row">
+      <input type="text" id="shareLinkInput" readonly onclick="this.select()">
+      <button type="button" id="shareCopyBtn" onclick="copyShareLink()">Kopiraj</button>
+    </div>
+    <div class="share-icons-row">
+      <a href="#" target="_blank" rel="noopener" class="share-icon-btn fb" id="shareFbBtn">📘 Facebook</a>
+      <a href="#" target="_blank" rel="noopener" class="share-icon-btn wa" id="shareWaBtn">💬 WhatsApp</a>
+      <a href="#" target="_blank" rel="noopener" class="share-icon-btn li" id="shareLiBtn">💼 LinkedIn</a>
+    </div>
+    <button type="button" class="share-icon-btn native" id="shareNativeBtn" style="width:100%;margin-bottom:14px;display:none;" onclick="nativeShareProfile()">
+      📱 Podijeli preko telefona
+    </button>
+    <button type="button" class="share-close-btn" onclick="closeShareModal()">Zatvori</button>
+  </div>
+</div>
+
+<!-- NOTIFIKACIJE + BLOKIRANI KORISNICI -->
+<div class="exyu-modal" id="exyuBlockedModal">
+  <div class="exyu-modal-box">
+    <h3>🚫 Blokirani korisnici</h3>
+    <div id="exyuBlockedList" style="max-height:400px;overflow-y:auto;"></div>
+    <div class="exyu-modal-actions" style="margin-top:14px;">
+      <button type="button" class="exyu-btn-cancel" onclick="document.getElementById('exyuBlockedModal').classList.remove('on')" style="flex:1;">Zatvori</button>
+    </div>
+  </div>
+</div>
+<div class="exyu-modal" id="exyuPokesModal">
+  <div class="exyu-modal-box">
+    <h3>👉 Bockanja</h3>
+    <div id="exyuPokesList" style="max-height:400px;overflow-y:auto;"></div>
+    <div class="exyu-modal-actions" style="margin-top:14px;">
+      <button type="button" class="exyu-btn-cancel" onclick="document.getElementById('exyuPokesModal').classList.remove('on')" style="flex:1;">Zatvori</button>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  function eschtml(t){ return String(t).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]); }); }
+
+  async function updateNotifBadge(){
+    try {
+      var data = await api('GET', '/moderation/notifications');
+      var n = (data.notifications || []).filter(function(x){ return !x.read_at; }).length;
+      var b = document.getElementById('exyuNotifBadge');
+      if(b){ b.textContent = n>0 ? n : ''; b.style.display = n>0 ? 'inline-block' : 'none'; }
+    } catch(e) {}
+  }
+  function ensurePanel(){
+    var p = document.getElementById('exyuNotifPanel');
+    if(p) return p;
+    p = document.createElement('div');
+    p.id = 'exyuNotifPanel';
+    p.className = 'exyu-notif-panel';
+    document.body.appendChild(p);
+    return p;
+  }
+  async function renderNotifPanel(){
+    var icon = {match:'💞', like:'💗', report:'🚩', msg:'💬', poke:'👉'};
+    var p = ensurePanel();
+    try {
+      var data = await api('GET', '/moderation/notifications');
+      var list = data.notifications || [];
+      p.innerHTML = '<div class="exyu-notif-head"><span>🔔 Notifikacije</span><a href="#" id="exyuNotifClear">Označi sve pročitano</a></div>' +
+        (list.length ? list.map(function(n){
+          return '<div class="exyu-notif-item'+(n.read_at?'':' unread')+'"><span>'+(icon[n.type]||'🔔')+'</span><span>'+eschtml(n.text)+'</span></div>';
+        }).join('') : '<div class="exyu-notif-item">Nema notifikacija.</div>');
+      var clearBtn = document.getElementById('exyuNotifClear');
+      if(clearBtn) clearBtn.addEventListener('click', async function(e){
+        e.preventDefault();
+        try { await api('POST', '/moderation/notifications/mark-read'); } catch(err){}
+        updateNotifBadge();
+        renderNotifPanel();
+      });
+    } catch(e) {
+      p.innerHTML = '<div class="exyu-notif-item">Greška pri učitavanju.</div>';
+    }
+  }
+  window.exyuToggleNotifPanel = function(){
+    var p = ensurePanel();
+    var willOpen = !p.classList.contains('on');
+    if(willOpen) renderNotifPanel();
+    p.classList.toggle('on');
+  };
+
+  window.exyuBlock = async function(name){
+    if(!confirm('Blokirati korisnika "'+name+'"? Nećete više vidjeti profil ni poruke jedno drugom.')) return;
+    try {
+      await api('POST', '/moderation/block', { toNick: name });
+      alert('🚫 Korisnik "'+name+'" je blokiran.');
+    } catch(e) { alert('❌ ' + e.message); }
+  };
+
+  window.exyuReport = async function(name){
+    var reason = prompt('Razlog prijave korisnika "'+name+'" (npr. neprimjeren sadržaj, lažni profil, spam, uznemiravanje):');
+    if(reason===null) return;
+    if(!reason.trim()){ alert('Molimo unesite razlog prijave.'); return; }
+    try {
+      await api('POST', '/moderation/report', { toNick: name, reason: reason.trim() });
+      alert('🚩 Prijava je poslana administratoru. Hvala što čuvate zajednicu sigurnom.');
+    } catch(e) { alert('❌ ' + e.message); }
+  };
+
+  window.exyuPoke = async function(name){
+    try {
+      await api('POST', '/moderation/poke', { toNick: name });
+      alert('👉 Bocnuo/la si korisnika "'+name+'"!');
+      updateNotifBadge();
+    } catch(e) { alert('❌ ' + e.message); }
+  };
+
+  async function renderPokesList(){
+    var list = document.getElementById('exyuPokesList');
+    list.innerHTML = 'Učitavam...';
+    try {
+      var data = await api('GET', '/moderation/pokes');
+      var received = data.received || [], sent = data.sent || [];
+      var html = '<div style="font-weight:700;color:#c57dff;font-size:13px;margin-bottom:8px;">Primljena bockanja ('+received.length+')</div>';
+      html += received.length ? received.map(function(p){
+        return '<div class="exyu-msg-item"><div class="from">'+eschtml(p.from_nick)+'</div><div class="time">'+new Date(p.created_at).toLocaleString('hr-HR')+'</div></div>';
+      }).join('') : '<div class="exyu-empty" style="padding:12px;">Nema primljenih bockanja.</div>';
+      html += '<div style="font-weight:700;color:#c57dff;font-size:13px;margin:14px 0 8px;">Poslana bockanja ('+sent.length+')</div>';
+      html += sent.length ? sent.map(function(p){
+        return '<div class="exyu-msg-item"><div class="from">'+eschtml(p.to_nick)+'</div><div class="time">'+new Date(p.created_at).toLocaleString('hr-HR')+'</div></div>';
+      }).join('') : '<div class="exyu-empty" style="padding:12px;">Niste nikoga bocnuli.</div>';
+      list.innerHTML = html;
+    } catch(e) {
+      list.innerHTML = '<div class="exyu-empty">Greška pri učitavanju.</div>';
+    }
+  }
+
+  var menuPoke = document.getElementById('menuPoke');
+  if(menuPoke) menuPoke.addEventListener('click', function(e){
+    e.preventDefault();
+    renderPokesList();
+    document.getElementById('exyuPokesModal').classList.add('on');
+  });
+
+  async function renderBlockedList(){
+    var list = document.getElementById('exyuBlockedList');
+    list.innerHTML = 'Učitavam...';
+    try {
+      var data = await api('GET', '/moderation/blocked');
+      var blocked = data.blocked || [];
+      if(!blocked.length){ list.innerHTML = '<div class="exyu-empty">Nemate blokiranih korisnika.</div>'; return; }
+      list.innerHTML = blocked.map(function(nick){
+        return '<div class="exyu-msg-item"><div class="from">'+eschtml(nick)+'</div>' +
+          '<div class="exyu-modal-actions" style="margin-top:8px;"><button type="button" class="exyu-btn-send" data-unblock="'+eschtml(nick)+'" style="padding:8px 14px;font-size:13px;">Odblokiraj</button></div></div>';
+      }).join('');
+      list.querySelectorAll('[data-unblock]').forEach(function(btn){
+        btn.addEventListener('click', async function(){
+          try {
+            await api('DELETE', '/moderation/block/' + encodeURIComponent(btn.getAttribute('data-unblock')));
+            renderBlockedList();
+          } catch(e) { alert('❌ ' + e.message); }
+        });
+      });
+    } catch(e) {
+      list.innerHTML = '<div class="exyu-empty">Greška pri učitavanju.</div>';
+    }
+  }
+
+  var menuBlock = document.getElementById('menuBlock');
+  if(menuBlock) menuBlock.addEventListener('click', function(e){
+    e.preventDefault();
+    renderBlockedList();
+    document.getElementById('exyuBlockedModal').classList.add('on');
+  });
+
+  document.addEventListener('click', function(e){
+    if(e.target.closest('#exyuBellBtn')){ e.preventDefault(); window.exyuToggleNotifPanel(); return; }
+    if(!e.target.closest('#exyuNotifPanel')){
+      var panel = document.getElementById('exyuNotifPanel');
+      if(panel) panel.classList.remove('on');
+    }
+  });
+
+  updateNotifBadge();
+})();
+</script>
+
+
+<script>
+(function(){
+  /* Hover prefetch — počni učitavati stranicu čim miš prijeđe na link */
+  var prefetched = {};
+  document.addEventListener('mouseover', function(e){
+    var a = e.target.closest('a[href]');
+    if (!a) return;
+    var href = a.getAttribute('href');
+    if (!href || href[0] === '#') return;
+    if (/^(javascript|mailto|tel):/.test(href)) return;
+    if (a.target === '_blank') return;
+    if (prefetched[href]) return;
+    prefetched[href] = true;
+    var l = document.createElement('link');
+    l.rel = 'prefetch'; l.href = href;
+    document.head.appendChild(l);
+  }, { passive: true });
+
+  /* Fallback za preglednike bez View Transitions API */
+  if (!document.startViewTransition) {
+    document.addEventListener('click', function(e){
+      if (e.defaultPrevented) return;
+      var a = e.target.closest('a[href]');
+      if (!a) return;
+      var href = a.getAttribute('href');
+      if (!href || href[0] === '#') return;
+      if (/^(javascript|mailto|tel):/.test(href)) return;
+      if (a.target === '_blank') return;
+      if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      document.body.style.transition = 'opacity 0.15s linear';
+      document.body.style.opacity   = '0';
+      setTimeout(function(){ window.location.href = href; }, 155);
+    });
+  }
+
+  /* Ako view transitions JEST aktivan, ugasi body animaciju —
+     preglednik već radi crossfade, dupla animacija = trzaj */
+  if (document.startViewTransition) {
+    var s = document.createElement('style');
+    s.textContent = 'body{animation:none!important;}';
+    document.head.appendChild(s);
+  }
+})();
+</script>
+</body>
+</html>

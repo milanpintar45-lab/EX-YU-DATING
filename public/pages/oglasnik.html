@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EX YU DATE — Oglasnik</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#1a0033;
+  --purple-900:#2d0057;
+  --purple-800:#4a0a7a;
+  --purple-700:#6b1a9e;
+  --purple-600:#7b2cbf;
+  --purple-500:#a23cff;
+  --purple-300:#c57dff;
+  --purple-100:#e9c6ff;
+  --pink:#ff6b9d;
+  --text:#e9c6ff;
+  --muted:#b8a4d4;
+  --line:rgba(162,60,255,0.45);
+  --panel:rgba(45,0,87,0.4);
+  --green:#22c55e;
+  --red:#ef4444;
+  --orange:#f59e0b;
+  --blue:#3b82f6;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+  font-family:'Inter',sans-serif;
+  background:linear-gradient(135deg,#1a0033 0%,#2d0057 50%,#4a0a7a 100%);
+  color:var(--text);
+  min-height:100vh;
+  padding:18px;
+}
+a{color:inherit;text-decoration:none;cursor:pointer;}
+
+.app{
+  min-height:calc(100vh - 36px);
+  border:1px solid rgba(162,60,255,0.25);
+  border-radius:14px;
+  overflow:hidden;
+  background:rgba(0,0,0,0.15);
+  display:flex;
+  flex-direction:column;
+}
+
+/* TOP HEADER */
+.top{
+  display:grid;
+  grid-template-columns: 160px 1fr 220px;
+  padding:18px 22px;
+  gap:16px;
+  align-items:start;
+}
+.corner-links{display:flex;flex-direction:column;gap:6px;font-size:13px;}
+.corner-links a{color:var(--purple-300);font-size:15px;}
+.corner-links a:hover{color:#fff;}
+
+.title-wrap{text-align:center;}
+.title{
+  font-family:'Poppins',sans-serif;
+  font-size:44px;
+  font-weight:700;
+  letter-spacing:6px;
+  background:linear-gradient(180deg,#fff 0%,var(--purple-100) 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  cursor:pointer;
+}
+.title-sub{font-size:11px;color:var(--muted);letter-spacing:3px;margin-top:2px;}
+
+.right-of-title{display:flex;flex-direction:column;gap:8px;align-items:flex-end;font-size:13px;}
+.right-of-title a{color:var(--purple-300);font-size:15px;}
+.right-of-title .with-count{display:flex;align-items:center;gap:6px;}
+.count-box{
+  min-width:32px;padding:2px 8px;text-align:center;
+  background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.6);border-radius:10px;font-size:13px;color:#ff5c5c;font-weight:700;
+}
+
+/* NAV BAR */
+.nav-bar{
+  display:flex;
+  align-items:stretch;
+  border-bottom:2px solid rgba(255,45,149,0.5);
+  flex-wrap:wrap;
+}
+.nav-bar a{
+  display:inline-block;
+  padding:14px 22px;
+  font-weight:700;
+  letter-spacing:1.5px;
+  color:var(--muted);
+  border-right:1px solid rgba(255,45,149,0.35);
+  transition:all .2s;
+  text-transform:uppercase;
+  font-size:14px;
+  cursor:pointer;
+}
+.nav-bar a:hover{color:#fff;background:rgba(255,45,149,0.16);}
+.nav-bar a.active{
+  color:#fff;
+  background:linear-gradient(180deg,#ff2d78,#c4145a);
+  box-shadow:inset 0 -3px 0 #ffb3d9;
+  text-shadow:0 0 12px rgba(255,92,173,0.85);
+}
+.nav-bar .spacer{flex:1;}
+
+/* ADS CONTENT */
+.ads-content{
+  flex:1;
+  padding:20px 24px;
+  overflow-y:auto;
+}
+
+/* CATEGORY GRID */
+.cat-grid{
+  display:grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap:16px;
+  margin-bottom:24px;
+}
+.cat-box{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(162,60,255,0.35);
+  border-radius:12px;
+  padding:16px 18px;
+  transition:all .2s;
+}
+.cat-box:hover{
+  border-color:rgba(162,60,255,0.7);
+  box-shadow:0 0 20px rgba(162,60,255,0.2);
+  transform:translateY(-2px);
+}
+.cat-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:18px;color:#fff;font-weight:700;
+  letter-spacing:2px;margin-bottom:12px;
+  padding-bottom:8px;
+  border-bottom:1px solid rgba(162,60,255,0.3);
+  display:flex;align-items:center;gap:8px;
+}
+.cat-links{
+  display:flex;flex-direction:column;gap:6px;
+}
+.cat-links a{
+  font-size:13px;color:var(--purple-300);padding:6px 8px;
+  border-radius:6px;transition:all .2s;
+  display:flex;align-items:center;gap:8px;
+}
+.cat-links a:hover{
+  background:rgba(162,60,255,0.15);color:#fff;
+}
+.cat-links a .count{
+  margin-left:auto;font-size:11px;color:var(--muted);
+  background:var(--purple-900);padding:2px 6px;border-radius:6px;
+}
+
+/* FILTER BAR */
+.filter-bar{
+  display:flex;align-items:center;gap:16px;
+  padding:14px 18px;
+  background:rgba(0,0,0,0.18);
+  border:1px solid rgba(162,60,255,0.35);
+  border-radius:12px;
+  margin-bottom:20px;
+  flex-wrap:wrap;
+}
+.filter-bar label{
+  font-size:13px;font-weight:600;color:var(--purple-100);letter-spacing:1px;
+}
+.filter-btn{
+  padding:8px 16px;border-radius:8px;
+  border:1px solid rgba(162,60,255,0.4);
+  background:transparent;color:var(--text);
+  font-family:inherit;font-size:13px;cursor:pointer;
+  transition:all .2s;
+}
+.filter-btn:hover, .filter-btn.active{
+  background:linear-gradient(90deg,var(--purple-500),var(--purple-600));
+  color:#fff;border-color:var(--purple-100);
+  box-shadow:0 0 15px rgba(162,60,255,0.4);
+}
+
+/* ADS LIST */
+.ads-list-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:22px;color:var(--purple-100);font-weight:700;
+  letter-spacing:2px;margin-bottom:16px;
+  display:flex;align-items:center;gap:10px;
+}
+.ads-grid{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:16px;
+}
+.ad-card{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(162,60,255,0.35);
+  border-radius:12px;
+  padding:16px;
+  transition:all .2s;
+  cursor:pointer;
+}
+.ad-card:hover{
+  border-color:rgba(162,60,255,0.7);
+  box-shadow:0 0 20px rgba(162,60,255,0.2);
+  transform:translateY(-3px);
+}
+.ad-card-header{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:10px;
+  padding-bottom:10px;
+  border-bottom:1px solid rgba(162,60,255,0.2);
+}
+.ad-avatar{
+  width:44px;height:44px;border-radius:50%;
+  background:linear-gradient(135deg,var(--purple-500),var(--pink));
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;border:2px solid rgba(255,224,236,0.3);
+  flex-shrink:0;
+}
+.ad-info h4{
+  font-size:14px;color:#fff;font-weight:600;
+}
+.ad-info .ad-meta{
+  font-size:11px;color:var(--muted);
+}
+.ad-card-body{
+  font-size:13px;color:var(--text);line-height:1.5;
+  margin-bottom:12px;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;
+  overflow:hidden;
+}
+.ad-card-footer{
+  display:flex;align-items:center;gap:10px;
+  font-size:11px;color:var(--muted);
+}
+.ad-tag{
+  padding:3px 8px;border-radius:6px;
+  background:var(--purple-900);border:1px solid rgba(162,60,255,0.4);
+  font-size:11px;color:var(--purple-300);
+}
+.ad-tag.vip{
+  background:linear-gradient(90deg,var(--orange),var(--pink));
+  color:#fff;border:none;
+}
+
+/* NEW AD BUTTON */
+.new-ad-btn{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:12px 24px;border-radius:12px;
+  background:linear-gradient(90deg,var(--green),#16a34a);
+  color:#fff;font-weight:700;font-size:14px;letter-spacing:1px;
+  border:none;cursor:pointer;transition:all .2s;
+  margin-bottom:20px;
+}
+.new-ad-btn:hover{
+  box-shadow:0 0 25px rgba(34,197,94,0.5);
+  transform:translateY(-2px);
+}
+
+/* CREATE AD MODAL */
+.modal-overlay{
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,0.8);
+  display:none;align-items:center;justify-content:center;
+  z-index:1000;padding:20px;
+}
+.modal-overlay.active{display:flex;}
+.modal-box{
+  background:linear-gradient(180deg,var(--purple-900),var(--bg));
+  border:1px solid rgba(162,60,255,0.5);
+  border-radius:16px;
+  width:100%;max-width:600px;
+  max-height:90vh;overflow-y:auto;
+  padding:24px;
+  box-shadow:0 0 40px rgba(162,60,255,0.3);
+}
+.modal-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:24px;color:#fff;font-weight:700;
+  letter-spacing:2px;margin-bottom:20px;
+  text-align:center;
+}
+.modal-form-row{
+  margin-bottom:14px;
+}
+.modal-form-row label{
+  display:block;font-size:13px;font-weight:600;color:var(--purple-100);
+  margin-bottom:6px;letter-spacing:1px;
+}
+.modal-form-row select, .modal-form-row input, .modal-form-row textarea{
+  width:100%;background:rgba(255,255,255,0.06);
+  border:1px solid rgba(162,60,255,0.4);border-radius:8px;
+  padding:10px 12px;color:#fff;font-family:inherit;font-size:13px;
+}
+.modal-form-row select option{background:var(--bg);color:#fff;}
+.modal-form-row textarea{min-height:100px;resize:vertical;}
+.modal-form-row select:focus, .modal-form-row input:focus, .modal-form-row textarea:focus{
+  outline:none;border-color:var(--purple-500);box-shadow:0 0 10px rgba(162,60,255,0.3);
+}
+.modal-btns{
+  display:flex;gap:12px;justify-content:center;margin-top:20px;
+}
+.modal-btn{
+  padding:10px 24px;border-radius:10px;border:none;
+  font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;
+  transition:all .2s;
+}
+.modal-btn.save{
+  background:linear-gradient(90deg,var(--purple-500),var(--purple-600));
+  color:#fff;
+}
+.modal-btn.save:hover{box-shadow:0 0 20px rgba(162,60,255,0.5);}
+.modal-btn.cancel{
+  background:transparent;border:1px solid rgba(162,60,255,0.4);
+  color:var(--text);
+}
+.modal-btn.cancel:hover{background:rgba(162,60,255,0.15);}
+
+/* FOOTER */
+.footer-nav{
+  text-align:center;padding:14px;
+  border-top:2px solid var(--line);
+  font-size:11px;color:var(--muted);letter-spacing:1.5px;
+}
+
+/* RESPONSIVE */
+@media (max-width:1000px){
+  .cat-grid{grid-template-columns: repeat(2, 1fr);}
+  .ads-grid{grid-template-columns: repeat(2, 1fr);}
+}
+@media (max-width:600px){
+  .top{grid-template-columns:1fr;text-align:center;}
+  .right-of-title{align-items:center;}
+  .nav-bar a{padding:10px 12px;font-size:12px;}
+  .cat-grid{grid-template-columns:1fr;}
+  .ads-grid{grid-template-columns:1fr;}
+  .filter-bar{flex-direction:column;align-items:stretch;}
+}
+
+body{opacity:1;transition:opacity .15s;}
+
+/* ===================================================
+   EX YU DATE — ANTI-TRZANJE v3 (FINALNA VERZIJA)
+   =================================================== */
+
+/* 1. Pozadina nikad ne nestaje — nema bijelog bljeska */
+html {
+  background: linear-gradient(135deg,#1a0033 0%,#2d0057 50%,#4a0a7a 100%);
+  background-attachment: fixed;
+  overflow-y: scroll; /* scrollbar uvijek prisutan → nema layout shiftova */
+}
+
+/* 2. View Transitions API (Chrome 111+) — čista crossfade, bez pokreta */
+@view-transition {
+  navigation: auto;
+}
+::view-transition-old(root) {
+  animation: 180ms linear forwards exyu-out;
+}
+::view-transition-new(root) {
+  animation: 220ms linear forwards exyu-in;
+}
+@keyframes exyu-out { to   { opacity: 0; } }
+@keyframes exyu-in  { from { opacity: 0; } }
+
+/* 3. Fallback — isti efekt za Firefox/Safari, BEZ pokreta */
+body {
+  animation: exyu-body-in 0.22s linear both;
+}
+@keyframes exyu-body-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* MALI "TV" VIDEO U PRAZNOM SREDNJEM PROSTORU ZAGLAVLJA */
+.title-wrap-tv{
+  width:100%;
+  max-width:220px;
+  margin:0 auto;
+  aspect-ratio:16/9;
+  border-radius:10px;
+  overflow:hidden;
+  border:2px solid rgba(162,60,255,0.5);
+  box-shadow:0 6px 20px rgba(162,60,255,0.4);
+  background:#000;
+}
+.title-wrap-tv video{width:100%;height:100%;object-fit:cover;display:block;}
+
+/* HERO BANNER - puna širina, video na vrhu stranice */
+.hero-banner{
+  position:relative;
+  width:100%;
+  height:220px;
+  background:linear-gradient(135deg, #2d0057, #4a0a7a);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  border-bottom:2px solid rgba(255,255,255,0.15);
+}
+.hero-banner video{
+  position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:0;
+}
+.hero-banner .hero-overlay{
+  position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.2)); z-index:1;
+}
+@media(max-width:600px){ .hero-banner{ height:140px; } }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <div class="hero-banner">
+    <video autoplay muted loop playsinline src="media/hero-banner-2.mp4"></video>
+    <div class="hero-overlay"></div>
+  </div>
+
+  <!-- TOP HEADER -->
+  <div class="top">
+    <div class="corner-links">
+      <a href="pocetna.html">« Povratak</a>
+      <a href="settings.html">⚙️ Postavke</a>
+      <a href="../index.html">Odjava</a>
+    </div>
+    <div class="title-wrap"></div>
+    <div class="right-of-title">
+      <a href="profil.html" title="Moj profil">👤</a>
+      <div class="with-count"><a href="chat.html">Poruke</a><span class="count-box">0</span></div>
+    </div>
+  </div>
+
+  <!-- NAV BAR -->
+  <div class="nav-bar">
+    <a href="pocetna.html">Početna</a>
+    <a href="hrvatska.html">Hrvatska</a>
+    <a href="bosna.html">Bosna i Hercegovina</a>
+    <a href="srbija.html">Srbija</a>
+    <a href="chat.html">Chat</a>
+    <a href="video.html">Video pozivi</a>
+    <a href="galerija.html">Galerija</a>
+    <a class="active" href="oglasnik.html">Oglasnik</a>
+    <a href="profil.html">Profil</a>
+    <a href="#" id="myFriendsNav">Moji prijatelji (<span id="myFriendsCount">0</span>)</a>
+  </div>
+
+  <!-- ADS CONTENT -->
+  <div class="ads-content">
+
+    <!-- NEW AD BUTTON -->
+    <button type="button" class="new-ad-btn" onclick="openNewAdModal()">
+      ➕ DODAJ NOVI OGLAS
+    </button>
+
+    <!-- DRŽAVE -->
+    <div class="filter-bar" style="margin-bottom:10px;">
+      <label>🌍 DRŽAVA:</label>
+      <button type="button" class="filter-btn active" onclick="filterCountry('svi',this)" id="btnCountrySvi">SVE</button>
+      <button type="button" class="filter-btn" onclick="filterCountry('hr',this)" id="btnCountryHr" style="color:#4da6ff;">🇭🇷 Hrvatska</button>
+      <button type="button" class="filter-btn" onclick="filterCountry('ba',this)" id="btnCountryBa" style="color:#4dd980;">🇧🇦 Bosna i Hercegovina</button>
+      <button type="button" class="filter-btn" onclick="filterCountry('rs',this)" id="btnCountryRs" style="color:#ff5c5c;">🇷🇸 Srbija</button>
+    </div>
+    <!-- REGIJE (izlazi tek kad je odabrana konkretna država) -->
+    <div class="filter-bar" id="regionBar" style="display:none;margin-bottom:10px;flex-wrap:wrap;">
+      <label>📍 REGIJA:</label>
+      <div id="regionButtons" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+    </div>
+
+    <!-- CATEGORIES -->
+    <div class="cat-grid">
+      <div class="cat-box">
+        <div class="cat-title">👨 ON TRAŽI</div>
+        <div class="cat-links">
+          <a href="#" onclick="filterAds('on-trazi-nju')">👩 NJU <span class="count" id="cnt-on-trazi-nju">0</span></a>
+          <a href="#" onclick="filterAds('on-trazi-njega')">👨 NJEGA <span class="count" id="cnt-on-trazi-njega">0</span></a>
+          <a href="#" onclick="filterAds('on-trazi-par')">💑 PAR <span class="count" id="cnt-on-trazi-par">0</span></a>
+        </div>
+      </div>
+      <div class="cat-box">
+        <div class="cat-title">👩 ONA TRAŽI</div>
+        <div class="cat-links">
+          <a href="#" onclick="filterAds('ona-trazi-nju')">👩 NJU <span class="count" id="cnt-ona-trazi-nju">0</span></a>
+          <a href="#" onclick="filterAds('ona-trazi-njega')">👨 NJEGA <span class="count" id="cnt-ona-trazi-njega">0</span></a>
+          <a href="#" onclick="filterAds('ona-trazi-par')">💑 PAR <span class="count" id="cnt-ona-trazi-par">0</span></a>
+        </div>
+      </div>
+      <div class="cat-box">
+        <div class="cat-title">👫 ONI TRAŽE</div>
+        <div class="cat-links">
+          <a href="#" onclick="filterAds('oni-traze-nju')">👩 NJU <span class="count" id="cnt-oni-traze-nju">0</span></a>
+          <a href="#" onclick="filterAds('oni-traze-njega')">👨 NJEGA <span class="count" id="cnt-oni-traze-njega">0</span></a>
+          <a href="#" onclick="filterAds('oni-traze-par')">💑 PAR <span class="count" id="cnt-oni-traze-par">0</span></a>
+        </div>
+      </div>
+      <div class="cat-box">
+        <div class="cat-title">🔥 OSTALO</div>
+        <div class="cat-links">
+          <a href="#" onclick="filterAds('dominacija')">⛓️ DOMINACIJA <span class="count" id="cnt-dominacija">0</span></a>
+          <a href="#" onclick="filterAds('fetisizam')">🦶 FETIŠIZAM <span class="count" id="cnt-fetisizam">0</span></a>
+          <a href="#" onclick="filterAds('zenidba-udaja')">💍 ŽENIDBA I UDAJA <span class="count" id="cnt-zenidba-udaja">0</span></a>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILTER BAR -->
+    <div class="filter-bar">
+      <label>🔍 PRIKAŽI:</label>
+      <button type="button" class="filter-btn active" onclick="filterGender('svi',this)" id="btnSvi">SVI OGLASI</button>
+      <button type="button" class="filter-btn" onclick="filterGender('m',this)" id="btnM">SAMO MUŠKARCI</button>
+      <button type="button" class="filter-btn" onclick="filterGender('z',this)" id="btnZ">SAMO ŽENE</button>
+      <button type="button" class="filter-btn" onclick="filterGender('par',this)" id="btnPar">PAROVI</button>
+    </div>
+
+    <!-- ADS LIST -->
+    <div class="ads-list-title">
+      📋 SVI OGLASI <span style="font-size:14px;color:var(--muted);font-family:'Inter',sans-serif;">(<span id="adCount">24</span> oglasa)</span>
+    </div>
+
+
+    <div class="ads-grid" id="adsGrid">
+    </div>
+
+  </div>
+
+  <div class="footer-nav">EX YU DATE — UPOZNAVANJE BEZ GRANICA</div>
+</div>
+
+<!-- NEW AD MODAL -->
+<div class="modal-overlay" id="newAdModal">
+  <div class="modal-box">
+    <div class="modal-title">➕ DODAJ NOVI OGLAS</div>
+    <div class="modal-form-row">
+      <label>Kategorija</label>
+      <select id="adCategory">
+        <option value="on-trazi-nju">👨 ON TRAŽI NJU</option>
+        <option value="on-trazi-njega">👨 ON TRAŽI NJEGA</option>
+        <option value="on-trazi-par">👨 ON TRAŽI PAR</option>
+        <option value="ona-trazi-nju">👩 ONA TRAŽI NJU</option>
+        <option value="ona-trazi-njega">👩 ONA TRAŽI NJEGA</option>
+        <option value="ona-trazi-par">👩 ONA TRAŽI PAR</option>
+        <option value="oni-traze-nju">👫 ONI TRAŽE NJU</option>
+        <option value="oni-traze-njega">👫 ONI TRAŽE NJEGA</option>
+        <option value="oni-traze-par">👫 ONI TRAŽE PAR</option>
+        <option value="dominacija">⛓️ DOMINACIJA</option>
+        <option value="fetisizam">🦶 FETIŠIZAM</option>
+        <option value="zenidba-udaja">💍 ŽENIDBA I UDAJA</option>
+      </select>
+    </div>
+    <div class="modal-form-row">
+      <label>Naslov oglasa</label>
+      <input type="text" id="adTitle" placeholder="npr. Tražim curu za ozbiljnu vezu">
+    </div>
+    <div class="modal-form-row">
+      <label>Tekst oglasa</label>
+      <textarea id="adText" placeholder="Opišite što tražite, što nudite, vaše interese..."></textarea>
+    </div>
+    <div class="modal-form-row">
+      <label>Vaš spol / oblik</label>
+      <select id="adGender">
+        <option value="m">Muškarac</option>
+        <option value="z">Žena</option>
+        <option value="par">Par</option>
+      </select>
+    </div>
+    <div class="modal-form-row">
+      <label>Godine</label>
+      <select id="adAge">
+        <option value="18-25">18-25</option>
+        <option value="25-35">25-35</option>
+        <option value="35-45">35-45</option>
+        <option value="45-55">45-55</option>
+        <option value="55+">55+</option>
+      </select>
+    </div>
+    <div class="modal-form-row">
+      <label>Grad</label>
+      <input type="text" id="adCity" placeholder="npr. Zagreb">
+    </div>
+    <div class="modal-btns">
+      <button type="button" class="modal-btn save" onclick="saveNewAd()">✅ OBJAVI OGLAS</button>
+      <button type="button" class="modal-btn cancel" onclick="closeNewAdModal()">❌ ODUSTANI</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_BASE = '/api';
+async function api(method, path, body) {
+  const opts = { method, headers: {}, credentials: 'include' };
+  if (body) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
+  const res = await fetch(API_BASE + path, opts);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'Greška.');
+  return data;
+}
+
+function escHtml(t){ return String(t).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]); }); }
+
+var CATEGORY_LABELS = {
+  'on-trazi-nju':'👨 ON TRAŽI NJU', 'on-trazi-njega':'👨 ON TRAŽI NJEGA', 'on-trazi-par':'👨 ON TRAŽI PAR',
+  'ona-trazi-nju':'👩 ONA TRAŽI NJU', 'ona-trazi-njega':'👩 ONA TRAŽI NJEGA', 'ona-trazi-par':'👩 ONA TRAŽI PAR',
+  'oni-traze-nju':'💑 ONI TRAŽE NJU', 'oni-traze-njega':'💑 ONI TRAŽE NJEGA', 'oni-traze-par':'💑 ONI TRAŽE PAR',
+  'dominacija':'⛓️ DOMINACIJA', 'fetisizam':'🦶 FETIŠIZAM', 'zenidba-udaja':'💍 ŽENIDBA I UDAJA'
+};
+var GENDER_ICON = { m:'👨', z:'👩', par:'💑' };
+
+var currentCountryFilter = 'svi';
+var currentRegionFilter = null;
+var currentGenderFilter = 'svi';
+var currentCategoryFilter = null;
+
+var REGIONS_BY_COUNTRY = {
+  hr: ["Bjelovarsko-bilogorska","Brodsko-posavska","Dubrovačko-neretvanska","Grad Zagreb","Istarska","Karlovačka","Koprivničko-križevačka","Krapinsko-zagorska","Ličko-senjska","Međimurska","Osječko-baranjska","Požeško-slavonska","Primorsko-goranska","Sisačko-moslavačka","Splitsko-dalmatinska","Šibensko-kninska","Varaždinska","Virovitičko-podravska","Vukovarsko-srijemska","Zadarska"],
+  ba: ["Unsko-sanski","Posavski","Tuzlanski","Zeničko-dobojski","Bosansko-podrinjski","Srednjobosanski","Hercegovačko-neretvanski","Zapadnohercegovački","Sarajevo","Kanton 10"],
+  rs: ["Beograd","Bor","Braničevo","Zaječar","Zapadna Bačka","Južna Bačka","Južni Banat","Zlatibor","Kolubara","Mačva","Moravica","Nišava","Pčinja","Pirot","Podunavlje","Pomoravlje","Raška","Rasina","Severna Bačka","Severni Banat","Srednji Banat","Srem","Šumadija","Toplica"]
+};
+
+function timeAgo(iso){
+  var diffMs = Date.now() - new Date(iso).getTime();
+  var mins = Math.floor(diffMs / 60000);
+  if (mins < 1) return 'upravo sad';
+  if (mins < 60) return 'Prije ' + mins + ' min';
+  var hrs = Math.floor(mins / 60);
+  if (hrs < 24) return 'Prije ' + hrs + ' sat' + (hrs===1?'':'a');
+  var days = Math.floor(hrs / 24);
+  return 'Prije ' + days + ' dan' + (days===1?'':'a');
+}
+
+function adCard(ad){
+  return '<div class="ad-card" data-gender="' + ad.poster_gender + '">' +
+    '<div class="ad-card-header">' +
+      '<div class="ad-avatar">' + (GENDER_ICON[ad.poster_gender]||'👤') + '</div>' +
+      '<div class="ad-info"><h4>' + escHtml(ad.nick) + (ad.age_range ? ', ' + ad.age_range : '') + '</h4>' +
+      '<div class="ad-meta">' + escHtml(ad.city||'—') + (ad.region ? ' · ' + escHtml(ad.region) : '') + ' • ' + timeAgo(ad.created_at) + '</div></div>' +
+    '</div>' +
+    '<div class="ad-card-body">' + escHtml(ad.body) + '</div>' +
+    '<div class="ad-card-footer"><span class="ad-tag">' + (CATEGORY_LABELS[ad.category]||ad.category) + '</span></div>' +
+  '</div>';
+}
+
+async function loadAds(){
+  var grid = document.getElementById('adsGrid');
+  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:30px;">Učitavam...</div>';
+  var qs = new URLSearchParams();
+  if (currentCountryFilter !== 'svi') qs.set('country', currentCountryFilter);
+  if (currentRegionFilter) qs.set('region', currentRegionFilter);
+  if (currentGenderFilter !== 'svi') qs.set('gender', currentGenderFilter);
+  if (currentCategoryFilter) qs.set('category', currentCategoryFilter);
+  try {
+    var data = await api('GET', '/ads?' + qs.toString());
+    var ads = data.ads || [];
+    grid.innerHTML = ads.length ? ads.map(adCard).join('') : '<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:30px;">Nema oglasa za odabrane filtere.</div>';
+    document.getElementById('adCount').textContent = ads.length;
+  } catch(e) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:30px;">Greška pri učitavanju (jeste li prijavljeni?)</div>';
+  }
+}
+
+async function loadCategoryCounts(){
+  try {
+    var qs = new URLSearchParams();
+    if (currentCountryFilter !== 'svi') qs.set('country', currentCountryFilter);
+    if (currentRegionFilter) qs.set('region', currentRegionFilter);
+    var data = await api('GET', '/ads/counts?' + qs.toString());
+    Object.keys(CATEGORY_LABELS).forEach(function(cat){
+      var el = document.getElementById('cnt-' + cat);
+      if (el) el.textContent = data.counts[cat] || 0;
+    });
+  } catch(e) {}
+}
+
+// FILTER BY COUNTRY - klikom na državu izlaze regije te države ispod
+function filterCountry(country, btn){
+  document.querySelectorAll('#btnCountrySvi, #btnCountryHr, #btnCountryBa, #btnCountryRs').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentCountryFilter = country;
+  currentRegionFilter = null;
+
+  var regionBar = document.getElementById('regionBar');
+  var regionButtons = document.getElementById('regionButtons');
+  if (country === 'svi' || !REGIONS_BY_COUNTRY[country]) {
+    regionBar.style.display = 'none';
+    regionButtons.innerHTML = '';
+  } else {
+    regionBar.style.display = 'flex';
+    regionButtons.innerHTML = REGIONS_BY_COUNTRY[country].map(function(r){
+      return '<button type="button" class="filter-btn" onclick="filterRegion(\'' + escHtml(r) + '\', this)" style="font-size:12px;padding:6px 12px;">' + escHtml(r) + '</button>';
+    }).join('');
+  }
+  loadAds();
+  loadCategoryCounts();
+}
+
+// FILTER BY REGION (županija/kanton/okrug unutar odabrane države)
+function filterRegion(region, btn){
+  var alreadyActive = btn.classList.contains('active');
+  document.querySelectorAll('#regionButtons .filter-btn').forEach(b => b.classList.remove('active'));
+  currentRegionFilter = alreadyActive ? null : region; // ponovni klik poništava filter regije
+  if (!alreadyActive) btn.classList.add('active');
+  loadAds();
+  loadCategoryCounts();
+}
+
+// FILTER BY GENDER
+function filterGender(gender, btn){
+  document.querySelectorAll('#btnSvi, #btnM, #btnZ, #btnPar').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentGenderFilter = gender;
+  loadAds();
+}
+
+// FILTER BY CATEGORY
+function filterAds(category){
+  currentCategoryFilter = (currentCategoryFilter === category) ? null : category; // ponovni klik poništava
+  loadAds();
+}
+
+// MODAL
+function openNewAdModal(){
+  document.getElementById('newAdModal').classList.add('active');
+}
+function closeNewAdModal(){
+  document.getElementById('newAdModal').classList.remove('active');
+}
+
+async function saveNewAd(){
+  var category = document.getElementById('adCategory').value;
+  var title = document.getElementById('adTitle').value.trim();
+  var text = document.getElementById('adText').value.trim();
+  var gender = document.getElementById('adGender').value;
+  var age = document.getElementById('adAge').value;
+  var city = document.getElementById('adCity').value.trim();
+  if(!title || !text){ alert('Molimo ispunite naslov i tekst oglasa!'); return; }
+  try {
+    await api('POST', '/ads', { category: category, title: title, body: text, posterGender: gender, ageRange: age, city: city });
+    alert('✅ Oglas je objavljen!');
+    closeNewAdModal();
+    document.getElementById('adTitle').value = '';
+    document.getElementById('adText').value = '';
+    document.getElementById('adCity').value = '';
+    currentGenderFilter = 'svi';
+    currentCategoryFilter = null;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('btnSvi').classList.add('active');
+    loadAds();
+    loadCategoryCounts();
+  } catch(e) { alert('❌ ' + e.message); }
+}
+
+// Close modal on overlay click
+document.getElementById('newAdModal').addEventListener('click', function(e){
+  if(e.target === this) closeNewAdModal();
+});
+
+loadAds();
+loadCategoryCounts();
+
+</script>
+<script>
+api('GET', '/users/friends-count').then(function(fc){
+  var cnt = document.getElementById("myFriendsCount");
+  if(cnt) cnt.textContent = fc.count;
+}).catch(function(){});
+</script>
+
+
+<script>
+(function(){
+  /* Hover prefetch — počni učitavati stranicu čim miš prijeđe na link */
+  var prefetched = {};
+  document.addEventListener('mouseover', function(e){
+    var a = e.target.closest('a[href]');
+    if (!a) return;
+    var href = a.getAttribute('href');
+    if (!href || href[0] === '#') return;
+    if (/^(javascript|mailto|tel):/.test(href)) return;
+    if (a.target === '_blank') return;
+    if (prefetched[href]) return;
+    prefetched[href] = true;
+    var l = document.createElement('link');
+    l.rel = 'prefetch'; l.href = href;
+    document.head.appendChild(l);
+  }, { passive: true });
+
+  /* Fallback za preglednike bez View Transitions API */
+  if (!document.startViewTransition) {
+    document.addEventListener('click', function(e){
+      if (e.defaultPrevented) return;
+      var a = e.target.closest('a[href]');
+      if (!a) return;
+      var href = a.getAttribute('href');
+      if (!href || href[0] === '#') return;
+      if (/^(javascript|mailto|tel):/.test(href)) return;
+      if (a.target === '_blank') return;
+      if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      document.body.style.transition = 'opacity 0.15s linear';
+      document.body.style.opacity   = '0';
+      setTimeout(function(){ window.location.href = href; }, 155);
+    });
+  }
+
+  /* Ako view transitions JEST aktivan, ugasi body animaciju —
+     preglednik već radi crossfade, dupla animacija = trzaj */
+  if (document.startViewTransition) {
+    var s = document.createElement('style');
+    s.textContent = 'body{animation:none!important;}';
+    document.head.appendChild(s);
+  }
+})();
+</script>
+</body>
+</html>

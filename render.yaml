@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: exyu-date
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node src/migrate.js && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: exyu-date-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: COOKIE_NAME
+        value: exyu_session
+      - key: JWT_EXPIRES_IN
+        value: 30d
+      # SMTP/Twilio se moraju ručno dodati u Render dashboardu (Environment)
+      # da bi email/SMS kodovi stvarno radili - bez njih se kodovi samo
+      # ispisuju u server log (vidi README).
+
+databases:
+  - name: exyu-date-db
+    plan: free
