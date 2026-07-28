@@ -1,32 +1,29 @@
-const nodemailer = require('nodemailer');
-
-let transporter = null;
-
-function getTransporter() {
-  if (transporter) return transporter;
-
-  if (!process.env.SMTP_HOST || !process.env.SMTP_USER) {
-    console.warn(
-      '⚠️  SMTP nije konfiguriran (.env) - emailovi se NEĆE stvarno slati, samo ispisivati u konzolu.'
-    );
+async function sendViaResend(toEmail, subject, html) {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('⚠️  RESEND_API_KEY nije postavljen - emailovi se NEĆE stvarno slati, samo ispisivati u konzolu.');
     return null;
   }
-
-  transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT || 587),
-    secure: Number(process.env.SMTP_PORT) === 465,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+      'Content-Type': 'application/json',
     },
+    body: JSON.stringify({
+      from: process.env.EMAIL_FROM || 'onboarding@resend.dev',
+      to: toEmail,
+      subject,
+      html,
+    }),
   });
-
-  return transporter;
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Resend greška: ${response.status} - ${errorText}`);
+  }
+  return response.json();
 }
 
 async function sendVerificationEmail(toEmail, code) {
-  const t = getTransporter();
   const subject = 'EX YU DATING - Kod za potvrdu emaila';
   const html = `
     <div style="font-family:sans-serif;padding:20px;">
@@ -36,23 +33,15 @@ async function sendVerificationEmail(toEmail, code) {
       <p>Kod vrijedi 10 minuta. Ako niste vi tražili ovaj kod, slobodno zanemarite ovaj email.</p>
     </div>
   `;
-
-  if (!t) {
-    // Fallback način rada dok SMTP nije postavljen - NE koristiti u produkciji.
+  const result = await sendViaResend(toEmail, subject, html);
+  if (!result) {
     console.log(`[DEV] Email kod za ${toEmail}: ${code}`);
     return { simulated: true };
   }
-
-  return t.sendMail({
-    from: process.env.SMTP_FROM || process.env.SMTP_USER,
-    to: toEmail,
-    subject,
-    html,
-  });
+  return result;
 }
 
 async function sendPasswordResetEmail(toEmail, code) {
-  const t = getTransporter();
   const html = `
     <div style="font-family:sans-serif;padding:20px;">
       <h2>Oporavak lozinke - EX YU DATING</h2>
@@ -61,18 +50,12 @@ async function sendPasswordResetEmail(toEmail, code) {
       <p>Kod vrijedi 10 minuta. Ako niste vi tražili oporavak lozinke, odmah promijenite lozinku ili kontaktirajte podršku.</p>
     </div>
   `;
-
-  if (!t) {
+  const result = await sendViaResend(toEmail, 'EX YU DATING - Oporavak lozinke', html);
+  if (!result) {
     console.log(`[DEV] Reset kod za ${toEmail}: ${code}`);
     return { simulated: true };
   }
-
-  return t.sendMail({
-    from: process.env.SMTP_FROM || process.env.SMTP_USER,
-    to: toEmail,
-    subject: 'EX YU DATING - Oporavak lozinke',
-    html,
-  });
+  return result;
 }
 
 module.exports = { sendVerificationEmail, sendPasswordResetEmail };
