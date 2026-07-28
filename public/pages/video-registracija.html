@@ -13,17 +13,6 @@
     font-family:Arial,sans-serif;
     overflow:hidden;
   }
-  h1{
-    color:#fff;
-    margin:0;
-    position:fixed;
-    top:20px;
-    left:0;
-    right:0;
-    text-align:center;
-    z-index:2;
-    text-shadow:0 2px 8px rgba(0,0,0,0.6);
-  }
   video{
     position:fixed;
     top:0;
@@ -35,34 +24,33 @@
   .skip{
     display:block;
     position:fixed;
-    bottom:30px;
-    left:50%;
-    transform:translateX(-50%);
+    top:20px;
+    right:20px;
     color:#fff;
-    background:#a23cff;
-    border:none;
-    padding:18px 40px;
-    border-radius:30px;
-    font-size:20px;
-    font-weight:700;
+    background:rgba(0,0,0,0.45);
+    border:1px solid rgba(255,255,255,0.5);
+    padding:8px 16px;
+    border-radius:20px;
+    font-size:14px;
+    font-weight:600;
     cursor:pointer;
     z-index:2;
-    box-shadow:0 8px 24px rgba(0,0,0,0.5);
   }
 </style>
 </head>
 <body>
 
-<h1>Dobrodošli na EX YU DATE!</h1>
+<video id="welcomeVideo" autoplay muted playsinline src="media/registracija-video.mp4"></video>
 
-<video id="welcomeVideo" controls autoplay playsinline src="media/registracija-video.mp4"></video>
-
-<button type="button" class="skip" id="skipBtn">Nastavi na Početnu →</button>
+<button type="button" class="skip" id="skipBtn">Preskoči</button>
 
 <script>
 document.getElementById('skipBtn').onclick = function(){
   window.location.href = 'pocetna.html';
 };
+document.getElementById('welcomeVideo').addEventListener('ended', function(){
+  window.location.href = 'pocetna.html';
+});
 </script>
 
 </body>
