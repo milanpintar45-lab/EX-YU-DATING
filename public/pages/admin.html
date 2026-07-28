@@ -655,176 +655,88 @@ window.exyuAdminReady = (async function(){
         <div class="stat-card">
           <div class="stat-icon purple">👥</div>
           <div class="stat-info">
-            <div class="stat-value" id="statTotalUsers">2,847</div>
+            <div class="stat-value" id="statTotalUsers">0</div>
             <div class="stat-label">UKUPNO KORISNIKA</div>
-            <div class="stat-change up">▲ +124 ovaj mjesec</div>
           </div>
         </div>
         <div class="stat-card">
           <div class="stat-icon green">🟢</div>
           <div class="stat-info">
-            <div class="stat-value">412</div>
+            <div class="stat-value" id="statOnlineUsers">0</div>
             <div class="stat-label">ONLINE KORISNIKA</div>
-            <div class="stat-change up">▲ +18 u posljednjih sat</div>
           </div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon pink">💬</div>
+          <div class="stat-icon purple">🆕</div>
           <div class="stat-info">
-            <div class="stat-value">15,932</div>
-            <div class="stat-label">PORUKA DANAS</div>
-            <div class="stat-change up">▲ +8.5% od jučer</div>
+            <div class="stat-value" id="statNewToday">0</div>
+            <div class="stat-label">NOVI DANAS</div>
           </div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon blue">📢</div>
+          <div class="stat-icon red">⏸️</div>
           <div class="stat-info">
-            <div class="stat-value">48</div>
-            <div class="stat-label">AKTIVNI OGLASI</div>
-            <div class="stat-change down">▼ -3 ovaj tjedan</div>
+            <div class="stat-value" id="statSuspended">0</div>
+            <div class="stat-label">SUSPENDIRANIH</div>
           </div>
         </div>
       </div>
 
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-icon orange">⭐</div>
-          <div class="stat-info">
-            <div class="stat-value">386</div>
-            <div class="stat-label">VIP KORISNIKA</div>
-            <div class="stat-change up">▲ +22 ovaj mjesec</div>
-          </div>
-        </div>
-        <div class="stat-card">
           <div class="stat-icon red">🚩</div>
           <div class="stat-info">
-            <div class="stat-value">17</div>
-            <div class="stat-label">PRIJAVE</div>
-            <div class="stat-change down">▼ -5 riješenih</div>
+            <div class="stat-value" id="statReportsTotal">0</div>
+            <div class="stat-label">PRIJAVE (UKUPNO)</div>
           </div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon purple">🆕</div>
+          <div class="stat-icon orange">⏳</div>
           <div class="stat-info">
-            <div class="stat-value">89</div>
-            <div class="stat-label">NOVI DANAS</div>
-            <div class="stat-change up">▲ +12</div>
+            <div class="stat-value" id="statReportsPending">0</div>
+            <div class="stat-label">PRIJAVE NA ČEKANJU</div>
           </div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon green">📈</div>
+          <div class="stat-icon pink">💬</div>
           <div class="stat-info">
-            <div class="stat-value">94.2%</div>
-            <div class="stat-label">AKTIVNOST</div>
-            <div class="stat-change up">▲ +2.1%</div>
+            <div class="stat-value" id="statMessagesTotal">0</div>
+            <div class="stat-label">PORUKA UKUPNO</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon blue">📩</div>
+          <div class="stat-info">
+            <div class="stat-value" id="statMessagesUnread">0</div>
+            <div class="stat-label">NEPROČITANIH PORUKA</div>
           </div>
         </div>
       </div>
 
       <div class="charts-row">
         <div class="chart-card">
-          <h3>📈 Aktivnost po zemljama (zadnjih 7 dana)</h3>
-          <div class="bar-chart">
-            <div class="bar-wrap"><div class="bar" style="height:45%"><div class="bar-tooltip">124 korisnika</div></div><div class="bar-label">Pon</div></div>
-            <div class="bar-wrap"><div class="bar" style="height:62%"><div class="bar-tooltip">186 korisnika</div></div><div class="bar-label">Uto</div></div>
-            <div class="bar-wrap"><div class="bar" style="height:38%"><div class="bar-tooltip">98 korisnika</div></div><div class="bar-label">Sri</div></div>
-            <div class="bar-wrap"><div class="bar" style="height:78%"><div class="bar-tooltip">241 korisnik</div></div><div class="bar-label">Čet</div></div>
-            <div class="bar-wrap"><div class="bar" style="height:55%"><div class="bar-tooltip">162 korisnika</div></div><div class="bar-label">Pet</div></div>
-            <div class="bar-wrap"><div class="bar" style="height:88%"><div class="bar-tooltip">298 korisnika</div></div><div class="bar-label">Sub</div></div>
-            <div class="bar-wrap"><div class="bar" style="height:72%"><div class="bar-tooltip">215 korisnika</div></div><div class="bar-label">Ned</div></div>
-          </div>
+          <h3>📈 Registracije po danu (zadnjih 7 dana)</h3>
+          <div class="bar-chart" id="realBarChart"></div>
         </div>
         <div class="chart-card">
           <h3>🌍 Korisnici po zemljama</h3>
-          <div class="donut-wrap">
-            <div class="donut-chart">
-              <div class="donut-center">
-                <div class="num">2,847</div>
-                <div class="txt">ukupno</div>
-              </div>
-            </div>
-            <div class="donut-legend">
-              <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Hrvatska (35%)</div>
-              <div class="legend-item"><div class="legend-dot" style="background:var(--purple-500)"></div>Srbija (30%)</div>
-              <div class="legend-item"><div class="legend-dot" style="background:var(--pink)"></div>BiH (20%)</div>
-              <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>Ostalo (15%)</div>
-            </div>
+          <div class="donut-wrap" id="realDonutWrap">
+            <div style="color:var(--muted);text-align:center;padding:20px;">Učitavam...</div>
           </div>
         </div>
       </div>
 
       <div class="two-col">
         <div class="chart-card">
-          <h3>🕐 Nedavne aktivnosti</h3>
-          <div class="activity-list">
-            <div class="activity-item">
-              <div class="activity-icon join">👤</div>
-              <div class="activity-info">
-                <div class="activity-text">Novi korisnik <b>Marko, 28</b> se pridružio iz Zagreba</div>
-                <div class="activity-time">Prije 2 minute</div>
-              </div>
-            </div>
-            <div class="activity-item">
-              <div class="activity-icon msg">💬</div>
-              <div class="activity-info">
-                <div class="activity-text"><b>Ana</b> je poslala poruku <b>Ivanu</b></div>
-                <div class="activity-time">Prije 5 minuta</div>
-              </div>
-            </div>
-            <div class="activity-item">
-              <div class="activity-icon vip">⭐</div>
-              <div class="activity-info">
-                <div class="activity-text"><b>Jovan, 32</b> je postao VIP korisnik</div>
-                <div class="activity-time">Prije 12 minuta</div>
-              </div>
-            </div>
-            <div class="activity-item">
-              <div class="activity-icon block">🚫</div>
-              <div class="activity-info">
-                <div class="activity-text">Korisnik <b>User99</b> je blokiran od strane admina</div>
-                <div class="activity-time">Prije 34 minute</div>
-              </div>
-            </div>
-            <div class="activity-item">
-              <div class="activity-icon join">👤</div>
-              <div class="activity-info">
-                <div class="activity-text">Novi korisnik <b>Sara, 24</b> se pridružio iz Beograda</div>
-                <div class="activity-time">Prije 1 sat</div>
-              </div>
-            </div>
+          <h3>🕐 Nedavno registrirani korisnici</h3>
+          <div class="activity-list" id="realRecentUsers">
+            <div style="color:var(--muted);text-align:center;padding:20px;">Učitavam...</div>
           </div>
         </div>
         <div class="chart-card">
-          <h3>🚨 Nove prijave</h3>
-          <div class="activity-list">
-            <div class="activity-item">
-              <div class="activity-icon block">🚩</div>
-              <div class="activity-info">
-                <div class="activity-text">Prijavljen <b>User42</b> — Neprimjereni sadržaj</div>
-                <div class="activity-time">Prije 10 minuta · <span style="color:var(--red)">Hitno</span></div>
-              </div>
-            </div>
-            <div class="activity-item">
-              <div class="activity-icon block">🚩</div>
-              <div class="activity-info">
-                <div class="activity-text">Prijavljen <b>MarkoX</b> — Lažni profil</div>
-                <div class="activity-time">Prije 45 minuta · <span style="color:var(--orange)">Na čekanju</span></div>
-              </div>
-            </div>
-            <div class="activity-item">
-              <div class="activity-icon block">🚩</div>
-              <div class="activity-info">
-                <div class="activity-text">Prijavljen <b>TestUser</b> — Spam poruke</div>
-                <div class="activity-time">Prije 2 sata · <span style="color:var(--orange)">Na čekanju</span></div>
-              </div>
-            </div>
-            <div class="activity-item">
-              <div class="activity-icon join">✅</div>
-              <div class="activity-info">
-                <div class="activity-text">Prijavljen <b>OldUser</b> — <span style="color:var(--green)">Riješeno</span></div>
-                <div class="activity-time">Prije 5 sati</div>
-              </div>
-            </div>
+          <h3>🚨 Nedavne prijave</h3>
+          <div class="activity-list" id="realRecentReports">
+            <div style="color:var(--muted);text-align:center;padding:20px;">Učitavam...</div>
           </div>
         </div>
       </div>
@@ -980,70 +892,7 @@ window.exyuAdminReady = (async function(){
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>#AD01</td>
-              <td><b>Premium Upoznavanje</b></td>
-              <td>Dashboard Top</td>
-              <td>Sve</td>
-              <td>12,450</td>
-              <td>342</td>
-              <td><span class="status-badge online">● Aktivan</span></td>
-              <td>
-                <div class="action-btns">
-                  <button type="button" class="action-btn">✏️</button>
-                  <button type="button" class="action-btn">⏸️</button>
-                  <button type="button" class="action-btn delete">🗑️</button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>#AD02</td>
-              <td><b>Nova Godina — Popust 50%</b></td>
-              <td>Sidebar</td>
-              <td>🇭🇷 Hrvatska</td>
-              <td>8,200</td>
-              <td>189</td>
-              <td><span class="status-badge online">● Aktivan</span></td>
-              <td>
-                <div class="action-btns">
-                  <button type="button" class="action-btn">✏️</button>
-                  <button type="button" class="action-btn">⏸️</button>
-                  <button type="button" class="action-btn delete">🗑️</button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>#AD03</td>
-              <td><b>VIP Članstvo</b></td>
-              <td>Chat Column</td>
-              <td>Sve</td>
-              <td>15,100</td>
-              <td>567</td>
-              <td><span class="status-badge offline">● Pauza</span></td>
-              <td>
-                <div class="action-btns">
-                  <button type="button" class="action-btn">✏️</button>
-                  <button type="button" class="action-btn">▶️</button>
-                  <button type="button" class="action-btn delete">🗑️</button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>#AD04</td>
-              <td><b>Ljetni Dodatak</b></td>
-              <td>Footer</td>
-              <td>🇭🇷 Hrvatska</td>
-              <td>3,400</td>
-              <td>78</td>
-              <td><span class="status-badge online">● Aktivan</span></td>
-              <td>
-                <div class="action-btns">
-                  <button type="button" class="action-btn">✏️</button>
-                  <button type="button" class="action-btn">⏸️</button>
-                  <button type="button" class="action-btn delete">🗑️</button>
-                </div>
-              </td>
-            </tr>
+            <tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px;">Nema oglasa — sustav za oglase još nije aktivan.</td></tr>
           </tbody>
         </table>
       </div>
@@ -1056,90 +905,22 @@ window.exyuAdminReady = (async function(){
           <div class="section-title">🚩 Prijave korisnika</div>
           <div class="breadcrumb">Početna <span>›</span> Prijave</div>
         </div>
-        <div class="section-actions">
-          <button type="button" class="btn btn-success">✅ Označi sve riješenim</button>
-        </div>
       </div>
 
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>ID</th>
               <th>Prijavljeni</th>
               <th>Prijavio</th>
               <th>Razlog</th>
-              <th>Zemlja</th>
               <th>Vrijeme</th>
               <th>Status</th>
               <th>Akcije</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td>#R001</td>
-              <td><b>User42</b></td>
-              <td>Ana</td>
-              <td>Neprimjereni sadržaj</td>
-              <td>🇭🇷 Hrvatska</td>
-              <td>14:20</td>
-              <td><span class="status-badge blocked">Hitno</span></td>
-              <td>
-                <div class="action-btns">
-                  <button type="button" class="action-btn">👁️</button>
-                  <button type="button" class="action-btn">✅</button>
-                  <button type="button" class="action-btn delete">🗑️</button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>#R002</td>
-              <td><b>MarkoX</b></td>
-              <td>Petra</td>
-              <td>Lažni profil</td>
-              <td>🇷🇸 Srbija</td>
-              <td>13:50</td>
-              <td><span class="status-badge vip">Na čekanju</span></td>
-              <td>
-                <div class="action-btns">
-                  <button type="button" class="action-btn">👁️</button>
-                  <button type="button" class="action-btn">✅</button>
-                  <button type="button" class="action-btn delete">🗑️</button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>#R003</td>
-              <td><b>TestUser</b></td>
-              <td>Jovan</td>
-              <td>Spam poruke</td>
-              <td>🇷🇸 Srbija</td>
-              <td>12:30</td>
-              <td><span class="status-badge vip">Na čekanju</span></td>
-              <td>
-                <div class="action-btns">
-                  <button type="button" class="action-btn">👁️</button>
-                  <button type="button" class="action-btn">✅</button>
-                  <button type="button" class="action-btn delete">🗑️</button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>#R004</td>
-              <td><b>OldUser</b></td>
-              <td>Sara</td>
-              <td>Uznemiravanje</td>
-              <td>🇧🇦 BiH</td>
-              <td>09:15</td>
-              <td><span class="status-badge online">Riješeno</span></td>
-              <td>
-                <div class="action-btns">
-                  <button type="button" class="action-btn">👁️</button>
-                  <button type="button" class="action-btn">↩️</button>
-                  <button type="button" class="action-btn delete">🗑️</button>
-                </div>
-              </td>
-            </tr>
+          <tbody id="reportsTabBody">
+            <tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px;">Učitavam...</td></tr>
           </tbody>
         </table>
       </div>
@@ -1244,43 +1025,12 @@ window.exyuAdminReady = (async function(){
           <div class="breadcrumb">Početna <span>›</span> Potrošnja i upozorenja</div>
         </div>
         <div class="section-actions">
-          <button type="button" class="btn btn-primary" onclick="alert('Za nadogradnju plana obratite se svom hosting/cloud provideru (npr. AWS, Vercel, Supabase, itd.) — ova stranica prikazuje trenutnu potrošnju kada je poveže se s njihovim API-jem za obračun.')">⬆️ Nadogradi plan</button>
+          <button type="button" class="btn btn-primary" onclick="alert('Za nadogradnju plana obratite se svom hosting/cloud provideru (npr. AWS, Vercel, Supabase, itd.) — ova stranica prikazuje trenutnu potrošnju kada se poveže s njihovim API-jem za obračun.')">⬆️ Nadogradi plan</button>
         </div>
       </div>
 
       <div class="chart-card">
-        <h3>💽 Hosting (prostor i promet)</h3>
-        <div class="usage-row">
-          <div class="usage-row-head"><span>Iskorišteno ovaj tjedan</span><span id="usageHostingPct">—</span></div>
-          <div class="usage-bar-track"><div class="usage-bar-fill" id="usageHostingBar"></div></div>
-          <div class="usage-warning" id="usageHostingWarn"></div>
-        </div>
-      </div>
-
-      <div class="chart-card" style="margin-top:18px;">
-        <h3>🗄️ Baza podataka</h3>
-        <div class="usage-row">
-          <div class="usage-row-head"><span>Iskorišteno ovaj tjedan</span><span id="usageDbPct">—</span></div>
-          <div class="usage-bar-track"><div class="usage-bar-fill" id="usageDbBar"></div></div>
-          <div class="usage-warning" id="usageDbWarn"></div>
-        </div>
-      </div>
-
-      <div class="chart-card" style="margin-top:18px;">
-        <h3>📹 Video / poruke servisi</h3>
-        <div class="usage-row">
-          <div class="usage-row-head"><span>Iskorišteno ovaj tjedan</span><span id="usageMsgPct">—</span></div>
-          <div class="usage-bar-track"><div class="usage-bar-fill" id="usageMsgBar"></div></div>
-          <div class="usage-warning" id="usageMsgWarn"></div>
-        </div>
-      </div>
-
-      <div class="chart-card" style="margin-top:18px;">
-        <h3>📊 Sažetak po servisima (po danima, zadnjih 7 dana)</h3>
-        <div class="bar-chart" id="usageDailyChart"></div>
-        <p style="color:var(--muted);font-size:12px;margin-top:14px;">
-          Spremno za spajanje na pravi hosting/cloud usage API (npr. AWS CloudWatch, Vercel Analytics).
-        </p>
+        <p style="color:var(--muted);font-size:13px;">Ovaj dio čeka spajanje na pravi hosting/cloud API (npr. AWS, Vercel, Supabase) da bi prikazivao stvarnu potrošnju. Trenutno nema podataka za prikaz.</p>
       </div>
     </div>
 
@@ -1290,9 +1040,6 @@ window.exyuAdminReady = (async function(){
         <div>
           <div class="section-title">💰 Uplate i isplate</div>
           <div class="breadcrumb">Početna <span>›</span> Uplate i isplate</div>
-        </div>
-        <div class="section-actions">
-          <button type="button" class="btn btn-primary" onclick="alert('Izvoz će biti dostupan kada se poveže pravi platni servis (npr. Stripe).')">⬇️ Izvoz podataka</button>
         </div>
       </div>
 
@@ -1404,50 +1151,8 @@ window.exyuAdminReady = (async function(){
 </div>
 
 <script>
-// Sidebar navigation
 // ======================
-// POTROŠNJA I UPOZORENJA (14) — struktura spremna za pravi API hosting/cloud providera
-// Trenutno prikazuje primjer podataka dok se ne spoji stvarni izvor.
-// ======================
-function renderUsageBar(pct, barId, pctId, warnId, label){
-  var bar = document.getElementById(barId);
-  var pctEl = document.getElementById(pctId);
-  var warnEl = document.getElementById(warnId);
-  var color = pct >= 90 ? 'red' : pct >= 80 ? 'orange' : pct >= 50 ? 'yellow' : 'green';
-  bar.style.width = Math.min(pct,100) + '%';
-  bar.className = 'usage-bar-fill ' + color;
-  pctEl.textContent = pct + '%';
-  warnEl.className = 'usage-warning';
-  if (pct >= 100) {
-    warnEl.classList.add('show','warn100');
-    warnEl.textContent = '🔴 ' + label + ' je dosegao 100% besplatnog plana! Potrebna je nadogradnja da usluga ne prestane raditi.';
-  } else if (pct >= 90) {
-    warnEl.classList.add('show','warn90');
-    warnEl.textContent = '🟠 ' + label + ' je na 90% besplatnog plana — razmislite o nadogradnji.';
-  } else if (pct >= 80) {
-    warnEl.classList.add('show','warn80');
-    warnEl.textContent = '🟡 ' + label + ' je na 80% besplatnog plana — pratite potrošnju.';
-  }
-}
-(function initUsagePanel(){
-  // PRIMJER PODATAKA — zamijeniti pravim vrijednostima iz API-ja hosting/baza/video providera
-  renderUsageBar(42, 'usageHostingBar', 'usageHostingPct', 'usageHostingWarn', 'Hosting');
-  renderUsageBar(76, 'usageDbBar', 'usageDbPct', 'usageDbWarn', 'Baza podataka');
-  renderUsageBar(88, 'usageMsgBar', 'usageMsgPct', 'usageMsgWarn', 'Video/poruke servisi');
-
-  var days = ['Pon','Uto','Sri','Čet','Pet','Sub','Ned'];
-  var exampleUsage = [30,45,38,60,55,70,88];
-  var chart = document.getElementById('usageDailyChart');
-  if (chart) {
-    chart.innerHTML = days.map(function(d,i){
-      var v = exampleUsage[i];
-      return '<div class="bar-wrap"><div class="bar" style="height:'+v+'%"><div class="bar-tooltip">'+v+'%</div></div><div class="bar-label">'+d+'</div></div>';
-    }).join('');
-  }
-})();
-
-// ======================
-// KORISNICI — STVARNO UPRAVLJANJE (18)
+// KORISNICI — STVARNO UPRAVLJANJE
 // ======================
 var _cachedAdminUsers = [];
 async function renderUsersTable(filterText){
@@ -1457,9 +1162,6 @@ async function renderUsersTable(filterText){
   try { users = (await api('GET', '/admin/users')).users || []; }
   catch(e) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px;">Greška pri učitavanju.</td></tr>'; return; }
   _cachedAdminUsers = users;
-
-  var statEl = document.getElementById('statTotalUsers');
-  if (statEl) statEl.textContent = users.length;
 
   var q = (filterText || '').toLowerCase().trim();
   if(q){
@@ -1612,12 +1314,152 @@ async function adminClearAllMessages(){
   catch(e) { alert('❌ ' + e.message); }
 }
 
+async function renderReportsTab(){
+  var tbody = document.getElementById('reportsTabBody');
+  if(!tbody) return;
+  var reports;
+  try { reports = (await api('GET', '/admin/reports')).reports || []; }
+  catch(e) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px;">Greška pri učitavanju.</td></tr>'; return; }
+  if(reports.length === 0){
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px;">Nema prijava.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = reports.map(function(r){
+    var statusBadge = r.status === 'pending' ? '<span class="status-badge vip">Na čekanju</span>' : '<span class="status-badge online">Riješeno</span>';
+    return '<tr><td><b>'+r.to_nick+'</b></td><td>'+r.from_nick+'</td><td>'+r.reason+'</td><td>'+new Date(r.created_at).toLocaleString('hr-HR')+'</td><td>'+statusBadge+'</td>' +
+      '<td><div class="action-btns">' +
+        (r.status==='pending' ? '<button type="button" class="action-btn" onclick="adminResolveReport('+r.id+')">✅</button>' : '') +
+      '</div></td></tr>';
+  }).join('');
+}
+
+async function renderDashboardStats(){
+  var users = _cachedAdminUsers || [];
+
+  var totalEl = document.getElementById('statTotalUsers');
+  if(totalEl) totalEl.textContent = users.length;
+
+  var today = new Date(); today.setHours(0,0,0,0);
+  var newTodayEl = document.getElementById('statNewToday');
+  var newToday = users.filter(function(u){ return u.created_at && new Date(u.created_at) >= today; }).length;
+  if(newTodayEl) newTodayEl.textContent = newToday;
+
+  var suspendedEl = document.getElementById('statSuspended');
+  var suspendedCount = users.filter(function(u){ return u.suspended; }).length;
+  if(suspendedEl) suspendedEl.textContent = suspendedCount;
+
+  var onlineEl = document.getElementById('statOnlineUsers');
+  var onlineTotal = 0;
+  var countries = ['hr','ba','rs'];
+  for (var i=0;i<countries.length;i++){
+    try {
+      var od = await api('GET', '/users?country='+countries[i]+'&onlineOnly=true');
+      onlineTotal += (od.users||[]).length;
+    } catch(e){}
+  }
+  if(onlineEl) onlineEl.textContent = onlineTotal;
+
+  var reportsTotalEl = document.getElementById('statReportsTotal');
+  var reportsPendingEl = document.getElementById('statReportsPending');
+  var recentReportsEl = document.getElementById('realRecentReports');
+  try {
+    var rd = await api('GET', '/admin/reports');
+    var reports = rd.reports || [];
+    if(reportsTotalEl) reportsTotalEl.textContent = reports.length;
+    if(reportsPendingEl) reportsPendingEl.textContent = reports.filter(function(r){return r.status==='pending';}).length;
+    if(recentReportsEl){
+      var sortedR = reports.slice().sort(function(a,b){ return new Date(b.created_at)-new Date(a.created_at); }).slice(0,5);
+      recentReportsEl.innerHTML = sortedR.length ? sortedR.map(function(r){
+        return '<div class="activity-item"><div class="activity-icon block">🚩</div><div class="activity-info">' +
+          '<div class="activity-text">Prijavljen <b>'+r.to_nick+'</b> — '+r.reason+'</div>' +
+          '<div class="activity-time">'+new Date(r.created_at).toLocaleString('hr-HR')+'</div></div></div>';
+      }).join('') : '<div style="color:var(--muted);text-align:center;padding:20px;font-style:italic;">Nema prijava.</div>';
+    }
+  } catch(e){}
+
+  var msgsTotalEl = document.getElementById('statMessagesTotal');
+  var msgsUnreadEl = document.getElementById('statMessagesUnread');
+  try {
+    var md = await api('GET', '/admin/messages');
+    var msgs = md.messages || [];
+    if(msgsTotalEl) msgsTotalEl.textContent = msgs.length;
+    if(msgsUnreadEl) msgsUnreadEl.textContent = msgs.filter(function(m){return !m.read_at;}).length;
+  } catch(e){}
+
+  var barEl = document.getElementById('realBarChart');
+  if(barEl){
+    var dayNames = ['Ned','Pon','Uto','Sri','Čet','Pet','Sub'];
+    var now = new Date();
+    var orderedBars = [];
+    for (var d=6; d>=0; d--){
+      var day = new Date(now); day.setDate(day.getDate()-d); day.setHours(0,0,0,0);
+      var dayEnd = new Date(day); dayEnd.setDate(dayEnd.getDate()+1);
+      var count = users.filter(function(u){
+        if(!u.created_at) return false;
+        var ud = new Date(u.created_at);
+        return ud >= day && ud < dayEnd;
+      }).length;
+      orderedBars.push({label: dayNames[day.getDay()], count: count});
+    }
+    var maxCount = Math.max.apply(null, orderedBars.map(function(b){return b.count;}).concat([1]));
+    barEl.innerHTML = orderedBars.map(function(b){
+      var h = maxCount ? Math.round((b.count/maxCount)*100) : 0;
+      return '<div class="bar-wrap"><div class="bar" style="height:'+(h||2)+'%"><div class="bar-tooltip">'+b.count+' korisnika</div></div><div class="bar-label">'+b.label+'</div></div>';
+    }).join('');
+  }
+
+  var donutWrap = document.getElementById('realDonutWrap');
+  if(donutWrap){
+    var countryCounts = {hr:0, ba:0, rs:0, ostalo:0};
+    users.forEach(function(u){
+      if(u.country==='hr') countryCounts.hr++;
+      else if(u.country==='ba') countryCounts.ba++;
+      else if(u.country==='rs') countryCounts.rs++;
+      else countryCounts.ostalo++;
+    });
+    var totalC = users.length;
+    if(totalC === 0){
+      donutWrap.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px;font-style:italic;">Nema korisnika za prikaz.</div>';
+    } else {
+      var pHr = Math.round((countryCounts.hr/totalC)*100);
+      var pBa = Math.round((countryCounts.ba/totalC)*100);
+      var pRs = Math.round((countryCounts.rs/totalC)*100);
+      var pOst = Math.max(0, 100 - pHr - pBa - pRs);
+      var cum1 = pHr;
+      var cum2 = cum1+pBa;
+      var cum3 = cum2+pRs;
+      donutWrap.innerHTML =
+        '<div class="donut-chart" style="background:conic-gradient(var(--green) 0% '+cum1+'%, var(--purple-500) '+cum1+'% '+cum2+'%, var(--pink) '+cum2+'% '+cum3+'%, var(--blue) '+cum3+'% 100%);">' +
+          '<div class="donut-center"><div class="num">'+totalC+'</div><div class="txt">ukupno</div></div>' +
+        '</div>' +
+        '<div class="donut-legend">' +
+          '<div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Hrvatska ('+pHr+'%)</div>' +
+          '<div class="legend-item"><div class="legend-dot" style="background:var(--purple-500)"></div>BiH ('+pBa+'%)</div>' +
+          '<div class="legend-item"><div class="legend-dot" style="background:var(--pink)"></div>Srbija ('+pRs+'%)</div>' +
+          '<div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>Ostalo ('+pOst+'%)</div>' +
+        '</div>';
+    }
+  }
+
+  var recentUsersEl = document.getElementById('realRecentUsers');
+  if(recentUsersEl){
+    var sortedUsers = users.slice().filter(function(u){return u.created_at;}).sort(function(a,b){ return new Date(b.created_at)-new Date(a.created_at); }).slice(0,5);
+    recentUsersEl.innerHTML = sortedUsers.length ? sortedUsers.map(function(u){
+      return '<div class="activity-item"><div class="activity-icon join">👤</div><div class="activity-info">' +
+        '<div class="activity-text">Novi korisnik <b>'+u.nick+'</b>'+(u.city?' iz '+u.city:'')+'</div>' +
+        '<div class="activity-time">'+new Date(u.created_at).toLocaleString('hr-HR')+'</div></div></div>';
+    }).join('') : '<div style="color:var(--muted);text-align:center;padding:20px;font-style:italic;">Nema registriranih korisnika.</div>';
+  }
+}
+
 window.exyuAdminReady.then(function(){
   renderUsersTable('').then(function(){
     renderPhotosTable();
     renderVideosTable();
     renderProfilesTable();
     renderAllMessagesTable();
+    renderReportsTab();
+    renderDashboardStats();
   });
   var searchInput = document.getElementById('userSearchInput');
   if(searchInput){
