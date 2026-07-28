@@ -1,4 +1,520 @@
-<!-- 4 COLUMNS -->
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EX YU DATE — Bosna i Hercegovina</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#1a0033;
+  --purple-900:#2d0057;
+  --county-name-color:#00e5ff;
+  --purple-800:#4a0a7a;
+  --purple-700:#6b1a9e;
+  --purple-600:#7b2cbf;
+  --purple-500:#a23cff;
+  --purple-300:#c57dff;
+  --purple-100:#e9c6ff;
+  --pink:#ff6b9d;
+  --text:#e9c6ff;
+  --muted:#b8a4d4;
+  --line:rgba(162,60,255,0.45);
+  --panel:rgba(45,0,87,0.4);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+  font-family:'Inter',sans-serif;
+  background:linear-gradient(135deg,#1a0033 0%,#2d0057 50%,#4a0a7a 100%);
+  color:var(--text);
+  min-height:100vh;
+  padding:18px;
+}
+a{color:inherit;text-decoration:none;cursor:pointer;}
+.app{
+  min-height:calc(100vh - 36px);
+  border:1px solid rgba(162,60,255,0.25);
+  border-radius:14px;
+  overflow:hidden;
+  background:rgba(0,0,0,0.15);
+  display:flex;
+  flex-direction:column;
+}
+/* TOP HEADER */
+.top{
+  display:grid;
+  grid-template-columns: 160px 1fr 220px;
+  padding:18px 22px;
+  gap:16px;
+  align-items:start;
+}
+.corner-links{display:flex;flex-direction:column;gap:6px;font-size:13px;}
+.corner-links a{color:var(--purple-300);font-size:15px;}
+.corner-links a:hover{color:#fff;}
+.title-wrap{text-align:center;}
+.title{
+  font-family:'Poppins',sans-serif;
+  font-size:44px;
+  font-weight:700;
+  letter-spacing:6px;
+  background:linear-gradient(180deg,#fff 0%,var(--purple-100) 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  cursor:pointer;
+}
+.title-sub{font-size:11px;color:var(--muted);letter-spacing:3px;margin-top:2px;}
+.right-of-title{display:flex;flex-direction:column;gap:8px;align-items:flex-end;font-size:13px;}
+.right-of-title a{color:var(--purple-300);font-size:15px;}
+.right-of-title .with-count{display:flex;align-items:center;gap:6px;}
+.count-box{
+  min-width:32px;padding:2px 8px;text-align:center;
+  background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.6);border-radius:10px;font-size:13px;color:#ff5c5c;font-weight:700;
+}
+.middle-row{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  padding:6px 22px 14px;
+  gap:24px;
+}
+.messages a{color:var(--purple-300);font-weight:500;}
+.messages{display:flex;align-items:center;gap:8px;}
+.search-row{display:flex;align-items:center;gap:8px;}
+.search-row label{color:var(--purple-300);white-space:nowrap;}
+.search-row input{
+  flex:0 1 200px;max-width:200px;background:rgba(255,255,255,0.06);
+  border:1px solid rgba(162,60,255,0.4);border-radius:8px;
+  padding:6px 10px;color:#fff;font-family:inherit;font-size:13px;
+}
+.search-row input::placeholder{color:var(--muted);}
+/* NAV BAR */
+.nav-bar{
+  display:flex;
+  align-items:stretch;
+  border-bottom:2px solid rgba(255,45,149,0.5);
+}
+.nav-bar a{
+  display:inline-block;
+  padding:14px 22px;
+  font-weight:700;
+  letter-spacing:1.5px;
+  color:var(--muted);
+  border-right:1px solid rgba(255,45,149,0.35);
+  transition:all .2s;
+  text-transform:uppercase;
+  font-size:14px;
+  cursor:pointer;
+}
+.nav-bar a:hover{color:#fff;background:rgba(255,45,149,0.16);}
+.nav-bar a.flag-hr{color:#4da6ff;}
+.nav-bar a.flag-ba{color:#4dd980;}
+.nav-bar a.flag-rs{color:#ff5c5c;}
+.nav-bar a.active{color:#fff !important;}
+.nav-bar a.active{
+  color:#fff;
+  background:linear-gradient(180deg,#ff2d78,#c4145a);
+  box-shadow:inset 0 -3px 0 #ffb3d9;
+  text-shadow:0 0 12px rgba(255,92,173,0.85);
+}
+.nav-bar .spacer{flex:1;}
+/* STATUS BAR */
+.status-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:18px;
+  padding:12px 22px;
+  border-bottom:2px solid var(--line);
+  background:rgba(0,0,0,0.18);
+}
+.status-stats{display:flex;gap:22px;flex-wrap:wrap;}
+.status-stats .stat{display:flex;align-items:center;gap:8px;font-size:13px;}
+.status-stats .stat span:first-child{color:var(--muted);letter-spacing:.5px;}
+.status-stats .stat .count-box{font-weight:600;background:var(--purple-900);border:1px solid rgba(162,60,255,0.4);color:#fff;}
+.status-menu{display:flex;gap:18px;flex-wrap:wrap;}
+.status-menu a{
+  color:var(--purple-300);font-weight:500;font-size:14px;letter-spacing:.5px;
+  transition:color .2s;
+}
+.status-menu a:hover{color:#fff;}
+/* 4 COLUMNS */
+.columns{
+  display:grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  flex:1;
+  min-height:480px;
+}
+.col{
+  padding:14px 14px 18px;
+  border-right:1px solid rgba(162,60,255,0.35);
+  display:flex;flex-direction:column;
+  min-height:100%;
+}
+.col:last-child{border-right:none;}
+.col-header{
+  font-family:'Cormorant Garamond',serif;
+  font-size:20px;
+  color:var(--purple-100);
+  font-weight:700;
+  text-align:center;
+  letter-spacing:2px;
+  padding-bottom:10px;
+  margin-bottom:12px;
+  border-bottom:1px solid rgba(162,60,255,0.35);
+}
+.col-body{flex:1;display:flex;flex-direction:column;gap:6px;font-size:13px;}
+/* county list */
+.county-list{display:flex;flex-direction:column;gap:4px;}
+.county-list a{
+  padding:7px 10px;
+  border-radius:6px;
+  color:var(--county-name-color);
+  border:1px solid transparent;
+  transition:all .15s;
+  font-size:15px;
+  font-weight:600;
+  text-shadow:0 0 8px rgba(0,229,255,0.55);
+}
+.county-list a:hover{
+  background:rgba(162,60,255,0.18);
+  border-color:rgba(255,224,236,0.35);
+  color:#fff;
+}
+.county-list a.active{
+  background:linear-gradient(180deg,var(--purple-500),var(--purple-600));
+  color:#fff;
+  border-color:var(--purple-100);
+  font-weight:600;
+}
+.county-list a.svi{
+  font-weight:700;
+  letter-spacing:2px;
+  text-align:center;
+  background:rgba(162,60,255,0.1);
+  border-color:rgba(255,224,236,0.25);
+  margin-bottom:6px;
+}
+.county-list a.svi.active{background:linear-gradient(180deg,var(--purple-500),var(--purple-600));}
+/* profile cards */
+.profile-card{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(162,60,255,0.35);
+  border-radius:8px;
+  padding:8px 10px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:13px;
+}
+.profile-card .avatar{
+  width:36px;height:36px;border-radius:50%;
+  background:linear-gradient(135deg,var(--purple-500),var(--purple-300));
+  flex-shrink:0;
+  border:1px solid rgba(255,224,236,0.4);
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+}
+.profile-card .info{flex:1;min-width:0;}
+.profile-card .info .name{color:#ffe27a;font-weight:700;font-size:15px;text-shadow:0 0 6px rgba(255,226,122,0.5);}
+.profile-card .info .meta{color:var(--muted);font-size:11px;}
+.dot-online{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 6px #22c55e;}
+.chat-card{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(162,60,255,0.35);
+  border-radius:8px;
+  padding:8px 10px;
+  font-size:13px;
+}
+.chat-card .who{color:#ffe27a;font-weight:700;font-size:14px;text-shadow:0 0 6px rgba(255,226,122,0.5);}
+.chat-card .msg{color:var(--text);margin-top:2px;}
+.empty{
+  text-align:center;color:var(--muted);font-style:italic;
+  padding:18px 8px;font-size:12px;
+}
+/* FOOTER NAV */
+.footer-nav{
+  padding:14px 22px;
+  border-top:1px solid rgba(162,60,255,0.35);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:rgba(0,0,0,0.22);
+}
+.btn{
+  background:linear-gradient(180deg,var(--purple-500),var(--purple-600));
+  color:#fff;
+  padding:10px 18px;
+  border-radius:8px;
+  font-weight:600;
+  letter-spacing:1px;
+  border:1px solid var(--purple-300);
+  font-size:13px;
+  cursor:pointer;
+  transition:all .2s;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+}
+.btn:hover{
+  background:linear-gradient(180deg,var(--purple-600),var(--purple-700));
+  box-shadow:0 0 14px rgba(199,155,255,0.4);
+}
+.current-filter{
+  color:var(--muted);
+  font-size:13px;
+  letter-spacing:.5px;
+}
+.current-filter b{color:var(--purple-100);}
+.filter-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:10px 22px;border-bottom:1px solid rgba(162,60,255,0.25);background:rgba(0,0,0,0.1);}
+.filter-bar .fb-group{display:flex;align-items:center;gap:6px;}
+.filter-bar label{color:var(--muted);font-size:12px;letter-spacing:.5px;white-space:nowrap;}
+.filter-bar select,.filter-bar input{background:rgba(255,255,255,0.06);border:1px solid rgba(162,60,255,0.4);border-radius:8px;padding:6px 10px;color:#fff;font-family:inherit;font-size:13px;outline:none;}
+.filter-bar select:focus,.filter-bar input:focus{border-color:#c57dff;}
+.profile-card{position:relative;flex-wrap:wrap;}
+.card-actions{display:flex;gap:6px;width:100%;margin-top:8px;justify-content:flex-end;}
+.act-btn{background:rgba(255,255,255,0.08);border:1px solid rgba(162,60,255,0.35);color:#fff;border-radius:8px;width:30px;height:30px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.act-btn:hover{transform:translateY(-2px);}
+.act-like:hover{background:linear-gradient(45deg,#a23cff,#c57dff);}
+.act-pass:hover{background:rgba(255,255,255,0.2);}
+.act-report:hover{background:#f59e0b;}
+.act-block:hover{background:#ef4444;}
+.exyu-notif-badge{background:#a23cff;color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;font-weight:800;margin-left:3px;display:none;vertical-align:top;}
+.exyu-notif-panel{position:fixed;top:60px;right:16px;width:320px;max-width:92vw;max-height:70vh;overflow-y:auto;background:linear-gradient(135deg,#2d0057,#4a0a7a);border:2px solid rgba(162,60,255,0.5);border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,0.6);z-index:9997;display:none;}
+.exyu-notif-panel.on{display:block;}
+.exyu-notif-head{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;font-weight:700;color:#fff;border-bottom:1px solid rgba(162,60,255,0.3);font-size:13px;}
+.exyu-notif-head a{color:var(--purple-300);font-size:11px;font-weight:600;}
+.exyu-notif-item{padding:10px 14px;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.06);color:var(--muted);display:flex;gap:8px;}
+.exyu-notif-item.unread{background:rgba(162,60,255,0.12);color:#fff;}
+@media (max-width: 1100px){
+  .columns{grid-template-columns:1fr 1fr;}
+  .col{border-bottom:1px solid rgba(162,60,255,0.35);}
+}
+@media (max-width: 900px){
+  .top{grid-template-columns:1fr 1fr; gap:10px; padding:14px 18px;}
+  .title{font-size:32px; letter-spacing:3px;}
+  .title-sub{font-size:10px;}
+  .corner-links{font-size:12px;}
+  .right-of-title{font-size:12px;}
+  .nav-bar a{padding:12px 16px; font-size:12px; letter-spacing:1px;}
+  .status-bar{padding:10px 18px;}
+  .middle-row{padding:6px 18px 12px;}
+}
+@media (max-width: 600px){
+  body{padding:8px;}
+  .app{min-height:calc(100vh - 16px); border-radius:10px;}
+  .top{grid-template-columns:1fr; text-align:center; gap:8px; padding:12px 14px;}
+  .corner-links{flex-direction:row; justify-content:center; gap:10px; flex-wrap:wrap;}
+  .right-of-title{align-items:center; gap:6px;}
+  .title{font-size:26px; letter-spacing:2px;}
+  .title-sub{font-size:9px; letter-spacing:2px;}
+  .middle-row{grid-template-columns:1fr; gap:10px; padding:6px 14px 10px;}
+  .messages{justify-content:center;}
+  .search-row{flex-direction:column; align-items:stretch; gap:6px;}
+  .search-row label{align-self:flex-start; font-size:12px;}
+  .search-row input{padding:8px 10px; font-size:14px;}
+  .nav-bar{flex-wrap:nowrap; overflow-x:auto; gap:0; -webkit-overflow-scrolling:touch;}
+  .nav-bar::-webkit-scrollbar{height:3px;}
+  .nav-bar::-webkit-scrollbar-thumb{background:rgba(162,60,255,0.5); border-radius:4px;}
+  .nav-bar a{padding:10px 12px; font-size:11px; letter-spacing:1px; border-right:none; border-bottom:1px solid rgba(162,60,255,0.2); white-space:nowrap; flex-shrink:0;}
+  .status-bar{flex-direction:column; align-items:flex-start; gap:10px; padding:10px 14px;}
+  .status-stats{gap:12px;}
+  .status-stats .stat{font-size:12px;}
+  .status-menu{gap:12px;}
+  .status-menu a{font-size:13px;}
+  .columns{grid-template-columns:1fr; gap:0;}
+  .col{padding:10px 14px 14px; border-right:none; border-bottom:1px solid rgba(162,60,255,0.35);}
+  .col:last-child{border-bottom:none;}
+  .col-header{font-size:17px; padding-bottom:8px; margin-bottom:10px;}
+  .col-body{gap:8px;}
+  .profile-card{padding:10px 12px; gap:10px; font-size:14px;}
+  .profile-card .avatar{width:40px;height:40px; font-size:18px;}
+  .profile-card .info .meta{font-size:12px;}
+  .gallery-grid{grid-template-columns:1fr 1fr; gap:8px;}
+  .thumb{max-height:110px;}
+  .chat-card{padding:10px 12px; font-size:14px;}
+  .empty{padding:22px 8px; font-size:13px;}
+  .footer-nav{padding:10px 14px; font-size:11px;}
+  .count-box{padding:3px 8px; font-size:11px;}
+  .county-list{flex-direction:row; flex-wrap:nowrap; overflow-x:auto; gap:6px; padding-bottom:4px; -webkit-overflow-scrolling:touch;}
+  .county-list::-webkit-scrollbar{height:4px;}
+  .county-list::-webkit-scrollbar-thumb{background:rgba(162,60,255,0.5); border-radius:4px;}
+  .county-list a{white-space:nowrap; padding:6px 10px; font-size:14px; flex-shrink:0; border-radius:6px;}
+  .county-list a.svi{margin-bottom:0;}
+  .current-filter{font-size:12px; text-align:center;}
+}
+/* ===================================================
+   EX YU DATE — ANTI-TRZANJE v3 (FINALNA VERZIJA)
+   =================================================== */
+/* 1. Pozadina nikad ne nestaje — nema bijelog bljeska */
+html {
+  background: linear-gradient(135deg,#1a0033 0%,#2d0057 50%,#4a0a7a 100%);
+  background-attachment: fixed;
+  overflow-y: scroll;
+}
+/* 2. View Transitions API (Chrome 111+) — čista crossfade, bez pokreta */
+@view-transition {
+  navigation: auto;
+}
+::view-transition-old(root) {
+  animation: 180ms linear forwards exyu-out;
+}
+::view-transition-new(root) {
+  animation: 220ms linear forwards exyu-in;
+}
+@keyframes exyu-out { to   { opacity: 0; } }
+@keyframes exyu-in  { from { opacity: 0; } }
+/* 3. Fallback — isti efekt za Firefox/Safari, BEZ pokreta */
+body {
+  animation: exyu-body-in 0.22s linear both;
+}
+@keyframes exyu-body-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+/* HERO BANNER - puna širina, "TV ekran" na vrhu stranice */
+.hero-banner{
+  position:relative;
+  width:100%;
+  height:260px;
+  background-size:cover;
+  background-position:center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  border-bottom:2px solid rgba(255,255,255,0.15);
+}
+.hero-banner video{
+  position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:0;
+}
+.hero-banner .hero-overlay{
+  position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.2)); z-index:1;
+}
+.hero-banner .hero-content{ position:relative; z-index:2; text-align:center; padding:0 20px; }
+.hero-banner .hero-flag{ font-size:64px; margin-bottom:8px; filter:drop-shadow(0 4px 12px rgba(0,0,0,0.5)); }
+.hero-banner .hero-title{ font-family:'Poppins',sans-serif; font-size:42px; font-weight:800; color:#fff; letter-spacing:3px; text-shadow:0 4px 20px rgba(0,0,0,0.6); }
+.hero-banner .hero-sub{ font-size:14px; color:rgba(255,255,255,0.9); letter-spacing:2px; margin-top:6px; text-transform:uppercase; }
+@media(max-width:600px){
+  .hero-banner{ height:160px; }
+  .hero-banner .hero-flag{ font-size:40px; }
+  .hero-banner .hero-title{ font-size:24px; letter-spacing:1.5px; }
+  .hero-banner .hero-sub{ font-size:11px; }
+}
+/* SLIKA IZNAD CHATA - odvojen prostor, klikni da postaviš/zamijeniš (samo admin) */
+.above-chat-img{
+  position:relative;
+  width:100%;
+  min-height:180px;
+  background:rgba(162,60,255,0.12);
+  background-size:cover;
+  background-position:center;
+  border-radius:10px;
+  margin-bottom:16px;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:2px dashed rgba(162,60,255,0.6);
+}
+.above-chat-img img{position:relative;display:block;max-width:100%;max-height:340px;width:auto;height:auto;object-fit:contain;margin:0 auto;}
+.above-chat-img .above-chat-placeholder{position:relative;z-index:1;color:#fff;font-size:14px;font-weight:600;text-align:center;padding:14px;}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- HERO BANNER - video: media/hero-banner.mp4 -->
+  <div class="hero-banner" style="background-image:linear-gradient(135deg, #0d3d24, #4dd980);">
+    <video autoplay muted loop playsinline src="media/hero-banner.mp4"></video>
+    <div class="hero-overlay"></div>
+  </div>
+  <!-- TOP HEADER -->
+  <div class="top">
+    <div class="corner-links">
+      <a href="#" id="logoutL">Odjava</a>
+      <a href="chat.html">Poruke <span class="count-box" id="headerPorukeBadge">0</span></a>
+      <a href="#" id="friendReqLink">Zahtjevi za prijateljstvo <span class="count-box" id="friendReqBadge">0</span></a>
+      <a href="#" id="giftsLink">🎁 Pokloni</a>
+      <a href="#" id="pokesLink">👉 Bockanja <span class="count-box" id="pokesBadge">0</span></a>
+    </div>
+    <div class="title-wrap"></div>
+    <div class="right-of-title">
+      <a href="#" id="contactAdminLink">✉️ Kontakt admina</a>
+      <a href="settings.html">⚙️ Postavke</a>
+      <div id="adminQuickButtons" style="display:none;flex-direction:column;gap:6px;margin-top:6px;align-items:flex-end;">
+        <a href="../index.html" style="color:#ffd700;font-weight:700;letter-spacing:1px;text-shadow:0 0 8px rgba(255,215,0,0.6);">📋 Registracija</a>
+        <a href="#" id="firstPageBtn" style="color:#ffd700;font-weight:700;letter-spacing:1px;text-shadow:0 0 8px rgba(255,215,0,0.6);">🔧 Prva stranica</a>
+        <a href="admin.html" style="color:#ffd700;font-weight:700;letter-spacing:1px;text-shadow:0 0 8px rgba(255,215,0,0.6);">🛠️ Admin panel</a>
+      </div>
+    </div>
+  </div>
+  <div class="middle-row">
+    <div class="search-row">
+      <label>Traži po nicku</label>
+      <input type="text" id="nickSearch" placeholder="Upiši nick…">
+    </div>
+  </div>
+  <!-- NAV BAR -->
+  <nav class="nav-bar">
+    <a href="pocetna.html">Početna</a>
+    <a href="hrvatska.html" class="flag-hr">🇭🇷 Hrvatska</a>
+    <a href="bosna.html" class="flag-ba active">🇧🇦 Bosna i Hercegovina</a>
+    <a href="srbija.html" class="flag-rs">🇷🇸 Srbija</a>
+    <a href="chat.html">Chat</a>
+    <a href="video.html">Video pozivi</a>
+    <a href="galerija.html">Galerija</a>
+    <a href="oglasnik.html">Oglasnik</a>
+    <a href="profil.html">Profil</a>
+    <a href="#" id="myFriendsNav">Moji prijatelji (<span id="myFriendsCount">0</span>)</a>
+    <a href="naplata.html" id="naplataNav" style="display:none;color:#ffd700;">💰 NAPLATA</a>
+    <div class="spacer"></div>
+  </nav>
+  <!-- STATUS BAR -->
+  <div class="status-bar">
+    <div class="status-stats">
+      <div class="stat"><span>online</span><span class="count-box">0</span></div>
+      <div class="stat"><span>žene</span><span class="count-box">0</span></div>
+      <div class="stat"><span>parovi</span><span class="count-box">0</span></div>
+      <div class="stat"><span>muškarci</span><span class="count-box">0</span></div>
+    </div>
+  </div>
+  <!-- SEARCH / FILTER / SORT BAR -->
+  <div class="filter-bar">
+    <div class="fb-group">
+      <label>Spol</label>
+      <select id="genderFilter">
+        <option value="svi">Svi</option>
+        <option value="M">Muškarci</option>
+        <option value="Z">Žene</option>
+        <option value="P">Parovi</option>
+      </select>
+    </div>
+    <div class="fb-group">
+      <label>Godine</label>
+      <select id="ageFilter">
+        <option value="svi">Sve</option>
+        <option value="18-25">18–25</option>
+        <option value="26-35">26–35</option>
+        <option value="36-45">36–45</option>
+        <option value="46-99">46+</option>
+      </select>
+    </div>
+    <div class="fb-group">
+      <label>Status</label>
+      <select id="onlineFilter">
+        <option value="svi">Svi</option>
+        <option value="online">Samo online</option>
+      </select>
+    </div>
+    <div class="fb-group">
+      <label>Sortiraj</label>
+      <select id="sortFilter">
+        <option value="online">Online prvo</option>
+        <option value="ime">Ime A–Ž</option>
+        <option value="godine">Godine</option>
+      </select>
+    </div>
+  </div><!-- 4 COLUMNS -->
   <div class="columns">
     <!-- COLUMN 1: KANTONI -->
     <div class="col">
