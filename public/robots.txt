@@ -1,0 +1,19 @@
+User-agent: *
+Disallow: /pages/admin.html
+Disallow: /pages/bosna.html
+Disallow: /pages/hrvatska.html
+Disallow: /pages/srbija.html
+Disallow: /pages/pocetna.html
+Disallow: /pages/chat.html
+Disallow: /pages/video.html
+Disallow: /pages/galerija.html
+Disallow: /pages/oglasnik.html
+Disallow: /pages/profil.html
+Disallow: /pages/naplata.html
+Disallow: /pages/settings.html
+Disallow: /pages/video-registracija.html
+Disallow: /pages/na-mrezi.html
+Disallow: /pages/prosireni-chat.html
+Disallow: /pages/svi-korisnici.html
+
+Sitemap: https://ex-yu-dating.onrender.com/sitemap.xml
