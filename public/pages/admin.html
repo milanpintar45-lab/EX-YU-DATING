@@ -655,7 +655,7 @@ window.exyuAdminReady = (async function(){
         <div class="stat-card">
           <div class="stat-icon purple">👥</div>
           <div class="stat-info">
-            <div class="stat-value">2,847</div>
+            <div class="stat-value" id="statTotalUsers">2,847</div>
             <div class="stat-label">UKUPNO KORISNIKA</div>
             <div class="stat-change up">▲ +124 ovaj mjesec</div>
           </div>
@@ -829,9 +829,7 @@ window.exyuAdminReady = (async function(){
         </div>
       </div>
 
-    </div>
-
-    <!-- ========== KORISNICI ========== -->
+    </div><!-- ========== KORISNICI ========== -->
     <div class="section" id="users">
       <div class="section-header">
         <div>
@@ -1459,6 +1457,9 @@ async function renderUsersTable(filterText){
   try { users = (await api('GET', '/admin/users')).users || []; }
   catch(e) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px;">Greška pri učitavanju.</td></tr>'; return; }
   _cachedAdminUsers = users;
+
+  var statEl = document.getElementById('statTotalUsers');
+  if (statEl) statEl.textContent = users.length;
 
   var q = (filterText || '').toLowerCase().trim();
   if(q){
