@@ -242,7 +242,7 @@ button.medium:disabled { opacity: 0.5; cursor: not-allowed; }
 .success { color: #00ff88; }
 .error { color: #ff6b6b; }
 .info { color: #00ffff; }
-.hidden { display: none !important; }
+hidden { display: none !important; } .locked-step { opacity: 0.35; pointer-events: none; filter: grayscale(60%); } .locked-msg { text-align:center; color:#ffaa00; font-weight:700; margin-top:8px; font-size:0.95em; }
 
 /* ===== SUCCESS MODAL ===== */
 .success-overlay {
@@ -638,7 +638,7 @@ body {
         </div>
         
         <!-- SMS potvrda broja mobitela (dodatna sigurnosna mjera) -->
-        <div class="email-verify-box" id="phoneBox">
+        <div class="email-verify-box" id="phoneBox"> <div id="phoneLockNotice" class="locked-msg">🔒 Prvo potvrdite email da biste otključali ovaj korak</div>
           <div id="phoneVerifyText">Potvrdite broj mobitela SMS kodom (dodatna sigurnosna mjera)</div>
           <button class="big" style="margin:10px 0; font-size:1em; padding:12px;" onclick="sendPhoneCode()" id="btnSendPhoneCode">📲 POŠALJI SMS KOD</button>
           <div id="phoneCodeInputArea" class="hidden">
@@ -664,7 +664,7 @@ body {
           <div id="ex3" class="hidden">💑 <b>Par:</b> Oba moraju izgovoriti svoju rečenicu odvojeno!</div>
         </div>
         
-        <div class="voice-section">
+        <div class="voice-section" id="voiceSection"> <div id="voiceLockNotice" class="locked-msg">🔒 Prvo potvrdite broj mobitela (SMS) da biste otključali ovaj korak</div>
           <button class="big" onclick="speakInstructions()" style="background: linear-gradient(45deg,#00a8ff,#00ff88); margin-bottom:15px;">🔊 POSLUŠAJ UPUTE</button>
           
           <div id="micSupportMsg" style="margin-bottom:10px; font-size:0.95em; color:#ffaa00;"></div>
@@ -744,12 +744,12 @@ let emailVerified = false;
 let generatedCode = "";
 let phoneVerified = false;
 let generatedPhoneCode = "";
-let isPair = false;
+let isPair = false; function updateStepLocks() { var phoneBox = document.getElementById('phoneBox'); var voiceSection = document.getElementById('voiceSection'); var phoneLockNotice = document.getElementById('phoneLockNotice'); var voiceLockNotice = document.getElementById('voiceLockNotice'); if (emailVerified) { phoneBox.classList.remove('locked-step'); phoneLockNotice.classList.add('hidden'); } else { phoneBox.classList.add('locked-step'); phoneLockNotice.classList.remove('hidden'); } if (phoneVerified) { voiceSection.classList.remove('locked-step'); voiceLockNotice.classList.add('hidden'); } else { voiceSection.classList.add('locked-step'); voiceLockNotice.classList.remove('hidden'); } }
 
 // ======================
 // INICIJALIZACIJA
 // ======================
-window.onload = async function() {
+window.onload = async function() { updateStepLocks();
   updateCities();
   handleGenderChange();
   updateExamples();
@@ -988,7 +988,7 @@ async function verifyEmailCode() {
     emailVerificationTicket = data.ticket;
     document.getElementById('emailStatus').innerHTML = '<span class="success">✅ Email potvrđen!</span>';
     document.getElementById('codeInputArea').classList.add('hidden');
-    document.getElementById('btnSendCode').textContent = '✅ EMAIL POTVRĐEN';
+    document.getElementById('btnSendCode').textContent = '✅ EMAIL POTVRĐEN'; updateStepLocks();
     checkAllReady();
   } catch (err) {
     document.getElementById('emailStatus').innerHTML = '<span class="error">❌ ' + err.message + '</span>';
@@ -1028,7 +1028,7 @@ async function verifyPhoneCode() {
     phoneVerificationTicket = data.ticket;
     document.getElementById('phoneStatus').innerHTML = '<span class="success">✅ Broj mobitela potvrđen!</span>';
     document.getElementById('phoneCodeInputArea').classList.add('hidden');
-    document.getElementById('btnSendPhoneCode').textContent = '✅ MOBITEL POTVRĐEN';
+    document.getElementById('btnSendPhoneCode').textContent = '✅ MOBITEL POTVRĐEN'; updateStepLocks();
     checkAllReady();
   } catch (err) {
     document.getElementById('phoneStatus').innerHTML = '<span class="error">❌ ' + err.message + '</span>';
