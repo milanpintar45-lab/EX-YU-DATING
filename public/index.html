@@ -743,7 +743,7 @@ let voiceCheck2Done = false;
 let emailVerified = false;
 let generatedCode = "";
 let phoneVerified = false;
-let generatedPhoneCode = "";
+let generatedPhoneCode = ""; const cityGenitive = {"zagreb":"Zagreba","split":"Splita","rijeka":"Rijeke","osijek":"Osijeka","zadar":"Zadra","pula":"Pule","dubrovnik":"Dubrovnika","šibenik":"Šibenika","varaždin":"Varaždina","karlovac":"Karlovca","sarajevo":"Sarajeva","banja luka":"Banje Luke","mostar":"Mostara","tuzla":"Tuzle","zenica":"Zenice","bihać":"Bihaća","bijeljina":"Bijeljine","prijedor":"Prijedora","doboj":"Doboja","travnik":"Travnika","beograd":"Beograda","novi sad":"Novog Sada","niš":"Niša","kragujevac":"Kragujevca","subotica":"Subotice","zrenjanin":"Zrenjanina","pančevo":"Pančeva","čačak":"Čačka","novi pazar":"Novog Pazara","kraljevo":"Kraljeva"}; function getCityGenitive(city) { if (!city) return 'Rijeke'; return cityGenitive[city] || (city.charAt(0).toUpperCase() + city.slice(1)); } let verificationNumber = Math.floor(Math.random()*90)+10;
 let isPair = false; function updateStepLocks() { var phoneBox = document.getElementById('phoneBox'); var voiceSection = document.getElementById('voiceSection'); var phoneLockNotice = document.getElementById('phoneLockNotice'); var voiceLockNotice = document.getElementById('voiceLockNotice'); if (emailVerified) { phoneBox.classList.remove('locked-step'); phoneLockNotice.classList.add('hidden'); } else { phoneBox.classList.add('locked-step'); phoneLockNotice.classList.remove('hidden'); } if (phoneVerified) { voiceSection.classList.remove('locked-step'); voiceLockNotice.classList.add('hidden'); } else { voiceSection.classList.add('locked-step'); voiceLockNotice.classList.remove('hidden'); } }
 
 // ======================
@@ -916,10 +916,10 @@ function updateExamples() {
   const nick = document.getElementById('nick').value.trim() || 'Ivan';
   const nick2 = document.getElementById('nick2').value.trim() || 'Iva';
   const city = document.getElementById('city').value;
-  const cityName = city ? city.charAt(0).toUpperCase() + city.slice(1) : 'Rijeke';
+  const cityName = getCityGenitive(city);
   
-  document.getElementById('ex1').innerHTML = `👨 <b>Vaša rečenica:</b> "Ja sam ${nick} iz ${cityName}"`;
-  document.getElementById('ex2').innerHTML = `👩 <b>Rečenica druge osobe:</b> "Ja sam ${nick2} iz ${cityName}"`;
+  document.getElementById('ex1').innerHTML = `👨 <b>Vaša rečenica:</b> "Ja sam ${nick} iz ${cityName}, broj ${verificationNumber}"`;
+  document.getElementById('ex2').innerHTML = `👩 <b>Rečenica druge osobe:</b> "Ja sam ${nick2} iz ${cityName}, broj ${verificationNumber}"`;
   document.getElementById('ex3').innerHTML = `💑 <b>Par:</b> Oba moraju izgovoriti svoju rečenicu odvojeno!`;
   var hint1El = document.getElementById('hint1');
   var hint2El = document.getElementById('hint2');
@@ -934,7 +934,7 @@ function speakInstructions() {
   const nick = document.getElementById('nick').value.trim() || 'Ivan';
   const nick2 = document.getElementById('nick2').value.trim() || 'Iva';
   const city = document.getElementById('city').value;
-  const cityName = city ? city.charAt(0).toUpperCase() + city.slice(1) : 'Rijeke';
+  const cityName = getCityGenitive(city);
   if (!window.speechSynthesis) {
     alert('Vaš preglednik ne podržava glasovnu reprodukciju.');
     return;
@@ -1041,7 +1041,7 @@ async function verifyPhoneCode() {
 async function startVoiceCheck(person) {
   const nick = person === 1 ? document.getElementById('nick').value.trim() : document.getElementById('nick2').value.trim();
   const city = document.getElementById('city').value;
-  const cityName = city ? city.charAt(0).toUpperCase() + city.slice(1) : '';
+  const cityName = getCityGenitive(city);
   
   if (!nick) { alert('Molimo upišite nick prije glasovne provjere!'); return; }
   if (!city) { alert('Molimo odaberite grad!'); return; }
@@ -1079,9 +1079,9 @@ async function startVoiceCheck(person) {
     const hasJaSam = transcript.includes('ja sam');
     const hasNick = transcript.includes(nick.toLowerCase());
     const hasIz = transcript.includes('iz');
-    const hasCity = transcript.includes(cityName.toLowerCase()) || transcript.includes(city.toLowerCase());
+    const hasCity = transcript.includes(cityName.toLowerCase()) || transcript.includes(city.toLowerCase()); const hasNumber = transcript.includes(String(verificationNumber));
     
-    if (hasJaSam && hasNick && hasIz && hasCity) {
+    if (hasJaSam && hasNick && hasIz && hasCity && hasNumber) {
       if (person === 1) voiceCheck1Done = true;
       else voiceCheck2Done = true;
       statusDiv.innerHTML = `✅ <b>GLASOVNA PROVJERA ${person} USPJEŠNO PROŠLA!</b> 🔒`;
@@ -1089,7 +1089,7 @@ async function startVoiceCheck(person) {
       btn.textContent = '✅ OK';
       checkAllReady();
     } else {
-      statusDiv.innerHTML = `❌ <b>NISI REKAO TOČNO!</b><br>Rečeno: "${transcript}"<br>Očekivano: "Ja sam ${nick} iz ${cityName}"`;
+      statusDiv.innerHTML = `❌ <b>NISI REKAO TOČNO!</b><br>Rečeno: "${transcript}"<br>Očekivano: "Ja sam ${nick} iz ${cityName}, broj ${verificationNumber}"`;
       btn.textContent = '🎤 POKUŠAJ PONOVO';
     }
   };
