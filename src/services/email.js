@@ -1,27 +1,24 @@
-const nodemailer = require('nodemailer');
+const SibApiV3Sdk = require('sib-api-v3-sdk');
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: process.env.SMTP_PORT,
-  secure: false,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+const defaultClient = SibApiV3Sdk.ApiClient.instance;
+const apiKey = defaultClient.authentications['api-key'];
+apiKey.apiKey = process.env.BREVO_API_KEY;
+
+const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
 async function sendViaResend(toEmail, subject, html) {
-  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
-    console.warn('⚠️ SMTP_USER ili SMTP_PASS nije postavljen — emailovi se NEĆE stvarno slati, samo ispisivati u konzolu.');
+  if (!process.env.BREVO_API_KEY) {
+    console.warn('⚠️ BREVO_API_KEY nije postavljen — emailovi se NEĆE stvarno slati, samo ispisivati u konzolu.');
     return null;
   }
-  const info = await transporter.sendMail({
-    from: `"EX YU DATING" <${process.env.SMTP_USER}>`,
-    to: toEmail,
+  const sendSmtpEmail = {
+    sender: { name: 'EX YU DATING', email: 'exyudating69@gmail.com' },
+    to: [{ email: toEmail }],
     subject,
-    html,
-  });
-  return info;
+    htmlContent: html,
+  };
+  const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
+  return result;
 }
 
 async function sendVerificationEmail(toEmail, code) {
@@ -40,7 +37,8 @@ async function sendVerificationEmail(toEmail, code) {
     return { simulated: true };
   }
   return result;
-}async function sendPasswordResetEmail(toEmail, code) {
+}
+async function sendPasswordResetEmail(toEmail, code) {
   const html = `
     <div style="font-family:sans-serif;padding:20px;">
       <h2>Oporavak lozinke - EX YU DATING</h2>
