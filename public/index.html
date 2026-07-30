@@ -992,6 +992,7 @@ async function verifyEmailCode() {
     checkAllReady();
   } catch (err) {
     document.getElementById('emailStatus').innerHTML = '<span class="error">❌ ' + err.message + '</span>';
+	document.getElementById('btnSendCode').disabled = false; document.getElementById('btnSendCode').textContent = '📧 POŠALJI NOVI KOD';
   }
 }
 
