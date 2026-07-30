@@ -1,26 +1,27 @@
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: process.env.SMTP_PORT,
+  secure: false,
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
+
 async function sendViaResend(toEmail, subject, html) {
-  if (!process.env.RESEND_API_KEY) {
-    console.warn('⚠️  RESEND_API_KEY nije postavljen - emailovi se NEĆE stvarno slati, samo ispisivati u konzolu.');
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    console.warn('⚠️ SMTP_USER ili SMTP_PASS nije postavljen — emailovi se NEĆE stvarno slati, samo ispisivati u konzolu.');
     return null;
   }
-  const response = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      from: process.env.EMAIL_FROM || 'onboarding@resend.dev',
-      to: toEmail,
-      subject,
-      html,
-    }),
+  const info = await transporter.sendMail({
+    from: `"EX YU DATING" <${process.env.SMTP_USER}>`,
+    to: toEmail,
+    subject,
+    html,
   });
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Resend greška: ${response.status} - ${errorText}`);
-  }
-  return response.json();
+  return info;
 }
 
 async function sendVerificationEmail(toEmail, code) {
@@ -39,9 +40,7 @@ async function sendVerificationEmail(toEmail, code) {
     return { simulated: true };
   }
   return result;
-}
-
-async function sendPasswordResetEmail(toEmail, code) {
+}async function sendPasswordResetEmail(toEmail, code) {
   const html = `
     <div style="font-family:sans-serif;padding:20px;">
       <h2>Oporavak lozinke - EX YU DATING</h2>
