@@ -1033,6 +1033,7 @@ async function verifyPhoneCode() {
     checkAllReady();
   } catch (err) {
     document.getElementById('phoneStatus').innerHTML = '<span class="error">❌ ' + err.message + '</span>';
+	document.getElementById('btnSendPhoneCode').disabled = false; document.getElementById('btnSendPhoneCode').textContent = '📲 POŠALJI NOVI SMS KOD';
   }
 }
 
