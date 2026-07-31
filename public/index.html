@@ -942,12 +942,13 @@ function speakInstructions() {
   window.speechSynthesis.cancel();
   const msg1 = new SpeechSynthesisUtterance();
   msg1.lang = 'hr-HR'; msg1.rate = 0.85; msg1.pitch = 1;
-  msg1.text = `Točno morate izgovoriti: Ja sam ${nick} iz ${cityName}.`;
+  msg1.text = `Točno morate izgovoriti: Ja sam ${nick} iz 
+  ${cityName}, broj ${verificationNumber}.`;
   window.speechSynthesis.speak(msg1);
   if (isPair) {
     const msg2 = new SpeechSynthesisUtterance();
     msg2.lang = 'hr-HR'; msg2.rate = 0.85; msg2.pitch = 1.2;
-    msg2.text = `Druga osoba mora izgovoriti: Ja sam ${nick2} iz ${cityName}.`;
+    msg2.text = `Druga osoba mora izgovoriti: Ja sam ${nick2} iz${cityName}, broj ${verificationNumber}.`;
     window.speechSynthesis.speak(msg2);
   }
 }
