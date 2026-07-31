@@ -1046,6 +1046,8 @@ async function startVoiceCheck(person) {
   const cityName = getCityGenitive(city);
   
   if (!nick) { alert('Molimo upišite nick prije glasovne provjere!'); return; }
+  const country = document.getElementById('country').value;
+  if (!country) { alert('Molimo odaberite državu!'); return; }
   if (!city) { alert('Molimo odaberite grad!'); return; }
   
   const statusDiv = person === 1 ? document.getElementById('voiceStatus') : document.getElementById('voiceStatus2');
