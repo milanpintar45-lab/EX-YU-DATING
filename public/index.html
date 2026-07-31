@@ -724,6 +724,7 @@ body {
       <div class="login-links">
         <a href="#" onclick="forgotPassword()">❌ Zaboravio si lozinku?</a>
         <a href="#" onclick="otherWay()">🔗 Pokušaj drugim načinom</a>
+		<a href="#" onclick="goBackToConsent()">⬅️ Natrag na uvjete korištenja</a>
       </div>
     </div>
   </div>
@@ -1379,6 +1380,11 @@ async function forgotPassword() {
 
 function otherWay() {
   document.getElementById('helpOverlay').classList.add('active');
+  
+  function goBackToConsent() {
+  document.getElementById('welcomeOverlay2').classList.remove('hidden');
+  document.getElementById('welcomeOverlay1').classList.add('hidden');
+}
 }
 function closeHelp() {
   document.getElementById('helpOverlay').classList.remove('active');
