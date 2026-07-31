@@ -616,6 +616,10 @@ body {
           <input type="text" id="nick2" placeholder="Upišite nick druge osobe" oninput="updateExamples()">
         </div>
         
+		<div class="form-group hidden" id="dob2Group">
+        <label>📅 Datum rođenja druge osobe (par)</label>
+        <input type="date" id="dob2" placeholder="Datum rođenja druge osobe">
+      </div>
         <div class="form-group">
           <label>✉️ Email adresa</label>
           <input type="email" id="email" placeholder="vaš@email.com">
@@ -896,6 +900,7 @@ function handleGenderChange() {
   const g = document.getElementById('myGender').value;
   isPair = (g === 'p');
   const nick2Group = document.getElementById('nick2Group');
+  const dob2Group = document.getElementById('dob2Group');
   const voiceBtn2 = document.getElementById('voiceBtn2');
   const ex2 = document.getElementById('ex2');
   const ex3 = document.getElementById('ex3');
@@ -903,6 +908,7 @@ function handleGenderChange() {
   
   if (isPair) {
     nick2Group.classList.remove('hidden');
+	dob2Group.classList.remove('hidden');
     voiceBtn2.classList.remove('hidden');
     ex2.classList.remove('hidden');
     ex3.classList.remove('hidden');
@@ -911,6 +917,7 @@ function handleGenderChange() {
   } else {
     nick2Group.classList.add('hidden');
     voiceBtn2.classList.add('hidden');
+	dob2Group.classList.add('hidden');
     ex2.classList.add('hidden');
     ex3.classList.add('hidden');
     voiceStatus2.classList.add('hidden');
