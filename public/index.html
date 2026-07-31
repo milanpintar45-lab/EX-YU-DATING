@@ -618,7 +618,21 @@ body {
         
 		<div class="form-group hidden" id="dob2Group">
         <label>📅 Datum rođenja druge osobe (par)</label>
-        <input type="date" id="dob2" placeholder="Datum rođenja druge osobe">
+        <div class="birthday-group" style="display:flex;gap:10px;">
+          <select id="dob2Day">
+            <option value="">Dan</option>
+          </select>
+          <select id="dob2Month">
+            <option value="">Mjesec</option>
+            <option value="1">Siječanj</option><option value="2">Veljača</option><option value="3">Ožujak</option>
+            <option value="4">Travanj</option><option value="5">Svibanj</option><option value="6">Lipanj</option>
+            <option value="7">Srpanj</option><option value="8">Kolovoz</option><option value="9">Rujan</option>
+            <option value="10">Listopad</option><option value="11">Studeni</option><option value="12">Prosinac</option>
+          </select>
+          <select id="dob2Year">
+            <option value="">Godina</option>
+          </select>
+        </div>
       </div>
         <div class="form-group">
           <label>✉️ Email adresa</label>
@@ -657,7 +671,9 @@ body {
           <div style="position:relative;">
           <input type="password" id="password" placeholder="Upišite lozinku" style="padding-right:44px;">
           <span onclick="togglePasswordVisibility('password', this)" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:1.2em;">👁️</span>
-        </div>
+		 </div>
+		 </div>
+       
         
         <div class="voice-notice">
           🔒 <b>OBAVEZNA GLASOVNA PROVJERA — bez izgovorene rečenice pristup nije moguć!</b>
@@ -708,7 +724,6 @@ body {
       <div class="login-links">
         <a href="#" onclick="forgotPassword()">❌ Zaboravio si lozinku?</a>
         <a href="#" onclick="otherWay()">🔗 Pokušaj drugim načinom</a>
-		<a href="#" onclick="goBackToConsent()">⬅️ Natrag na uvjete korištenja</a>
       </div>
     </div>
   </div>
@@ -918,7 +933,6 @@ function handleGenderChange() {
   } else {
     nick2Group.classList.add('hidden');
     voiceBtn2.classList.add('hidden');
-	dob2Group.classList.add('hidden');
     ex2.classList.add('hidden');
     ex3.classList.add('hidden');
     voiceStatus2.classList.add('hidden');
@@ -1365,11 +1379,6 @@ async function forgotPassword() {
 
 function otherWay() {
   document.getElementById('helpOverlay').classList.add('active');
-}
-
-function goBackToConsent() {
-  document.getElementById('welcomeOverlay2').classList.remove('hidden');
-  document.getElementById('welcomeOverlay1').classList.add('hidden');
 }
 function closeHelp() {
   document.getElementById('helpOverlay').classList.remove('active');
