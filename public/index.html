@@ -980,10 +980,11 @@ async function sendEmailCode() {
 }
 
 async function verifyEmailCode() {
-  const email = document.getElementById('email').value.trim();
-  const entered = document.getElementById('emailCode').value.trim();
-  try {
-    const data = await api('/verify-email-code', { email, code: entered });
+ const email = document.getElementById('email').value.trim();
+    const entered = document.getElementById('emailCode').value.replace(/\D/g, '');
+    try {
+      const data = await api('/verify-email-code', { email, code: entered }); 
+
     emailVerified = true;
     emailVerificationTicket = data.ticket;
     document.getElementById('emailStatus').innerHTML = '<span class="success">✅ Email potvrđen!</span>';
@@ -1022,7 +1023,7 @@ async function sendPhoneCode() {
 
 async function verifyPhoneCode() {
   const phone = document.getElementById('phone').value.trim();
-  const entered = document.getElementById('phoneCode').value.trim();
+  const entered = document.getElementById('phoneCode').value.replace(/\D/g, '');
   try {
     const data = await api('/verify-phone-code', { phone, code: entered });
     phoneVerified = true;
