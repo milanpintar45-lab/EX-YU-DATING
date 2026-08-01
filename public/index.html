@@ -1400,12 +1400,11 @@ function otherWay() {
 function goBackToConsent() {
   document.getElementById('welcomeOverlay2').classList.remove('hidden');
   document.getElementById('welcomeOverlay1').classList.add('hidden');
-}
-}
-function closeHelp() {
-  document.getElementById('helpOverlay').classList.remove('active');
-}
-function copySupportEmail() {
+1403  }
+1404  function closeHelp() {
+1405    document.getElementById('helpOverlay').classList.remove('active');
+1406  }
+1407  function copySupportEmail() {
   if (navigator.clipboard) {
     navigator.clipboard.writeText('exyu.upoznavanje@gmail.com').then(function() {
       alert('📧 Email kopiran u međuspremnik: exyu.upoznavanje@gmail.com');
