@@ -1257,6 +1257,16 @@ async function cyclePrivacy(kind, id){
 }
 var PRIVACY_BORDER = { javno: '#22c55e', matchevi: '#f59e0b', privatno: '#ef4444' };
 
+async function deleteMedia(kind, id){
+  if (!confirm('Jeste li sigurni da želite obrisati ovu ' + (kind === 'photo' ? 'sliku' : 'video') + '?')) return;
+  try {
+    var path = (kind === 'photo' ? '/profile/photos/' : '/profile/videos/') + id;
+    await api('DELETE', path);
+    if (kind === 'photo') { myPhotos = myPhotos.filter(function(p){ return p.id !== id; }); renderGallery(); }
+    else { myVideos = myVideos.filter(function(v){ return v.id !== id; }); renderVideos(); }
+  } catch (e) { alert('❌ ' + e.message); }
+}
+
 function renderGallery(){
   var g = document.getElementById('galleryGrid');
   var addBtn = g.querySelector('.media-thumb.add');
@@ -1268,7 +1278,8 @@ function renderGallery(){
     div.style.border = '2px solid ' + PRIVACY_BORDER[item.privacy];
     var thumb = item.data_url ? '<img src="'+item.data_url+'" style="width:100%;height:100%;object-fit:cover;' + (item.privacy==='privatno' ? 'filter:brightness(0.5);' : '') + '">' : '📷';
     div.innerHTML = thumb +
-      '<div onclick="event.stopPropagation();cyclePrivacy(\'photo\','+item.id+')" title="Klikni za promjenu privatnosti" style="position:absolute;bottom:2px;left:2px;right:2px;font-size:10px;background:rgba(0,0,0,0.65);border-radius:6px;padding:2px 0;text-align:center;cursor:pointer;">' + PRIVACY_LABELS[item.privacy] + '</div>';
+      '<div onclick="event.stopPropagation();cyclePrivacy(\'photo\','+item.id+')" title="Klikni za promjenu privatnosti" style="position:absolute;bottom:2px;left:2px;right:2px;font-size:10px;background:rgba(0,0,0,0.65);border-radius:6px;padding:2px 0;text-align:center;cursor:pointer;">' + PRIVACY_LABELS[item.privacy] + '</div>' +
+      '<button type="button" title="Obriši" onclick="event.stopPropagation();deleteMedia(\'photo\','+item.id+')" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.6);color:#fff;border:none;width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;">✕</button>';
     g.insertBefore(div, addBtn);
   });
 }
