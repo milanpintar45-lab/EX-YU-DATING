@@ -551,60 +551,103 @@ body {
       
       <!-- REGISTRACIJA -->
       <div id="regSection">
-        <div class="form-group">
-          <label>👤 Ja sam</label>
-          <select id="myGender" onchange="handleGenderChange()">
-            <option value="m">👨 Muškarac</option>
-            <option value="z">👩 Žena</option>
-            <option value="p">💑 Par</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label>❤️ Tražim</label>
-          <select id="seekGender">
-            <option value="z">👩 Ženu</option>
-            <option value="m">👨 Muškarca</option>
-            <option value="p">💑 Par</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label>🎂 Datum rođenja</label>
-          <div class="birthday-group" style="display:flex;gap:10px;">
-            <select id="birthDay">
-              <option value="">Dan</option>
-            </select>
-            <select id="birthMonth">
-              <option value="">Mjesec</option>
-              <option value="1">Siječanj</option><option value="2">Veljača</option><option value="3">Ožujak</option>
-              <option value="4">Travanj</option><option value="5">Svibanj</option><option value="6">Lipanj</option>
-              <option value="7">Srpanj</option><option value="8">Kolovoz</option><option value="9">Rujan</option>
-              <option value="10">Listopad</option><option value="11">Studeni</option><option value="12">Prosinac</option>
-            </select>
-            <select id="birthYear">
-              <option value="">Godina</option>
-            </select>
-          </div>
-          <div style="font-size:0.85em;color:#b8a4d4;margin-top:6px;">Platforma je namijenjena isključivo osobama starijim od 18 godina.</div>
-        </div>
+      <div class="form-group">
+  <label>👤 Ja sam</label>
+  <select id="myGender" onchange="handleGenderChange()">
+    <option value="m">👨 Muškarac</option>
+    <option value="z">👩 Žena</option>
+    <option value="p">💑 Par</option>
+  </select>
+</div>
 
-        <div class="form-group">
-          <label>🌍 Država</label>
-          <select id="country" onchange="updateCities()">
-            <option value="">-- Odaberi državu --</option>
-            <option value="hr">🇭🇷 Hrvatska</option>
-            <option value="ba">🇧🇦 Bosna i Hercegovina</option>
-            <option value="rs">🇷🇸 Srbija</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label>🏙️ Odaberi grad</label>
-          <select id="city" onchange="updateExamples()">
-            <option value="">-- Prvo odaberi državu --</option>
-          </select>
-        </div>
+<div class="form-group">
+  <label>❤️ Tražim</label>
+  <select id="seekGender">
+    <option value="z">👩 Ženu</option>
+    <option value="m">👨 Muškarca</option>
+    <option value="p">💑 Par</option>
+  </select>
+</div>
+
+<div class="form-group hidden" id="pairGenderGroup">
+  <label>💑 Mi smo</label>
+  <div style="display:flex;gap:10px;">
+    <select id="pairGender1">
+      <option value="m">👨 Muškarac</option>
+      <option value="z">👩 Žena</option>
+    </select>
+    <select id="pairGender2">
+      <option value="z">👩 Žena</option>
+      <option value="m">👨 Muškarac</option>
+    </select>
+  </div>
+</div>
+
+<div class="form-group">
+  <label>🏷️ Nick</label>
+  <input type="text" id="nick" placeholder="Upišite svoj nick" oninput="updateExamples(); saveRegProgress();">
+</div>
+
+<div class="form-group">
+  <label>🎂 Datum rođenja</label>
+  <div class="birthday-group" style="display:flex;gap:10px;">
+    <select id="birthDay">
+      <option value="">Dan</option>
+    </select>
+    <select id="birthMonth">
+      <option value="">Mjesec</option>
+      <option value="1">Siječanj</option><option value="2">Veljača</option><option value="3">Ožujak</option>
+      <option value="4">Travanj</option><option value="5">Svibanj</option><option value="6">Lipanj</option>
+      <option value="7">Srpanj</option><option value="8">Kolovoz</option><option value="9">Rujan</option>
+      <option value="10">Listopad</option><option value="11">Studeni</option><option value="12">Prosinac</option>
+    </select>
+    <select id="birthYear">
+      <option value="">Godina</option>
+    </select>
+  </div>
+  <div style="font-size:0.85em;color:#b8a4d4;margin-top:6px;">Platforma je namijenjena isključivo osobama starijim od 18 godina.</div>
+</div>
+
+<div class="form-group hidden" id="nick2Group">
+  <label>🏷️ Nick druge osobe (par)</label>
+  <input type="text" id="nick2" placeholder="Upišite nick druge osobe" oninput="updateExamples(); saveRegProgress();">
+</div>
+
+<div class="form-group hidden" id="dob2Group">
+  <label>📅 Datum rođenja druge osobe (par)</label>
+  <div class="birthday-group" style="display:flex;gap:10px;">
+    <select id="dob2Day">
+      <option value="">Dan</option>
+    </select>
+    <select id="dob2Month">
+      <option value="">Mjesec</option>
+      <option value="1">Siječanj</option><option value="2">Veljača</option><option value="3">Ožujak</option>
+      <option value="4">Travanj</option><option value="5">Svibanj</option><option value="6">Lipanj</option>
+      <option value="7">Srpanj</option><option value="8">Kolovoz</option><option value="9">Rujan</option>
+      <option value="10">Listopad</option><option value="11">Studeni</option><option value="12">Prosinac</option>
+    </select>
+    <select id="dob2Year">
+      <option value="">Godina</option>
+    </select>
+  </div>
+</div>
+
+<div class="form-group">
+  <label>🌍 Država</label>
+  <select id="country" onchange="updateCities()">
+    <option value="">-- Odaberi državu --</option>
+    <option value="hr">🇭🇷 Hrvatska</option>
+    <option value="ba">🇧🇦 Bosna i Hercegovina</option>
+    <option value="rs">🇷🇸 Srbija</option>
+  </select>
+</div>
+
+<div class="form-group">
+  <label>🏙️ Odaberi grad</label>
+  <select id="city" onchange="updateExamples()">
+    <option value="">-- Prvo odaberi državu --</option>
+  </select>
+</div> 
         
         <div class="form-group">
           <label>🏷️ Nick</label>
@@ -938,6 +981,7 @@ function updateCities() {
 function handleGenderChange() {
   const g = document.getElementById('myGender').value;
   isPair = (g === 'p');
+  const pairGenderGroup = document.getElementById('pairGenderGroup');
   const nick2Group = document.getElementById('nick2Group');
   const dob2Group = document.getElementById('dob2Group');
   const voiceBtn2 = document.getElementById('voiceBtn2');
@@ -946,6 +990,7 @@ function handleGenderChange() {
   const voiceStatus2 = document.getElementById('voiceStatus2');
   
   if (isPair) {
+    pairGenderGroup.classList.remove('hidden');
     nick2Group.classList.remove('hidden');
 	dob2Group.classList.remove('hidden');
     voiceBtn2.classList.remove('hidden');
@@ -954,7 +999,9 @@ function handleGenderChange() {
     voiceStatus2.classList.remove('hidden');
     voiceCheck2Done = false;
   } else {
+    pairGenderGroup.classList.add('hidden');
     nick2Group.classList.add('hidden');
+    dob2Group.classList.add('hidden');
     voiceBtn2.classList.add('hidden');
     ex2.classList.add('hidden');
     ex3.classList.add('hidden');
@@ -965,7 +1012,6 @@ function handleGenderChange() {
   checkAllReady();
   saveRegProgress();
 }
-
 // ======================
 // DINAMIČKI PRIMJERI
 // ======================
