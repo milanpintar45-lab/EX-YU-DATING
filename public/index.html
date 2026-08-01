@@ -993,6 +993,11 @@ function speakInstructions() {
 let emailVerificationTicket = null;
 
 async function sendEmailCode() {
+  const nick = document.getElementById('nick').value.trim();
+  if (!nick) {
+    alert('Molimo prvo upišite svoj nick!');
+    return;
+  }
   const email = document.getElementById('email').value.trim();
   if (!email || !email.includes('@')) {
     alert('Molimo upišite ispravnu email adresu!');
@@ -1035,6 +1040,15 @@ async function verifyEmailCode() {
 let phoneVerificationTicket = null;
 
 async function sendPhoneCode() {
+  const nick = document.getElementById('nick').value.trim();
+  if (!nick) {
+    alert('Molimo prvo upišite svoj nick!');
+    return;
+  }
+  if (!emailVerified) {
+    alert('Molimo prvo potvrdite svoj email!');
+    return;
+  }
   const phone = document.getElementById('phone').value.trim();
   if (!phone || phone.length < 6) {
     alert('Molimo upišite ispravan broj mobitela!');
@@ -1081,7 +1095,8 @@ async function startVoiceCheck(person) {
   const city = document.getElementById('city').value;
   const cityName = getCityGenitive(city);
   
-  if (!nick) { alert('Molimo upišite nick prije glasovne provjere!'); return; }
+ if (!nick) { alert('Molimo upišite nick prije glasovne provjere!'); return; }
+if (!phoneVerified) { alert('Molimo prvo potvrdite svoj broj mobitela!'); return; } 
   const country = document.getElementById('country').value;
   if (!country) { alert('Molimo odaberite državu!'); return; }
   if (!city) { alert('Molimo odaberite grad!'); return; }
