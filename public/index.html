@@ -608,12 +608,12 @@ body {
         
         <div class="form-group">
           <label>🏷️ Nick</label>
-          <input type="text" id="nick" placeholder="Upišite svoj nick" oninput="updateExamples()">
+          <input type="text" id="nick" placeholder="Upišite svoj nick" oninput="updateExamples(; saveRegProgress();">
         </div>
         
         <div class="form-group hidden" id="nick2Group">
           <label>🏷️ Nick druge osobe (par)</label>
-          <input type="text" id="nick2" placeholder="Upišite nick druge osobe" oninput="updateExamples()">
+          <input type="text" id="nick2" placeholder="Upišite nick druge osobe"oninput="updateExamples(); saveRegProgress();"> 
         </div>
         
 		<div class="form-group hidden" id="dob2Group">
@@ -772,11 +772,17 @@ let isPair = false; function updateStepLocks() { var phoneBox = document.getElem
 // ======================
 // INICIJALIZACIJA
 // ======================
-window.onload = async function() { updateStepLocks();
+window.onload = async function() { updateStepLocks()
+const savedNick = localStorage.getItem('exyu_registered_nick');
+  if (savedNick) {
+    switchTab('login', document.getElementById('tabLogin'));
+    document.getElementById('loginNick').value = savedNick;
+  }
   updateCities();
   handleGenderChange();
   updateExamples();
   checkMicSupport();
+  restoreRegProgress();
 
   // Popuni dan (1-31) i godinu (od danas-18 do danas-100) za datum rođenja
   var dayEl = document.getElementById('birthDay');
@@ -908,6 +914,7 @@ function updateCities() {
     citySelect.appendChild(opt);
   });
   updateExamples();
+  saveRegProgress();
 }
 
 // ======================
@@ -941,12 +948,51 @@ function handleGenderChange() {
   }
   updateExamples();
   checkAllReady();
+  saveRegProgress();
 }
 
 // ======================
 // DINAMIČKI PRIMJERI
 // ======================
-function updateExamples() {
+function saveRegProgress() {
+  const data = {
+    myGender: document.getElementById('myGender').value,
+    seekGender: document.getElementById('seekGender').value,
+    birthDay: document.getElementById('birthDay').value,
+    birthMonth: document.getElementById('birthMonth').value,
+    birthYear: document.getElementById('birthYear').value,
+    country: document.getElementById('country').value,
+    city: document.getElementById('city').value,
+    nick: document.getElementById('nick').value,
+    nick2: document.getElementById('nick2').value,
+    dob2Day: document.getElementById('dob2Day') ? document.getElementById('dob2Day').value : '',
+    dob2Month: document.getElementById('dob2Month') ? document.getElementById('dob2Month').value : '',
+    dob2Year: document.getElementById('dob2Year') ? document.getElementById('dob2Year').value : '',
+  };
+  localStorage.setItem('exyu_reg_progress', JSON.stringify(data));
+}
+
+function restoreRegProgress() {
+  const saved = localStorage.getItem('exyu_reg_progress');
+  if (!saved) return;
+  try {
+    const data = JSON.parse(saved);
+    if (data.myGender) document.getElementById('myGender').value = data.myGender;
+    if (data.seekGender) document.getElementById('seekGender').value = data.seekGender;
+    if (data.country) document.getElementById('country').value = data.country;
+    if (data.nick) document.getElementById('nick').value = data.nick;
+    if (data.nick2) document.getElementById('nick2').value = data.nick2;
+    handleGenderChange();
+    updateCities();
+    if (data.city) document.getElementById('city').value = data.city;
+    if (data.birthDay) document.getElementById('birthDay').value = data.birthDay;
+    if (data.birthMonth) document.getElementById('birthMonth').value = data.birthMonth;
+    if (data.birthYear) document.getElementById('birthYear').value = data.birthYear;
+    if (data.dob2Day && document.getElementById('dob2Day')) document.getElementById('dob2Day').value = data.dob2Day;
+    if (data.dob2Month && document.getElementById('dob2Month')) document.getElementById('dob2Month').value = data.dob2Month;
+    if (data.dob2Year && document.getElementById('dob2Year')) document.getElementById('dob2Year').value = data.dob2Year;
+  } catch (e) { /* ignoriraj grešku */ }
+} function updateExamples( ) {
   const nick = document.getElementById('nick').value.trim() || 'Ivan';
   const nick2 = document.getElementById('nick2').value.trim() || 'Iva';
   const city = document.getElementById('city').value;
@@ -1260,6 +1306,8 @@ async function submitRegistration(triggerBtn) {
       consents,
     });
     window.exyuJustRegistered = true;
+	localStorage.setItem('exyu_registered_nick', data.nick);
+      localStorage.removeItem('exyu_reg_progress');
     showSuccess(
       'USPJEŠNO STE REGISTRIRANI!',
       'Dobrodošli, <span class="success-nick">' + data.nick + '</span>!<br>Vaš profil čeka odobrenje administratora prije nego postane vidljiv.',
