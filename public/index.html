@@ -796,6 +796,21 @@ const savedNick = localStorage.getItem('exyu_registered_nick');
     var oy = document.createElement('option'); oy.value = y; oy.textContent = y;
     yearEl.appendChild(oy);
   }
+  var dayEl2 = document.getElementById('dob2Day');
+  for (var d2 = 1; d2 <= 31; d2++) {
+    var o2 = document.createElement('option');
+    o2.value = d2;
+    o2.textContent = d2;
+    dayEl2.appendChild(o2);
+  }
+  var yearEl2 = document.getElementById('dob2Year');
+  for (var y2 = thisYear - 18; y2 >= thisYear - 100; y2--) {
+    var oy2 = document.createElement('option');
+    oy2.value = y2;
+    oy2.textContent = y2;
+    yearEl2.appendChild(oy2);
+  }
+  
 
   // Ako je korisnik već prijavljen (server provjerava httpOnly cookie), prikaži banner
   try {
