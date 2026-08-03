@@ -245,7 +245,8 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
 
 @media (max-width:480px){
   .share-icon-btn{min-width:100%;}
-}.success-overlay{
+}
+.success-overlay{
   display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);
   z-index:300;align-items:center;justify-content:center;padding:16px;
 }
@@ -913,7 +914,6 @@ function showStep(i){
   document.querySelectorAll('.step-dot').forEach(function(d){
     d.style.background = (parseInt(d.dataset.i, 10) === currentStep) ? '#a23cff' : 'rgba(162,60,255,0.3)';
   });
-  // Strelice su UVIJEK vidljive i aktivne (nema zaglavljivanja na prvom/zadnjem koraku)
   document.getElementById('stepPrevBtn').style.visibility = 'visible';
   document.getElementById('stepNextBtn').style.visibility = 'visible';
 }
@@ -921,8 +921,6 @@ function profileStep(dir){
   showStep(currentStep + dir);
 }
 
-// Spremanje pojedinačnog polja (kratki opis / osobna poruka) s gumbom "Gotovo",
-// neovisno o glavnom UREDI/SPREMI PROFIL prekidaču
 async function saveOneField(apiField, inputId, btnId){
   var val = document.getElementById(inputId).value;
   var btn = document.getElementById(btnId);
@@ -938,7 +936,6 @@ async function saveOneField(apiField, inputId, btnId){
   }
 }
 
-// EDIT MODE
 var editMode = false;
 function toggleEdit(){
   editMode = !editMode;
@@ -970,7 +967,6 @@ function toggleEdit(){
   }
 }
 
-// SPOL CHANGE - show/hide couple rows
 document.getElementById('spol').addEventListener('change', function(){
   var v = this.value;
   var soloRow = document.getElementById('soloAgeRow');
@@ -1003,11 +999,6 @@ function updateCoupleLabels(v){
   }
 }
 
-// SAVE PROFILE
-// NAPOMENA: dob (polje "godine") se NE šalje - stvarna dob se uvijek računa na serveru iz
-// datuma rođenja unesenog kod registracije, da se ne zaobiđe provjera punoljetnosti.
-// Isto vrijedi za email/grad/županiju - to su podaci provjereni kod registracije;
-// ovdje se prikazuju informativno, ali se ne mogu prepisati preko ove forme.
 async function saveProfile(){
   var data = {
     displayName: document.getElementById('imeKorisnika').value,
@@ -1032,9 +1023,6 @@ async function saveProfile(){
   }
 }
 
-// ======================
-// PROMJENA PROFILNE SLIKE
-// ======================
 function openAvatarPicker(){
   var wrap = document.getElementById('avatarGalleryPicker');
   wrap.innerHTML = '';
@@ -1085,7 +1073,6 @@ function setProfileAvatar(dataUrl){
   avatarEl.childNodes[0].textContent = '';
 }
 
-// ===== PODIJELI PROFIL =====
 function getShareTargetNick(){
   return window.exyuTargetUser || window.exyuMeNick || (myProfile && myProfile.nick) || '';
 }
@@ -1142,11 +1129,9 @@ async function nativeShareProfile(){
       url: url
     });
   } catch (err) {
-    // Korisnik je otkazao dijeljenje ili share nije podržan - nema potrebe za greškom
   }
 }
 
-// LOAD PROFILE (own profile, editable)
 async function loadProfile(){
   try {
     myProfile = await api('GET', '/profile/me');
@@ -1188,7 +1173,6 @@ async function loadProfile(){
   updateHeaderDisplay();
 }
 
-// LOAD OTHER USER'S PROFILE (read-only view)
 async function loadOtherProfile(nick){
   document.getElementById('profileNick').textContent = nick;
   document.getElementById('profileAvatar').textContent = nick.charAt(0).toUpperCase();
@@ -1249,12 +1233,10 @@ function updateHeaderDisplay(){
   }
 }
 
-// BLOCK POKE TOGGLE
 function toggleBlockPoke(){
   document.getElementById('blockPokeToggle').classList.toggle('active');
 }
 
-// ACTIONS
 function openChat(){
   if(window.exyuTargetUser) window.location.href = 'chat.html?user=' + encodeURIComponent(window.exyuTargetUser);
   else alert('Ovo je vaš profil — otvorite Chat iz izbornika da razgovarate s drugima.');
@@ -1285,12 +1267,6 @@ async function deleteOtherUser(){
   }catch(e){ alert('❌ ' + e.message); }
 }
 
-// ======================
-// GALERIJA I VIDEO — PRIVATNOST PO SVAKOJ STAVCI POSEBNO
-// Opcije: javno (svi vide), matchevi (samo moji matchevi), privatno (samo ja)
-// NAPOMENA: ovo su i dalje samo placeholder stavke (bez stvarnog uploada slike/videa),
-// isto kao u originalu - pravi upload datoteka bio bi sljedeći korak.
-// ======================
 var PRIVACY_LABELS = { javno: '👁️ Javno', matchevi: '💞 Samo matchevi', privatno: '🔒 Privatno' };
 
 async function cyclePrivacy(kind, id){
@@ -1363,7 +1339,6 @@ async function addVideo(){
   } catch(e) { alert('❌ ' + e.message); }
 }
 
-// INIT
 (async function(){
   let me = { loggedIn: false };
   try { me = await api('GET', '/auth/me'); } catch(e){}
@@ -1401,11 +1376,10 @@ async function addVideo(){
       if(delBtn) delBtn.style.display = 'flex';
     }
     await loadOtherProfile(viewedUser);
-    showStep(2); // ime/kontakt/lokacija se ne prikazuju za tuđi profil - kreni od osnovnih podataka
+    showStep(2);
   }
 })();
 
-// Prikaz tuđe galerije/videa - server je već primijenio privatnost po stavci
 var RESTRICTED_LABELS = { matchevi: '💞 Samo matchevi', privatno: '🔒 Privatno' };
 
 function otherMediaThumb(item, isVideo){
@@ -1421,7 +1395,6 @@ function otherMediaThumb(item, isVideo){
       div.innerHTML = thumb + '<span title="Javno" style="position:absolute;top:4px;right:4px;font-size:12px;background:rgba(0,0,0,0.5);border-radius:50%;padding:2px 4px;">👁️</span>';
     }
   } else {
-    // Zatamnjeno - vidljivo da sadržaj postoji, ali ne i sam sadržaj
     div.style.background = 'rgba(0,0,0,0.55)';
     div.style.backdropFilter = 'blur(6px)';
     div.style.display = 'flex';
@@ -1459,7 +1432,6 @@ function renderOtherMedia(data){
   if(videos.length === 0){ v.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:10px;">Korisnik nema videa.</div>'; }
 }
 
-// Sakrij "Pošalji poruku" i "Video poziv" ako je korisnik blokiran ili kontakt ograničen na matcheve
 function applyContactRestrictions(data){
   var msgBtn = document.querySelector('.btn-msg');
   var vidBtn = document.querySelector('.btn-video');
@@ -1664,7 +1636,6 @@ api('GET', '/users/friends-count').then(function(fc){
 
 <script>
 (function(){
-  /* Hover prefetch — počni učitavati stranicu čim miš prijeđe na link */
   var prefetched = {};
   document.addEventListener('mouseover', function(e){
     var a = e.target.closest('a[href]');
@@ -1680,7 +1651,6 @@ api('GET', '/users/friends-count').then(function(fc){
     document.head.appendChild(l);
   }, { passive: true });
 
-  /* Fallback za preglednike bez View Transitions API */
   if (!document.startViewTransition) {
     document.addEventListener('click', function(e){
       if (e.defaultPrevented) return;
@@ -1698,8 +1668,6 @@ api('GET', '/users/friends-count').then(function(fc){
     });
   }
 
-  /* Ako view transitions JEST aktivan, ugasi body animaciju —
-     preglednik već radi crossfade, dupla animacija = trzaj */
   if (document.startViewTransition) {
     var s = document.createElement('style');
     s.textContent = 'body{animation:none!important;}';
