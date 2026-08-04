@@ -39,13 +39,16 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
 .filter-bar select{background:rgba(255,255,255,0.06);border:1px solid rgba(162,60,255,0.4);border-radius:8px;padding:6px 10px;color:#fff;font-family:inherit;font-size:13px;outline:none;}
 .filter-bar select:focus{border-color:#c57dff;}
 .chat-wrap{flex:1;display:flex;flex-direction:column;padding:18px 22px;gap:10px;overflow-y:auto;}
-.chat-card{background:rgba(255,255,255,0.04);border:1px solid rgba(162,60,255,0.35);border-radius:10px;padding:12px 14px;font-size:14px;}
+.chat-card{background:rgba(255,255,255,0.04);border:1px solid rgba(162,60,255,0.35);border-radius:10px;padding:12px 14px;font-size:14px;position:relative;}
 .chat-card .who{color:#ffe27a;font-weight:700;font-size:15px;text-shadow:0 0 6px rgba(255,226,122,0.5);}
 .chat-card .who span{color:var(--muted);font-weight:400;font-size:11px;}
 .chat-card .msg{color:var(--text);margin-top:4px;line-height:1.5;}
 .chat-card .time{color:var(--muted);font-size:11px;margin-top:4px;}
 .chat-card.own{background:var(--msg-own);border-color:rgba(162,60,255,0.5);margin-left:40px;}
 .chat-card.other{background:var(--msg-other);margin-right:40px;}
+.chat-card .msg-delete{position:absolute;top:8px;right:10px;width:22px;height:22px;border-radius:50%;background:rgba(255,94,120,0.9);color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid rgba(255,255,255,0.4);opacity:0;transition:opacity .15s;}
+.chat-card:hover .msg-delete{opacity:1;}
+.chat-card .msg-delete:hover{background:#ff2d55;}
 .chat-input-wrap{display:flex;gap:8px;padding:14px 22px;border-top:1px solid rgba(162,60,255,0.25);background:rgba(0,0,0,0.15);}
 .chat-input-wrap input{flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(162,60,255,0.4);border-radius:8px;padding:10px 14px;color:#fff;font-family:inherit;font-size:14px;outline:none;}
 .chat-input-wrap input::placeholder{color:var(--muted);}
@@ -114,99 +117,3 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
     <div class="current-filter">Prikaz: <b id="currentFilter">—</b></div>
   </div>
 </div>
-<script>
-const API_BASE = '/api';
-async function api(method, path, body) {
-  const opts = { method, headers: {}, credentials: 'include' };
-  if (body) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
-  const res = await fetch(API_BASE + path, opts);
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.error || 'Greška.');
-  return data;
-}
-
-var params=new URLSearchParams(window.location.search);
-var COUNTRY=params.get('country')||'hr';
-var COUNTY=params.get('county')||'SVI';
-var countryNames={hr:'Hrvatska',ba:'Bosna i Hercegovina',rs:'Srbija'};
-var countryPage={hr:'hrvatska.html',ba:'bosna.html',rs:'srbija.html'};
-
-// Stvarne regije po državi (usklađeno s hrvatska/bosna/srbija.html - HR županije,
-// BA kantoni, RS okruzi), ne više gradovi kao u ranijoj demo verziji.
-var counties={
-  hr:["Bjelovarsko-bilogorska","Brodsko-posavska","Dubrovačko-neretvanska","Grad Zagreb","Istarska","Karlovačka","Koprivničko-križevačka","Krapinsko-zagorska","Ličko-senjska","Međimurska","Osječko-baranjska","Požeško-slavonska","Primorsko-goranska","Sisačko-moslavačka","Splitsko-dalmatinska","Šibensko-kninska","Varaždinska","Virovitičko-podravska","Vukovarsko-srijemska","Zadarska"],
-  ba:["Unsko-sanski","Posavski","Tuzlanski","Zeničko-dobojski","Bosansko-podrinjski","Srednjobosanski","Hercegovačko-neretvanski","Zapadnohercegovački","Sarajevo","Kanton 10"],
-  rs:["Beograd","Bor","Braničevo","Zaječar","Zapadna Bačka","Južna Bačka","Južni Banat","Zlatibor","Kolubara","Mačva","Moravica","Nišava","Pčinja","Pirot","Podunavlje","Pomoravlje","Raška","Rasina","Severna Bačka","Severni Banat","Srednji Banat","Srem","Šumadija","Toplica"]
-};
-
-function escHtml(t){return String(t).replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]);});}
-
-function chatCard(c){
-  var cls=c.own?'own':'other';
-  return '<div class="chat-card '+cls+'"><div class="who">'+escHtml(c.who)+' <span>'+escHtml(c.region||c.city||'')+' · '+escHtml(c.time||'')+'</span></div><div class="msg">'+escHtml(c.body)+'</div></div>';
-}
-
-let myNick = null;
-
-async function render(){
-  var wrap=document.getElementById('chatWrap');
-  wrap.innerHTML='<div class="empty">Učitavam...</div>';
-
-  var fc=document.getElementById('countyFilter').value;
-  try {
-    var data = await api('GET', '/country-chat?country=' + COUNTRY + '&limit=100');
-    var msgs = data.messages.map(function(m){
-      return {
-        who: m.who, city: m.city, region: m.region,
-        body: m.body,
-        time: new Date(m.created_at).getHours().toString().padStart(2,'0') + ':' + new Date(m.created_at).getMinutes().toString().padStart(2,'0'),
-        own: myNick && m.who === myNick,
-      };
-    });
-    if (fc !== 'SVI') msgs = msgs.filter(function(c){ return c.region === fc; });
-
-    wrap.innerHTML = msgs.length ? msgs.map(chatCard).join('') : '<div class="empty">Nema poruka</div>';
-    wrap.scrollTop = wrap.scrollHeight;
-    var label = COUNTY==='SVI' ? countryNames[COUNTRY] : COUNTY;
-    document.getElementById('currentFilter').textContent = label + ' — ' + msgs.length + ' poruka';
-  } catch (e) {
-    wrap.innerHTML = '<div class="empty">Greška pri učitavanju (jeste li prijavljeni?)</div>';
-  }
-}
-
-var countySelect=document.getElementById('countyFilter');
-(counties[COUNTRY]||[]).forEach(function(c){
-  var opt=document.createElement('option');
-  opt.value=c;opt.textContent=c;
-  countySelect.appendChild(opt);
-});
-if(COUNTY!=='SVI')countySelect.value=COUNTY;
-
-document.getElementById('chatSendBtn').addEventListener('click',async function(){
-  var inp=document.getElementById('chatInput');
-  var txt=inp.value.trim();
-  if(!txt)return;
-  try {
-    await api('POST', '/country-chat', { country: COUNTRY, body: txt });
-    inp.value='';
-    render();
-  } catch(e) { alert('❌ ' + e.message); }
-});
-document.getElementById('chatInput').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('chatSendBtn').click();});
-document.getElementById('countyFilter').addEventListener('change',render);
-
-document.getElementById('pageTitle').textContent='CHAT — '+countryNames[COUNTRY];
-document.getElementById('pageSub').textContent=COUNTY==='SVI'?'Svi razgovori':COUNTY;
-document.getElementById('backBtn').href=countryPage[COUNTRY]||'hrvatska.html';
-document.getElementById('navOnline').href='na-mrezi.html?country='+COUNTRY+'&county='+COUNTY;
-document.getElementById('navUsers').href='svi-korisnici.html?country='+COUNTRY+'&county='+COUNTY;
-document.title='EX YU DATE — Chat — '+countryNames[COUNTRY];
-
-(async function(){
-  try { var me = await api('GET', '/auth/me'); if (me.loggedIn) myNick = me.nick; } catch(e){}
-  render();
-})();
-</script>
-
-</body>
-</html>
