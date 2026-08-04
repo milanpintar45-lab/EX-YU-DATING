@@ -648,10 +648,19 @@ function profileCard(p){
   </div>`;
 }
 function chatCard(c){
-  return `<div class="chat-card">
-    <div class="who">${escHtml(c.who)} <span style="color:var(--muted);font-weight:400">· ${escHtml(c.city||'')}</span></div>
+  var mine = (window.exyuMeNick && c.who === window.exyuMeNick);
+  return `<div class="chat-card" data-msg-id="${c.id}">
+    <div class="who">${escHtml(c.who)} <span style="color:var(--muted);font-weight:400">· ${escHtml(c.city||'')}</span>${mine ? '<button type="button" onclick="event.stopPropagation();deleteChatMsg('+c.id+')" title="Obriši poruku" style="float:right;background:none;border:none;color:#ff6b6b;cursor:pointer;font-size:14px;">🗑️</button>' : ''}</div>
     <div class="msg">${escHtml(c.body)}</div>
   </div>`;
+}
+
+async function deleteChatMsg(msgId){
+  if (!confirm('Obrisati ovu poruku?')) return;
+  try {
+    await api('DELETE', '/country-chat/' + msgId);
+    render(activeCountyTop());
+  } catch(e) { alert('❌ ' + e.message); }
 }
 
 async function render(filter){
