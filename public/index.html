@@ -671,16 +671,8 @@ body {
           <input type="tel" id="phone" placeholder="+385 91 234 5678">
         </div>
         
-        <!-- SMS potvrda broja mobitela (dodatna sigurnosna mjera) -->
-        <div class="email-verify-box" id="phoneBox"> <div id="phoneLockNotice" class="locked-msg">🔒 Prvo potvrdite email da biste otključali ovaj korak</div>
-          <div id="phoneVerifyText">Potvrdite broj mobitela SMS kodom (dodatna sigurnosna mjera)</div>
-          <button class="big" style="margin:10px 0; font-size:1em; padding:12px;" onclick="sendPhoneCode()" id="btnSendPhoneCode">📲 POŠALJI SMS KOD</button>
-          <div id="phoneCodeInputArea" class="hidden">
-            <input type="text" id="phoneCode" placeholder="Upišite kod iz SMS-a" maxlength="6" style="margin-top:10px; text-align:center; font-size:1.2em; letter-spacing:5px;">
-            <button class="big" style="margin:10px 0; font-size:1em; padding:12px;" onclick="verifyPhoneCode()" id="btnVerifyPhoneCode">✅ POTVRDI KOD</button>
-          </div>
-          <div id="phoneStatus"></div>
-        </div>
+     
+        
         
         <div class="form-group">
           <label>🔐 Lozinka</label>
@@ -783,7 +775,7 @@ let emailVerified = false;
 let generatedCode = "";
 let phoneVerified = false;
 let generatedPhoneCode = ""; const cityGenitive = {"zagreb":"Zagreba","split":"Splita","rijeka":"Rijeke","osijek":"Osijeka","zadar":"Zadra","pula":"Pule","dubrovnik":"Dubrovnika","šibenik":"Šibenika","varaždin":"Varaždina","karlovac":"Karlovca","sarajevo":"Sarajeva","banja luka":"Banje Luke","mostar":"Mostara","tuzla":"Tuzle","zenica":"Zenice","bihać":"Bihaća","bijeljina":"Bijeljine","prijedor":"Prijedora","doboj":"Doboja","travnik":"Travnika","beograd":"Beograda","novi sad":"Novog Sada","niš":"Niša","kragujevac":"Kragujevca","subotica":"Subotice","zrenjanin":"Zrenjanina","pančevo":"Pančeva","čačak":"Čačka","novi pazar":"Novog Pazara","kraljevo":"Kraljeva"}; function getCityGenitive(city) { if (!city) return 'Rijeke'; return cityGenitive[city] || (city.charAt(0).toUpperCase() + city.slice(1)); } let verificationNumber = Math.floor(Math.random()*90)+10;
-let isPair = false; function updateStepLocks() { var phoneBox = document.getElementById('phoneBox'); var voiceSection = document.getElementById('voiceSection'); var phoneLockNotice = document.getElementById('phoneLockNotice'); var voiceLockNotice = document.getElementById('voiceLockNotice'); if (emailVerified) { phoneBox.classList.remove('locked-step'); phoneLockNotice.classList.add('hidden'); } else { phoneBox.classList.add('locked-step'); phoneLockNotice.classList.remove('hidden'); } if (phoneVerified) { voiceSection.classList.remove('locked-step'); voiceLockNotice.classList.add('hidden'); } else { voiceSection.classList.add('locked-step'); voiceLockNotice.classList.remove('hidden'); } }
+let isPair = false; function updateStepLocks() { var voiceSection = document.getElementById('voiceSection'); var voiceLockNotice = document.getElementById('voiceLockNotice'); if (emailVerified) { voiceSection.classList.remove('locked-step'); voiceLockNotice.classList.add('hidden'); } else { voiceSection.classList.add('locked-step'); voiceLockNotice.classList.remove('hidden'); } }
 
 // ======================
 // INICIJALIZACIJA
@@ -1119,53 +1111,7 @@ async function verifyEmailCode() {
 
 let phoneVerificationTicket = null;
 
-async function sendPhoneCode() {
-  const nick = document.getElementById('nick').value.trim();
-  if (!nick) {
-    alert('Molimo prvo upišite svoj nick!');
-    return;
-  }
-  if (!emailVerified) {
-    alert('Molimo prvo potvrdite svoj email!');
-    return;
-  }
-  const phone = document.getElementById('phone').value.trim();
-  if (!phone || phone.length < 6) {
-    alert('Molimo upišite ispravan broj mobitela!');
-    return;
-  }
-  const btn = document.getElementById('btnSendPhoneCode');
-  btn.disabled = true;
-  btn.textContent = '⏳ ŠALJEM...';
-  try {
-    await api('/send-phone-code', { phone });
-    document.getElementById('phoneVerifyText').innerHTML =
-      '<span class="info">SMS kod je poslan na ' + phone + '!</span>';
-    document.getElementById('phoneCodeInputArea').classList.remove('hidden');
-    btn.textContent = '✅ SMS KOD POSLAN';
-  } catch (err) {
-    btn.disabled = false;
-    btn.textContent = '📲 POŠALJI SMS KOD';
-    document.getElementById('phoneStatus').innerHTML = '<span class="error">❌ ' + err.message + '</span>';
-  }
-}
 
-async function verifyPhoneCode() {
-  const phone = document.getElementById('phone').value.trim();
-  const entered = document.getElementById('phoneCode').value.replace(/\D/g, '');
-  try {
-    const data = await api('/verify-phone-code', { phone, code: entered });
-    phoneVerified = true;
-    phoneVerificationTicket = data.ticket;
-    document.getElementById('phoneStatus').innerHTML = '<span class="success">✅ Broj mobitela potvrđen!</span>';
-    document.getElementById('phoneCodeInputArea').classList.add('hidden');
-    document.getElementById('btnSendPhoneCode').textContent = '✅ MOBITEL POTVRĐEN'; updateStepLocks();
-    checkAllReady();
-  } catch (err) {
-    document.getElementById('phoneStatus').innerHTML = '<span class="error">❌ ' + err.message + '</span>';
-	document.getElementById('btnSendPhoneCode').disabled = false; document.getElementById('btnSendPhoneCode').textContent = '📲 POŠALJI NOVI SMS KOD';
-  }
-}
 
 // ======================
 // GLASOVNA PROVJERA
@@ -1176,7 +1122,7 @@ async function startVoiceCheck(person) {
   const cityName = getCityGenitive(city);
   
  if (!nick) { alert('Molimo upišite nick prije glasovne provjere!'); return; }
-if (!phoneVerified) { alert('Molimo prvo potvrdite svoj broj mobitela!'); return; } 
+if (!emailVerified) { alert('Molimo prvo potvrdite svoj email!'); return; }
   const country = document.getElementById('country').value;
   if (!country) { alert('Molimo odaberite državu!'); return; }
   if (!city) { alert('Molimo odaberite grad!'); return; }
@@ -1260,7 +1206,7 @@ if (!phoneVerified) { alert('Molimo prvo potvrdite svoj broj mobitela!'); return
 function checkAllReady() {
   const regBtn = document.getElementById('regBtn');
   const nextBtn = document.getElementById('nextPageBtn');
-  const allReady = voiceCheck1Done && voiceCheck2Done && emailVerified && phoneVerified;
+  const allReady = voiceCheck1Done && voiceCheck2Done && emailVerified;
 
   if (allReady) {
     regBtn.style.display = 'none';
@@ -1272,7 +1218,7 @@ function checkAllReady() {
     nextBtn.disabled = true;
     let missing = [];
     if (!emailVerified) missing.push('potvrdi email');
-    if (!phoneVerified) missing.push('potvrdi mobitel');
+    
     if (!voiceCheck1Done) missing.push('provjera 1');
     if (isPair && !voiceCheck2Done) missing.push('provjera 2');
     regBtn.textContent = '🚀 PRIJAVITE SE ODMAH! (' + missing.join(', ') + ')';
@@ -1314,7 +1260,7 @@ async function submitRegistration(triggerBtn) {
   // Ove provjere postoje i na frontendu radi boljeg UX-a (odmah vidljiva poruka),
   // ali server IH PONOVNO provjerava - frontend provjere same po sebi nisu sigurnosna mjera.
   if (!emailVerified) { alert('❌ Email nije potvrđen! Molimo potvrdite email prije registracije.'); return; }
-  if (!phoneVerified) { alert('❌ Broj mobitela nije potvrđen! Molimo potvrdite mobitel prije registracije.'); return; }
+  
   if (!voiceCheck1Done) { alert('❌ Glasovna provjera 1 nije završena! Molimo izgovorite rečenicu prije registracije.'); return; }
   if (isPair && !voiceCheck2Done) { alert('❌ Glasovna provjera 2 nije završena! Druga osoba mora izgovoriti rečenicu prije registracije.'); return; }
 
