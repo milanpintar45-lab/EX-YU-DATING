@@ -767,10 +767,7 @@ document.querySelectorAll('#countyList a[data-county]:not(.svi)').forEach(functi
   const text = (inp.value||'').trim();
   if(!text) return;
   const county = activeCountyTop();
-  if(!county || county === 'SVI'){
-    alert('Odaberi županiju prije slanja poruke.');
-    return;
-  }
+  
   try{
     await api('POST', '/country-chat', { country: COUNTRY_CODE, county: county, body: text });
     inp.value = '';
