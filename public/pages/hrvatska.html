@@ -703,44 +703,18 @@ async function render(filter){
   document.getElementById('currentFilter').textContent =
     filter === "SVI" ? "SVI — cijela Hrvatska" : filter + " županija";
 
-  // Chat kolona - javna soba za državu (dijeli podatke s prosireni-chat.html)
+  // Chat kolona - javna soba za državu/županiju (dijeli podatke s prosireni-chat.html)
   try {
-    const chatData = await api('GET', '/country-chat?country=' + COUNTRY_CODE + '&limit=8');
-    const chatList = filter === 'SVI' ? chatData.messages : chatData.messages.filter(c => c.region === filter);
+    const qsChat = new URLSearchParams({ country: COUNTRY_CODE, limit: '20' });
+    if (filter !== 'SVI') qsChat.set('county', filter);
+    const chatData = await api('GET', '/country-chat?' + qsChat.toString());
+    const chatList = chatData.messages || [];
     document.getElementById('chatCol').innerHTML =
       chatList.length ? chatList.map(chatCard).join('') : '<div class="empty">Nema poruka</div>';
   } catch (e) {
     document.getElementById('chatCol').innerHTML = '<div class="empty">Greška pri učitavanju chata</div>';
   }
 }
-
-// Wire up county clicks
-document.querySelectorAll('#countyList a').forEach(a=>{
-  a.addEventListener('click', e=>{
-    e.preventDefault();
-    document.querySelectorAll('#countyList a').forEach(x=>x.classList.remove('active'));
-    a.classList.add('active');
-    render(a.dataset.county);
-  });
-});
-// Dodaj expand linkove svakoj županiji
-document.querySelectorAll('#countyList a[data-county]:not(.svi)').forEach(function(a){
-  var c=a.dataset.county;
-  var enc=encodeURIComponent(c);
-  var wrap=document.createElement('span');
-  wrap.style.cssText='display:inline-flex;gap:4px;align-items:center;';
-  var expand=document.createElement('a');
-  expand.href='na-mrezi.html?country=hr&county='+enc;
-  expand.textContent='↗';
-  expand.title='Prošireni prikaz — '+c;
-  expand.style.cssText='font-size:10px;color:#00ffff;text-decoration:none;font-weight:700;opacity:0.7;transition:opacity .15s;flex-shrink:0;';
-  expand.addEventListener('mouseenter',function(){this.style.opacity='1';});
-  expand.addEventListener('mouseleave',function(){this.style.opacity='0.7';});
-  expand.addEventListener('click',function(e){e.stopPropagation();});
-  a.style.display='inline';
-  a.parentNode.insertBefore(expand,a.nextSibling);
-});
-
 // Wire up search/filter/sort controls
 ['nickSearch'].forEach(function(id){
   var el = document.getElementById(id);
@@ -760,16 +734,21 @@ render("SVI");
 
 // ===== JAVNI CHAT PO DRŽAVI + PRIJATELJI + ADMIN =====
 (function(){
-  async function sendMsg(){
-    const inp = document.getElementById('chatInput');
-    const text = inp.value.trim();
-    if(!text) return;
-    try {
-      await api('POST', '/country-chat', { country: COUNTRY_CODE, body: text });
-      inp.value = '';
-      render(activeCountyTop());
-    } catch(e) { alert('❌ ' + e.message); }
+ async function sendMsg(){
+  const inp = document.getElementById('chatInput');
+  const text = (inp.value||'').trim();
+  if(!text) return;
+  const county = activeCountyTop();
+  if(!county || county === 'SVI'){
+    alert('Odaberi županiju prije slanja poruke.');
+    return;
   }
+  try{
+    await api('POST', '/country-chat', { country: COUNTRY_CODE, county: county, body: text });
+    inp.value = '';
+    render(activeCountyTop());
+  } catch(e){ alert('❌ ' + e.message); }
+} 
   const sendBtn = document.getElementById('chatSendBtn');
   const inp = document.getElementById('chatInput');
   if(sendBtn) sendBtn.addEventListener('click', sendMsg);
