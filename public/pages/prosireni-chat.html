@@ -84,7 +84,7 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
 <body>
 <div class="app">
   <div class="top">
-    <div class="corner-links">
+    <div class="corner-links">Y3EWSDXC
       <a href="../index.html">Odjava</a>
       <a href="pocetna.html">Početna</a>
       <a href="settings.html">⚙️ Postavke</a>
@@ -117,3 +117,112 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
     <div class="current-filter">Prikaz: <b id="currentFilter">—</b></div>
   </div>
 </div>
+<script>
+const API_BASE = '/api';
+async function api(method, path, body) {
+  const opts = { method, headers: {}, credentials: 'include' };
+  if (body) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
+  const res = await fetch(API_BASE + path, opts);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'Greška.');
+  return data;
+}
+
+function escHtml(t){ return String(t).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]); }); }
+
+const urlParams = new URLSearchParams(window.location.search);
+const COUNTRY_CODE = urlParams.get('country') || 'hr';
+const INITIAL_COUNTY = urlParams.get('county') || 'SVI';
+
+const COUNTRY_INFO = {
+  hr: { label: 'Hrvatska', back: 'hrvatska.html', counties: [
+    'Bjelovarsko-bilogorska','Brodsko-posavska','Dubrovačko-neretvanska','Grad Zagreb','Istarska',
+    'Karlovačka','Koprivničko-križevačka','Krapinsko-zagorska','Ličko-senjska','Međimurska',
+    'Osječko-baranjska','Požeško-slavonska','Primorsko-goranska','Sisačko-moslavačka',
+    'Splitsko-dalmatinska','Šibensko-kninska','Varaždinska','Virovitičko-podravska',
+    'Vukovarsko-srijemska','Zadarska'
+  ]},
+  ba: { label: 'Bosna i Hercegovina', back: 'bosna.html', counties: [] },
+  rs: { label: 'Srbija', back: 'srbija.html', counties: [] }
+};
+const info = COUNTRY_INFO[COUNTRY_CODE] || COUNTRY_INFO.hr;
+
+document.getElementById('pageSub').textContent = info.label;
+document.getElementById('backBtn').href = info.back;
+
+function populateCountyFilter(){
+  const sel = document.getElementById('countyFilter');
+  info.counties.forEach(function(c){
+    const opt = document.createElement('option');
+    opt.value = c; opt.textContent = c;
+    sel.appendChild(opt);
+  });
+  sel.value = INITIAL_COUNTY;
+}
+
+function chatCard(c){
+  var mine = (window.exyuMeNick && c.who === window.exyuMeNick);
+  var cls = mine ? 'own' : 'other';
+  return `<div class="chat-card ${cls}" data-msg-id="${c.id}">
+    ${mine ? '<div class="msg-delete" onclick="deleteChatMsg('+c.id+')" title="Obriši poruku">✕</div>' : ''}
+    <div class="who">${escHtml(c.who)} <span>· ${escHtml(c.city||'')}</span></div>
+    <div class="msg">${escHtml(c.body)}</div>
+    <div class="time">${new Date(c.created_at).toLocaleString('hr-HR')}</div>
+  </div>`;
+}
+
+async function deleteChatMsg(msgId){
+  if (!confirm('Obrisati ovu poruku?')) return;
+  try {
+    await api('DELETE', '/country-chat/' + msgId);
+    render(document.getElementById('countyFilter').value);
+  } catch(e) { alert('❌ ' + e.message); }
+}
+
+async function render(county){
+  const chatWrap = document.getElementById('chatWrap');
+  chatWrap.innerHTML = '<div class="empty">Učitavam...</div>';
+  try {
+    const qs = new URLSearchParams({ country: COUNTRY_CODE, limit: '100' });
+    if (county && county !== 'SVI') qs.set('county', county);
+    const data = await api('GET', '/country-chat?' + qs.toString());
+    const list = data.messages || [];
+    chatWrap.innerHTML = list.length ? list.map(chatCard).join('') : '<div class="empty">Nema poruka</div>';
+    chatWrap.scrollTop = chatWrap.scrollHeight;
+    document.getElementById('currentFilter').textContent = county === 'SVI' ? 'SVI — ' + info.label : county + ' županija';
+  } catch (e) {
+    chatWrap.innerHTML = '<div class="empty">Greška pri učitavanju chata</div>';
+  }
+}
+
+async function sendMsg(){
+  const inp = document.getElementById('chatInput');
+  const text = (inp.value || '').trim();
+  if (!text) return;
+  const county = document.getElementById('countyFilter').value;
+  if (!county || county === 'SVI') {
+    alert('Odaberi županiju prije slanja poruke.');
+    return;
+  }
+  try {
+    await api('POST', '/country-chat', { country: COUNTRY_CODE, county: county, body: text });
+    inp.value = '';
+    render(county);
+  } catch (e) { alert('❌ ' + e.message); }
+}
+
+document.getElementById('countyFilter').addEventListener('change', function(){ render(this.value); });
+document.getElementById('chatSendBtn').addEventListener('click', sendMsg);
+document.getElementById('chatInput').addEventListener('keydown', function(e){ if (e.key === 'Enter') sendMsg(); });
+
+(async function(){
+  let me = { loggedIn: false };
+  try { me = await api('GET', '/auth/me'); } catch(e){}
+  if (!me.loggedIn) { window.location.href = '../index.html'; return; }
+  window.exyuMeNick = me.nick;
+  populateCountyFilter();
+  render(INITIAL_COUNTY);
+})();
+</script>
+</body>
+</html>
