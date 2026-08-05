@@ -589,7 +589,7 @@ body {
 
     <!-- COLUMN 3: CHAT -->
     <div class="col">
-      <div class="col-header">CHAT <a href="prosireni-chat.html?country=hr" style="font-size:11px;color:#00ffff;float:right;text-decoration:underline;">Proširi ↗</a></div>
+      <div class="col-header">CHAT <a href="prosireni-chat.html?country=hr" id="chatExpandLink" style="font-size:11px;color:#00ffff;float:right;text-decoration:underline;">Proširi ↗</a></div>
       <div class="col-body" id="chatCol"></div>
       <div class="chat-input-wrap" style="margin-top:8px;display:flex;gap:6px;">
         <input type="text" id="chatInput" placeholder="Napiši poruku…" style="flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(162,60,255,0.4);border-radius:8px;padding:8px 10px;color:#fff;font-family:inherit;font-size:13px;outline:none;">
@@ -702,6 +702,8 @@ async function render(filter){
 
   document.getElementById('currentFilter').textContent =
     filter === "SVI" ? "SVI — cijela Hrvatska" : filter + " županija";
+	var expandLink = document.getElementById('chatExpandLink');
+  if (expandLink) expandLink.href = 'prosireni-chat.html?country=hr' + (filter !== 'SVI' ? '&county=' + encodeURIComponent(filter) : '');
 
   // Chat kolona - javna soba za državu/županiju (dijeli podatke s prosireni-chat.html)
   try {
