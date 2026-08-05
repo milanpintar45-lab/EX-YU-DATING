@@ -696,7 +696,7 @@ render("SVI");
     if(!text) return;
     try {
      const county = activeCountyTop();
-      if(!county || county === 'SVI'){ alert('Odaberi kanton/regiju prije slanja poruke.'); return; }
+      
       await api('POST', '/country-chat', { country: COUNTRY_CODE, county: county, body: text });
       inp.value = '';
       render(activeCountyTop());
