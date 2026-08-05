@@ -29,7 +29,7 @@ router.get('/', requireAuth, async (req, res) => {
   let rows = result.rows;
   if (county && county !== 'SVI') {
     const target = normalizeStr(county);
-    rows = rows.filter(m => normalizeStr(m.county) === target);
+    rows = rows.filter(m => normalizeStr(m.saved_county) === target);
   }
   rows = rows.slice(0, limit);
   const messages = rows.reverse().map((m) => ({
