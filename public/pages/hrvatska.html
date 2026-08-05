@@ -905,6 +905,8 @@ document.querySelectorAll('#countyList a[data-county]:not(.svi)').forEach(functi
     let me = { loggedIn: false };
     try { me = await api('GET', '/auth/me'); } catch(e){}
     if (!me.loggedIn) { window.location.href = '../index.html'; return; }
+	window.exyuMeNick = me.nick;
+    render(activeCountyTop());
 
     document.getElementById('logoutL').addEventListener('click', async function(e) {
       e.preventDefault();
