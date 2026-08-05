@@ -608,7 +608,6 @@ async function deleteChatMsg(msgId){
     render(document.querySelector('#countyList a.active') ? document.querySelector('#countyList a.active').dataset.county : 'SVI');
   } catch(e) { alert('❌ ' + e.message); }
 }
-}
 async function render(filter){
   const nameQ = (document.getElementById('nickSearch') && document.getElementById('nickSearch').value || '').trim();
   const genderMapBack={M:'m',Z:'z',P:'p'};
