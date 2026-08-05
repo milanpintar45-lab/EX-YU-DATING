@@ -648,7 +648,7 @@ async function render(filter){
   if (expandLink) expandLink.href = 'prosireni-chat.html?country=ba' + (filter !== 'SVI' ? '&county=' + encodeURIComponent(filter) : '');
   try {
     const chatData = await api('GET', '/country-chat?country=' + COUNTRY_CODE + '&limit=8');
-    const chatList = filter === 'SVI' ?chatData.messages.filter(c => c.saved_county === filter)
+   const chatList = filter === 'SVI' ? chatData.messages : chatData.messages.filter(c => c.saved_county === filter);
     document.getElementById('chatCol').innerHTML =
       chatList.length ? chatList.map(chatCard).join('') : '<div class="empty">Nema poruka</div>';
   } catch (e) {
