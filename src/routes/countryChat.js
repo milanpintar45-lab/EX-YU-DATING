@@ -2,28 +2,37 @@ const express = require('express');
 const db = require('../db');
 const { requireAuth } = require('../middleware/auth');
 const { getRegion } = require('../utils/geo');
-
 const router = express.Router();
 const ALLOWED_COUNTRIES = ['hr', 'ba', 'rs'];
 
+function normalizeStr(s) {
+  return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+}
+
 // ============================================
-// GET /api/country-chat?country=hr&limit=50
+// GET /api/country-chat?country=hr&county=...&limit=50
 // ============================================
 router.get('/', requireAuth, async (req, res) => {
   const country = req.query.country;
   if (!ALLOWED_COUNTRIES.includes(country)) {
     return res.status(400).json({ error: 'Nepoznata država.' });
   }
+  const county = req.query.county;
   const limit = Math.min(parseInt(req.query.limit, 10) || 50, 200);
-
   const result = await db.query(
     `SELECT cc.id, cc.body, cc.created_at, cc.county AS saved_county, cc.from_user_id, u.nick AS who, u.city
      FROM country_chat_messages cc JOIN users u ON u.id = cc.from_user_id
      WHERE cc.country = $1
-     ORDER BY cc.created_at DESC LIMIT $2`,
-    [country, limit]
+     ORDER BY cc.created_at DESC LIMIT 200`,
+    [country]
   );
-  const messages = result.rows.reverse().map((m) => ({
+  let rows = result.rows;
+  if (county && county !== 'SVI') {
+    const target = normalizeStr(county);
+    rows = rows.filter(m => normalizeStr(m.county) === target);
+  }
+  rows = rows.slice(0, limit);
+  const messages = rows.reverse().map((m) => ({
     ...m,
     region: m.saved_county || getRegion(country, m.city),
   }));
@@ -41,9 +50,7 @@ router.post('/', requireAuth, async (req, res) => {
   const text = String(body || '').trim();
   if (!text) return res.status(400).json({ error: 'Prazna poruka.' });
   if (text.length > 1000) return res.status(400).json({ error: 'Poruka je predugačka.' });
-
   const countyValue = (county && county !== 'SVI') ? String(county) : null;
-
   await db.query(
     'INSERT INTO country_chat_messages (country, from_user_id, body, county) VALUES ($1, $2, $3, $4)',
     [country, req.user.userId, text, countyValue]
