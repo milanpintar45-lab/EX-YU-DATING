@@ -731,6 +731,32 @@ function activeCountyTop(){
 
 // Initial render
 render("SVI");
+// Wire up county clicks
+document.querySelectorAll('#countyList a').forEach(a=>{
+  a.addEventListener('click', e=>{
+    e.preventDefault();
+    document.querySelectorAll('#countyList a').forEach(x=>x.classList.remove('active'));
+    a.classList.add('active');
+    render(a.dataset.county);
+  });
+});
+// Dodaj expand linkove svakoj županiji
+document.querySelectorAll('#countyList a[data-county]:not(.svi)').forEach(function(a){
+  var c=a.dataset.county;
+  var enc=encodeURIComponent(c);
+  var wrap=document.createElement('span');
+  wrap.style.cssText='display:inline-flex;gap:4px;align-items:center;';
+  var expand=document.createElement('a');
+  expand.href='na-mrezi.html?country=hr&county='+enc;
+  expand.textContent='↗';
+  expand.title='Prošireni prikaz — '+c;
+  expand.style.cssText='font-size:10px;color:#00ffff;text-decoration:none;font-weight:700;opacity:0.7;transition:opacity .15s;flex-shrink:0;';
+  expand.addEventListener('mouseenter',function(){this.style.opacity='1';});
+  expand.addEventListener('mouseleave',function(){this.style.opacity='0.7';});
+  expand.addEventListener('click',function(e){e.stopPropagation();});
+  a.style.display='inline';
+  a.parentNode.insertBefore(expand,a.nextSibling);
+});
 
 // ===== JAVNI CHAT PO DRŽAVI + PRIJATELJI + ADMIN =====
 (function(){
