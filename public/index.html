@@ -835,6 +835,11 @@ const savedNick = localStorage.getItem('exyu_registered_nick');
     console.error('Provjera prijave nije uspjela:', e);
   }
 };
+window.addEventListener('pageshow', function(event) {
+  if (event.persisted) {
+    restoreRegProgress();
+  }
+});
 
 // ======================
 // SUCCESS MODAL
