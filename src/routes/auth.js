@@ -217,10 +217,7 @@ router.post('/register', registerLimiter, async (req, res) => {
   // --- Obavezne provjere (ovo je bilo samo na frontendu - sada i server provjerava) ---
   if (!verifyVerificationTicket(emailTicket, 'email', cleanEmail)) {
     return res.status(400).json({ error: 'Email nije potvrđen (ili je potvrda istekla). Ponovite potvrdu emaila.' });
-  }
-  if (!verifyVerificationTicket(phoneTicket, 'phone', cleanPhone)) {
-    return res.status(400).json({ error: 'Broj mobitela nije potvrđen (ili je potvrda istekla). Ponovite potvrdu.' });
-  }
+ 
   if (!voice1Confirmed) {
     return res.status(400).json({ error: 'Glasovna provjera 1 nije završena.' });
   }
