@@ -1133,9 +1133,9 @@ render("SVI");
       if (a.target === '_blank') return;
       if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
       e.preventDefault();
-      document.body.style.transition = 'opacity 0.15s linear';
+      document.body.style.transition = 'opacity 0.08s linear';
       document.body.style.opacity   = '0';
-      setTimeout(function(){ window.location.href = href; }, 155);
+      setTimeout(function(){ window.location.href = href; }, 80);
     });
   }
   if (document.startViewTransition) {
