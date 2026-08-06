@@ -689,6 +689,7 @@ function activeCountyTop(){
   return a ? a.dataset.county : 'SVI';
 }
 render("SVI");
+setInterval(function(){ render(activeCountyTop()); }, 10000);
 (function(){
   async function sendMsg(){
     const inp = document.getElementById('chatInput');
