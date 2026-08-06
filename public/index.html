@@ -841,6 +841,12 @@ window.addEventListener('pageshow', function(event) {
   }
 });
 
+document.addEventListener('visibilitychange', function() {
+  if (document.visibilityState === 'hidden') {
+    saveRegProgress();
+  }
+});
+
 // ======================
 // SUCCESS MODAL
 // ======================
