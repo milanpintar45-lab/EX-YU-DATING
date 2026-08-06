@@ -53,6 +53,7 @@ const CITY_TO_COUNTY_RS = {
   'sremska mitrovica': 'Srem', ruma: 'Srem', inđija: 'Srem', indjija: 'Srem', 'stara pazova': 'Srem', pećinci: 'Srem', pecinci: 'Srem', šid: 'Srem', sid: 'Srem', irig: 'Srem',
   kragujevac: 'Šumadija', aranđelovac: 'Šumadija', arandjelovac: 'Šumadija', batočina: 'Šumadija', batocina: 'Šumadija', knić: 'Šumadija', knic: 'Šumadija', lapovo: 'Šumadija', rača: 'Šumadija', raca: 'Šumadija', topola: 'Šumadija',
   prokuplje: 'Toplica', kuršumlija: 'Toplica', kursumlija: 'Toplica', blace: 'Toplica', žitorađa: 'Toplica', zitoradja: 'Toplica',
+  leskovac: 'Jablanica', vlasotince: 'Jablanica', lebane: 'Jablanica', bojnik: 'Jablanica', medveđa: 'Jablanica', medvedja: 'Jablanica', 'crna trava': 'Jablanica',
 };
 const MAPS = { hr: CITY_TO_COUNTY_HR, ba: CITY_TO_COUNTY_BA, rs: CITY_TO_COUNTY_RS };
 function getRegion(country, city) {
