@@ -1124,6 +1124,7 @@ async function verifyEmailCode() {
     document.getElementById('codeInputArea').classList.add('hidden');
     document.getElementById('btnSendCode').textContent = '✅ EMAIL POTVRĐEN'; updateStepLocks();
     checkAllReady();
+	    saveRegProgress();
   } catch (err) {
     document.getElementById('emailStatus').innerHTML = '<span class="error">❌ ' + err.message + '</span>';
 	document.getElementById('btnSendCode').disabled = false; document.getElementById('btnSendCode').textContent = '📧 POŠALJI NOVI KOD';
@@ -1190,6 +1191,7 @@ if (!emailVerified) { alert('Molimo prvo potvrdite svoj email!'); return; }
       btn.style.background = 'linear-gradient(45deg,#00ff88,#00cc66)';
       btn.textContent = '✅ OK';
       checkAllReady();
+	  saveRegProgress();
     } else {
       statusDiv.innerHTML = `❌ <b>NISI REKAO TOČNO!</b><br>Rečeno: "${transcript}"<br>Očekivano: "Ja sam ${nick} iz ${cityName}, broj ${verificationNumber}"`;
       btn.textContent = '🎤 POKUŠAJ PONOVO';
