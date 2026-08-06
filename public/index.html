@@ -873,7 +873,7 @@ function checkMicSupport() {
   } else if (!hasMedia) {
     msg.innerHTML = '❌ Mikrofon nije dostupan. Molimo omogućite pristup mikrofonu za nastavak registracije.';
   } else {
-    msg.innerHTML = '✅ Mikrofon je podržan. Kliknite gumb ili upišite tekst.';
+  msg.innerHTML = '✅ Mikrofon je podržan. Kliknite gumb za glasovnu provjeru.';  
   }
 }
 function isSpeechSupported() {
@@ -991,6 +991,10 @@ function saveRegProgress() {
     dob2Day: document.getElementById('dob2Day') ? document.getElementById('dob2Day').value : '',
     dob2Month: document.getElementById('dob2Month') ? document.getElementById('dob2Month').value : '',
     dob2Year: document.getElementById('dob2Year') ? document.getElementById('dob2Year').value : '',
+	voiceCheck1Done: voiceCheck1Done,
+    voiceCheck2Done: voiceCheck2Done,
+    emailVerified: emailVerified,
+    emailVerificationTicket: emailVerificationTicket,
   };
   localStorage.setItem('exyu_reg_progress', JSON.stringify(data));
 }
@@ -1014,6 +1018,26 @@ function restoreRegProgress() {
     if (data.dob2Day && document.getElementById('dob2Day')) document.getElementById('dob2Day').value = data.dob2Day;
     if (data.dob2Month && document.getElementById('dob2Month')) document.getElementById('dob2Month').value = data.dob2Month;
     if (data.dob2Year && document.getElementById('dob2Year')) document.getElementById('dob2Year').value = data.dob2Year;
+	if (data.voiceCheck1Done) {
+      voiceCheck1Done = true;
+      document.getElementById('voiceStatus').innerHTML = '✅ <b>GLASOVNA PROVJERA 1 USPJEŠNO PROŠLA!</b> 🔒';
+      document.getElementById('voiceBtn1').style.background = 'linear-gradient(45deg,#00ff88,#00cc66)';
+      document.getElementById('voiceBtn1').textContent = '✅ OK';
+    }
+    if (data.voiceCheck2Done) {
+      voiceCheck2Done = true;
+      document.getElementById('voiceStatus2').innerHTML = '✅ <b>GLASOVNA PROVJERA 2 USPJEŠNO PROŠLA!</b> 🔒';
+      document.getElementById('voiceBtn2').style.background = 'linear-gradient(45deg,#00ff88,#00cc66)';
+      document.getElementById('voiceBtn2').textContent = '✅ OK';
+    }
+    if (data.emailVerified) {
+      emailVerified = true;
+      emailVerificationTicket = data.emailVerificationTicket;
+      document.getElementById('emailStatus').innerHTML = '<span class="success">✅ Email potvrđen!</span>';
+      document.getElementById('btnSendCode').textContent = '✅ EMAIL POTVRĐEN';
+      updateStepLocks();
+    }
+    checkAllReady();
   } catch (e) { /* ignoriraj grešku */ }
 } function updateExamples( ) {
   const nick = document.getElementById('nick').value.trim() || 'Ivan';
