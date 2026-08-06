@@ -164,7 +164,7 @@ router.post('/register', registerLimiter, async (req, res) => {
     nick, nick2, email, phone, password,
     gender, seekGender, country, city, birthDate,
     emailTicket, phoneTicket,
-    voice1Confirmed, voice2Confirmed,
+    voiceConfirmed, voice2Confirmed,
     consents, // objekt npr. { age: true, explicit: true, content: true, ... }
   } = req.body;
 
@@ -176,7 +176,6 @@ router.post('/register', registerLimiter, async (req, res) => {
   const cleanEmail = String(email || '').trim().toLowerCase();
   const cleanPhone = String(phone || '').trim();
 
-  // --- Validacija osnovnih polja ---
   if (!cleanNick || cleanNick.length < 2) {
     return res.status(400).json({ error: 'Nick mora imati barem 2 znaka.' });
   }
@@ -199,7 +198,6 @@ router.post('/register', registerLimiter, async (req, res) => {
     return res.status(400).json({ error: 'Za par profil potreban je i drugi nick.' });
   }
 
-  // --- Stvarna provjera dobi (18+) na temelju datuma rođenja, ne samo checkboxa ---
   const parsedBirthDate = new Date(birthDate);
   if (!birthDate || isNaN(parsedBirthDate.getTime())) {
     return res.status(400).json({ error: 'Unesite ispravan datum rođenja.' });
@@ -214,11 +212,10 @@ router.post('/register', registerLimiter, async (req, res) => {
     return res.status(403).json({ error: 'Platforma je namijenjena isključivo osobama starijim od 18 godina.' });
   }
 
-  // --- Obavezne provjere (ovo je bilo samo na frontendu - sada i server provjerava) ---
   if (!verifyVerificationTicket(emailTicket, 'email', cleanEmail)) {
     return res.status(400).json({ error: 'Email nije potvrđen (ili je potvrda istekla). Ponovite potvrdu emaila.' });
- 
-  if (!voice1Confirmed) {
+  }
+  if (!voiceConfirmed) {
     return res.status(400).json({ error: 'Glasovna provjera 1 nije završena.' });
   }
   if (gender === 'p' && !voice2Confirmed) {
@@ -230,7 +227,6 @@ router.post('/register', registerLimiter, async (req, res) => {
     });
   }
 
-  // --- Provjera da nick/email/phone već ne postoje ---
   const dup = await db.query(
     'SELECT id FROM users WHERE nick = $1 OR email = $2 OR (phone = $3 AND phone IS NOT NULL)',
     [cleanNick, cleanEmail, cleanPhone]
@@ -243,26 +239,27 @@ router.post('/register', registerLimiter, async (req, res) => {
 
   const insert = await db.query(
     `INSERT INTO users
-      (nick, nick2, email, phone, password_hash, gender, seek_gender, country, city, birth_date,
-       email_verified, phone_verified, voice1_confirmed, voice2_confirmed,
-       status, consent_accepted_at, consent_details, consent_ip)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10, true, true, $11, $12, 'pending', now(), $13, $14)
+     (nick, nick2, email, phone, password_hash, gender, seek_gender,
+      country, city, birth_date,
+      email_verified, phone_verified, voice1_confirmed,
+      voice2_confirmed,
+      status, consent_accepted_at, consent_details, consent_ip)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10, true, true, $11, $12,
+     'pending', now(), $13, $14)
      RETURNING id, nick`,
     [
-      cleanNick, gender === 'p' ? String(nick2).trim() : null, cleanEmail, cleanPhone, passwordHash,
+      cleanNick, gender === 'p' ? String(nick2).trim() : null,
+      cleanEmail, cleanPhone, passwordHash,
       gender, seekGender, country, city, birthDate,
-      !!voice1Confirmed, gender === 'p' ? !!voice2Confirmed : false,
+      !!voiceConfirmed, gender === 'p' ? !!voice2Confirmed : false,
       JSON.stringify(consentObj), req.ip,
     ]
   );
-
   const user = insert.rows[0];
   const token = signToken({ userId: user.id, nick: user.nick, isAdmin: false });
   res.cookie(process.env.COOKIE_NAME || 'exyu_session', token, cookieOptions());
-
   res.json({ ok: true, nick: user.nick });
 });
-
 // ============================================
 // POST /api/auth/login
 // ============================================
