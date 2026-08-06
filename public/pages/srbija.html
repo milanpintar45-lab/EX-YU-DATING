@@ -579,7 +579,7 @@ body {
           <a href="#" data-county="Srem">Srem</a>
           <a href="#" data-county="Šumadija">Šumadija</a>
           <a href="#" data-county="Toplica">Toplica</a>
-		  <a href="#" data-county="Jablanica">Jablanica</a>
+          <a href="#" data-county="Jablanica">Jablanica</a>
         </div>
       </div>
     </div>
@@ -901,6 +901,7 @@ render("SVI");
     let me = { loggedIn: false };
     try { me = await api('GET', '/auth/me'); } catch(e){}
     if (!me.loggedIn) { window.location.href = '../index.html'; return; }
+    window.exyuMeNick = me.nick;
 
     document.getElementById('logoutL').addEventListener('click', async function(e) {
       e.preventDefault();
