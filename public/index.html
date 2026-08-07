@@ -783,13 +783,13 @@ const savedNick = localStorage.getItem('exyu_registered_nick');
     switchTab('login', document.getElementById('tabLogin'));
     document.getElementById('loginNick').value = savedNick;
   }
+ restoringProgress = true;
   updateCities();
-  restoringProgress = true;
   handleGenderChange();
-  restoringProgress = false;
   updateExamples();
   checkMicSupport();
   restoreRegProgress();
+  restoringProgress = false;
 
   // Popuni dan (1-31) i godinu (od danas-18 do danas-100) za datum rođenja
   var dayEl = document.getElementById('birthDay');
@@ -947,7 +947,7 @@ function updateCities() {
     citySelect.appendChild(opt);
   });
   updateExamples();
-  saveRegProgress();
+ if (!restoringProgress) saveRegProgress();
 }
 
 // ======================
