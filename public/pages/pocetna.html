@@ -619,7 +619,12 @@ body {
     var searchInput = document.getElementById('nickSearchHome');
     var searchResults = document.getElementById('nickSearchResults');
     function escName(t){ return String(t).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]); }); }
-    searchInput.addEventListener('input', function(){
+   
+ var searchBtn = document.getElementById('nickSearchBtn');
+function runNickSearch(){
+  searchInput.dispatchEvent(new Event('input'));
+}
+if (searchBtn) searchBtn.addEventListener('click', runNickSearch);  searchInput.addEventListener('input', function(){
       var q = searchInput.value.trim();
       clearTimeout(searchTimer);
       if (!q) { searchResults.style.display = 'none'; return; }
