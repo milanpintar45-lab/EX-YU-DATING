@@ -772,7 +772,7 @@ let emailVerified = false;
 let generatedCode = "";
 let phoneVerified = false;
 let generatedPhoneCode = ""; const cityGenitive = {"zagreb":"Zagreba","split":"Splita","rijeka":"Rijeke","osijek":"Osijeka","zadar":"Zadra","pula":"Pule","dubrovnik":"Dubrovnika","šibenik":"Šibenika","varaždin":"Varaždina","karlovac":"Karlovca","sarajevo":"Sarajeva","banja luka":"Banje Luke","mostar":"Mostara","tuzla":"Tuzle","zenica":"Zenice","bihać":"Bihaća","bijeljina":"Bijeljine","prijedor":"Prijedora","doboj":"Doboja","travnik":"Travnika","beograd":"Beograda","novi sad":"Novog Sada","niš":"Niša","kragujevac":"Kragujevca","subotica":"Subotice","zrenjanin":"Zrenjanina","pančevo":"Pančeva","čačak":"Čačka","novi pazar":"Novog Pazara","kraljevo":"Kraljeva"}; function getCityGenitive(city) { if (!city) return 'Rijeke'; return cityGenitive[city] || (city.charAt(0).toUpperCase() + city.slice(1)); } let verificationNumber = Math.floor(Math.random()*90)+10;
-let isPair = false; function updateStepLocks() { var voiceSection = document.getElementById('voiceSection'); var voiceLockNotice = document.getElementById('voiceLockNotice'); if (emailVerified) { voiceSection.classList.remove('locked-step'); voiceLockNotice.classList.add('hidden'); } else { voiceSection.classList.add('locked-step'); voiceLockNotice.classList.remove('hidden'); } }
+let isPair = false;let restoringProgress = false; function updateStepLocks() { var voiceSection = document.getElementById('voiceSection'); var voiceLockNotice = document.getElementById('voiceLockNotice'); if (emailVerified) { voiceSection.classList.remove('locked-step'); voiceLockNotice.classList.add('hidden'); } else { voiceSection.classList.add('locked-step'); voiceLockNotice.classList.remove('hidden'); } }
 
 // ======================
 // INICIJALIZACIJA
@@ -983,7 +983,7 @@ function handleGenderChange() {
   }
   updateExamples();
   checkAllReady();
-  saveRegProgress();
+  if (!restoringProgress) saveRegProgress();
 }
 // ======================
 // DINAMIČKI PRIMJERI
@@ -1014,6 +1014,7 @@ function restoreRegProgress() {
   const saved = localStorage.getItem('exyu_reg_progress');
   if (!saved) return;
   try {
+  restoringProgress = true;
     const data = JSON.parse(saved);
     if (data.myGender) document.getElementById('myGender').value = data.myGender;
     if (data.seekGender) document.getElementById('seekGender').value = data.seekGender;
@@ -1050,6 +1051,7 @@ function restoreRegProgress() {
     }
     checkAllReady();
   } catch (e) { /* ignoriraj grešku */ }
+  restoringProgress = false;
 } function updateExamples( ) {
   const nick = document.getElementById('nick').value.trim() || 'Ivan';
   const nick2 = document.getElementById('nick2').value.trim() || 'Iva';
