@@ -1158,7 +1158,7 @@ async function nativeShareProfile(){
 
 async function loadProfile(){
   try {
-    myProfile = await api('GET', '/profile/me');
+  myProfile = await api('GET', '/profile/me');
   } catch (err) {
     alert('❌ Greška pri učitavanju profila: ' + err.message);
     return;
