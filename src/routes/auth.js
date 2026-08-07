@@ -164,7 +164,7 @@ router.post('/register', registerLimiter, async (req, res) => {
     nick, nick2, email, phone, password,
     gender, seekGender, country, city, birthDate,
     emailTicket, phoneTicket,
-    voiceConfirmed, voice2Confirmed,
+    voice1Confirmed, voice2Confirmed,
     consents, // objekt npr. { age: true, explicit: true, content: true, ... }
   } = req.body;
 
@@ -215,7 +215,7 @@ router.post('/register', registerLimiter, async (req, res) => {
   if (!verifyVerificationTicket(emailTicket, 'email', cleanEmail)) {
     return res.status(400).json({ error: 'Email nije potvrđen (ili je potvrda istekla). Ponovite potvrdu emaila.' });
   }
-  if (!voiceConfirmed) {
+  if (!voice1Confirmed) {
     return res.status(400).json({ error: 'Glasovna provjera 1 nije završena.' });
   }
   if (gender === 'p' && !voice2Confirmed) {
@@ -251,7 +251,7 @@ router.post('/register', registerLimiter, async (req, res) => {
       cleanNick, gender === 'p' ? String(nick2).trim() : null,
       cleanEmail, cleanPhone, passwordHash,
       gender, seekGender, country, city, birthDate,
-      !!voiceConfirmed, gender === 'p' ? !!voice2Confirmed : false,
+      !!voice1Confirmed, gender === 'p' ? !!voice2Confirmed : false,
       JSON.stringify(consentObj), req.ip,
     ]
   );
