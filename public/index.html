@@ -784,7 +784,9 @@ const savedNick = localStorage.getItem('exyu_registered_nick');
     document.getElementById('loginNick').value = savedNick;
   }
   updateCities();
+  restoringProgress = true;
   handleGenderChange();
+  restoringProgress = false;
   updateExamples();
   checkMicSupport();
   restoreRegProgress();
