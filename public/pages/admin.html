@@ -1187,9 +1187,8 @@ async function renderUsersTable(filterText){
       ? '<button type="button" class="action-btn" title="Odobri" onclick="adminApproveUser(\'' + u.nick + '\')">✅</button>' +
         '<button type="button" class="action-btn delete" title="Odbij" onclick="adminRejectUser(\'' + u.nick + '\')">⛔</button>'
       : '';
-    return '<tr>' +
-      '<td><div class="user-cell"><div class="user-avatar">👤</div><div><div class="user-name">' + (u.nick||'—') + '</div><div class="user-meta">' + (u.email||'—') + '</div></div></div></td>' +
-      '<td>#' + (u.nick ? u.nick.length + Date.now().toString().slice(-3) : '—') + '</td>' +
+   </td>' +return '<tr>' +
+      '<td><div class="user-cell"><div class="user-avatar">👤</div><div><div class="user-name" style="cursor:pointer;text-decoration:underline;" onclick="window.location.href=\'profil.html?user=\' + encodeURIComponent(\'' + u.nick + '\')">' + (u.nick||'—') + '</div><div class="user-meta">' + (u.email||'—') + '</div></div></div></td>' +
       '<td>' + (countryFlag[u.country]||'') + ' ' + (u.country||'—') + '</td>' +
       '<td>' + (u.city||'—') + '</td>' +
       '<td>' + statusHtml + '</td>' +
