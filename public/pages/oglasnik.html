@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="hr">
 <head>
 <meta charset="UTF-8" />
@@ -519,7 +519,7 @@ body {
 
     <!-- ADS LIST -->
     <div class="ads-list-title">
-      📋 SVI OGLASI <span style="font-size:14px;color:var(--muted);font-family:'Inter',sans-serif;">(<span id="adCount">24</span> oglasa)</span>
+      📋 SVI OGLASI <span style="font-size:14px;color:var(--muted);font-family:'Inter',sans-serif;">(<span id="adCount">0</span> oglasa)</span>
     </div>
 
 
@@ -601,8 +601,8 @@ async function api(method, path, body) {
 }
 
 function escHtml(t){ return String(t).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]); }); }
+
 var myNick = null;
-api('GET', '/auth/me').then(function(me){ myNick = me.nick; loadAds(); }).catch(function(){});
 
 var CATEGORY_LABELS = {
   'on-trazi-nju':'👨 ON TRAŽI NJU', 'on-trazi-njega':'👨 ON TRAŽI NJEGA', 'on-trazi-par':'👨 ON TRAŽI PAR',
@@ -645,7 +645,8 @@ function adCard(ad){
     '</div>' +
     '<div class="ad-card-body">' + escHtml(ad.body) + '</div>' +
     '<div class="ad-card-footer"><span class="ad-tag">' + (CATEGORY_LABELS[ad.category]||ad.category) + '</span></div>' +
- 
+  '</div>';
+}
 
 async function deleteAd(id){
   if (!confirm('Jeste li sigurni da želite obrisati ovaj oglas?')) return;
@@ -655,7 +656,6 @@ async function deleteAd(id){
     loadCategoryCounts();
   } catch(e) { alert('❌ ' + e.message); }
 }
-  
 
 async function loadAds(){
   var grid = document.getElementById('adsGrid');
@@ -741,6 +741,7 @@ function openNewAdModal(){
 function closeNewAdModal(){
   document.getElementById('newAdModal').classList.remove('active');
 }
+
 async function saveNewAd(){
   var category = document.getElementById('adCategory').value;
   var title = document.getElementById('adTitle').value.trim();
@@ -770,6 +771,13 @@ document.getElementById('newAdModal').addEventListener('click', function(e){
   if(e.target === this) closeNewAdModal();
 });
 
+// Prvo saznaj tko je ulogiran, pa tek onda učitaj oglase (da gumb za brisanje zna čiji su oglasi moji)
+api('GET', '/auth/me').then(function(me){
+  myNick = me.nick;
+  loadAds();
+}).catch(function(){
+  loadAds();
+});
 loadCategoryCounts();
 
 </script>
