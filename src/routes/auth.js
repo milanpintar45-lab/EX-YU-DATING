@@ -215,12 +215,7 @@ router.post('/register', registerLimiter, async (req, res) => {
   if (!verifyVerificationTicket(emailTicket, 'email', cleanEmail)) {
     return res.status(400).json({ error: 'Email nije potvrđen (ili je potvrda istekla). Ponovite potvrdu emaila.' });
   }
-  if (!voice1Confirmed) {
-    return res.status(400).json({ error: 'Glasovna provjera 1 nije završena.' });
-  }
-  if (gender === 'p' && !voice2Confirmed) {
-    return res.status(400).json({ error: 'Glasovna provjera 2 nije završena.' });
-  }
+ 
   if (missingConsents.length > 0) {
     return res.status(400).json({
       error: 'Morate prihvatiti sve uvjete korištenja i zakonske suglasnosti (uključujući potvrdu punoljetnosti) prije registracije.',
@@ -251,7 +246,7 @@ router.post('/register', registerLimiter, async (req, res) => {
       cleanNick, gender === 'p' ? String(nick2).trim() : null,
       cleanEmail, cleanPhone, passwordHash,
       gender, seekGender, country, city, birthDate,
-      !!voice1Confirmed, gender === 'p' ? !!voice2Confirmed : false,
+     true, true,
       JSON.stringify(consentObj), req.ip,
     ]
   );
