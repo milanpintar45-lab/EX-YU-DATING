@@ -580,7 +580,7 @@ body {
 
       <div class="profile-header">
       <div class="profile-avatar" id="profileAvatar" onclick="openAvatarPicker()" style="cursor:pointer;position:relative;overflow:hidden;" title="Kliknite za promjenu profilne slike">👤
-  <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.55);font-size:10px;padding:2px 0;text-align:center;">✏️ Promjeni</div>
+  <div id="avatarEditHint" style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.55);font-size:10px;padding:2px 0;text-align:center;">✏️ Promjeni</div>
   <button type="button" id="btnDeleteUser" onclick="event.stopPropagation();deleteOtherUser()" title="Izbaci korisnika (samo admin)" style="display:none;position:absolute;top:-8px;right:-8px;width:30px;height:30px;border-radius:50%;background:#dc2626;color:#fff;border:2px solid #1a0033;cursor:pointer;font-size:14px;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.5);z-index:5;">⛔</button>
 </div>
 <input type="file" id="avatarUploadInput" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)">
@@ -1385,7 +1385,16 @@ function renderVideos(){
       if(delBtn) delBtn.style.display = 'flex';
     }
     await loadOtherProfile(viewedUser);
-    showStep(2);
+      showStep(2);
+      var avatarEl = document.getElementById('profileAvatar');
+      if(avatarEl){
+        avatarEl.onclick = null;
+        avatarEl.style.cursor = 'default';
+        avatarEl.removeAttribute('title');
+      }
+      var editHint = document.getElementById('avatarEditHint');
+      if(editHint) editHint.style.display = 'none';
+    
   }
 })();
 
