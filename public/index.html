@@ -148,55 +148,6 @@ button.medium {
 }
 button.medium:hover:not(:disabled) { transform: translateY(-2px); }
 button.medium:disabled { opacity: 0.5; cursor: not-allowed; }
-.voice-section {
-  background: rgba(255,77,109,0.15);
-  border: 2px solid rgba(255,77,109,0.5);
-  border-radius: 18px;
-  padding: 22px;
-  margin: 20px 0;
-  text-align: center;
-}
-#voiceStatus, #voiceStatus2 {
-  font-size: 1.1em;
-  font-weight: 600;
-  margin: 12px 0;
-  min-height: 28px;
-  padding: 10px 12px;
-  background: rgba(0,0,0,0.3);
-  border-radius: 10px;
-}
-.voice-notice {
-  background: rgba(255,255,0,0.15);
-  border: 2px solid rgba(255,255,0,0.4);
-  border-radius: 14px;
-  padding: 14px;
-  margin-bottom: 15px;
-  font-size: 1.05em;
-  font-weight: 600;
-  text-align: center;
-  color: #fff;
-}
-.voice-examples {
-  background: rgba(0,255,255,0.1);
-  border: 2px solid rgba(0,255,255,0.4);
-  border-radius: 14px;
-  padding: 16px;
-  margin: 12px 0;
-  font-size: 1em;
-  text-align: left;
-}
-.voice-examples h4 {
-  color: #00ffff;
-  margin-bottom: 10px;
-  font-size: 1.15em;
-}
-.voice-examples div {
-  background: rgba(0,0,0,0.4);
-  padding: 10px 12px;
-  margin: 8px 0;
-  border-radius: 10px;
-  border-left: 4px solid #00ffff;
-}
 .login-links {
   text-align: center;
   margin-top: 25px;
@@ -247,7 +198,7 @@ button.medium:disabled { opacity: 0.5; cursor: not-allowed; }
 .success { color: #00ff88; }
 .error { color: #ff6b6b; }
 .info { color: #00ffff; }
-.hidden { display: none !important; } .locked-step { opacity: 0.35; pointer-events: none; filter: grayscale(60%); } .locked-msg { text-align:center; color:#ffaa00; font-weight:700; margin-top:8px; font-size:0.95em; }
+.hidden { display: none !important; }
 
 /* ===== SUCCESS MODAL ===== */
 .success-overlay {
@@ -359,36 +310,6 @@ button.medium:disabled { opacity: 0.5; cursor: not-allowed; }
   box-shadow: 0 16px 50px rgba(0,255,136,0.4);
 }
 
-/* ===== TEXT VERIFICATION (always works) ===== */
-.text-verify-box {
-  background: rgba(0,255,136,0.08);
-  border: 2px solid rgba(0,255,136,0.35);
-  border-radius: 14px;
-  padding: 18px;
-  margin-top: 14px;
-  text-align: left;
-}
-.text-verify-box label {
-  font-size: 1em; color: #00ff88; margin-bottom: 8px;
-}
-.text-verify-box input {
-  margin-bottom: 10px; font-size: 1em;
-}
-.text-verify-box .hint {
-  font-size: 0.9em; color: #b8a4d4; margin-bottom: 10px;
-}
-
-/* ===== SKIP / ALWAYS WORKS ===== */
-.always-works-banner {
-  background: rgba(255,255,255,0.06);
-  border: 1px dashed rgba(162,60,255,0.5);
-  border-radius: 10px;
-  padding: 10px 14px;
-  margin-top: 10px;
-  font-size: 0.95em;
-  color: #b8a4d4;
-}
-
 @media (max-width: 768px) {
   .login-page{padding:12px;}
   .woman, .man {
@@ -406,15 +327,11 @@ button.medium:disabled { opacity: 0.5; cursor: not-allowed; }
   select, input { padding: 12px 14px; font-size: 1em; border-radius: 12px; }
   button.big { padding: 14px; font-size: 1.1em; border-radius: 14px; }
   button.medium { width: 100%; margin: 5px 0; padding: 12px; font-size: 1em; }
-  .voice-section { padding: 16px; margin: 14px 0; }
-  #voiceStatus, #voiceStatus2 { font-size: 1em; padding: 8px 10px; }
   .success-box { padding: 30px 20px; max-width: 92vw; }
   .success-icon { font-size: 3.5em; }
   .success-title { font-size: 1.8em; }
   .success-text { font-size: 1.1em; }
   .success-btn { padding: 14px 24px; font-size: 1em; }
-  .text-verify-box { padding: 14px; }
-  .always-works-banner { font-size: 0.9em; padding: 8px 12px; }
   .birthday-group { flex-direction:column; gap:10px; }
   .birthday-group select { width:100%; }
 }
@@ -430,14 +347,12 @@ button.medium:disabled { opacity: 0.5; cursor: not-allowed; }
    EX YU DATE — ANTI-TRZANJE v3 (FINALNA VERZIJA)
    =================================================== */
 
-/* 1. Pozadina nikad ne nestaje — nema bijelog bljeska */
 html {
   background: linear-gradient(135deg,#1a0033 0%,#2d0057 50%,#4a0a7a 100%);
   background-attachment: fixed;
-  overflow-y: scroll; /* scrollbar uvijek prisutan → nema layout shiftova */
+  overflow-y: scroll;
 }
 
-/* 2. View Transitions API (Chrome 111+) — čista crossfade, bez pokreta */
 @view-transition {
   navigation: auto;
 }
@@ -450,7 +365,6 @@ html {
 @keyframes exyu-out { to   { opacity: 0; } }
 @keyframes exyu-in  { from { opacity: 0; } }
 
-/* 3. Fallback — isti efekt za Firefox/Safari, BEZ pokreta */
 body {
   animation: exyu-body-in 0.22s linear both;
 }
@@ -683,33 +597,7 @@ body {
           <span onclick="togglePasswordVisibility('password', this)" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:1.2em;">👁️</span>
 		 </div>
 		 </div>
-       
-        
-        <div class="voice-notice">
-          🔒 <b>OBAVEZNA GLASOVNA PROVJERA — bez izgovorene rečenice pristup nije moguć!</b>
-        </div>
-        
-        <div class="voice-examples" id="voiceExamples">
-          <h4>💬 TOČNO ŠTO MORATE IZGOVORITI:</h4>
-          <div id="ex1">👨 <b>Vaša rečenica:</b> "Ja sam Ivan iz Rijeke"</div>
-          <div id="ex2" class="hidden">👩 <b>Rečenica druge osobe:</b> "Ja sam Iva iz Rijeke"</div>
-          <div id="ex3" class="hidden">💑 <b>Par:</b> Oba moraju izgovoriti svoju rečenicu odvojeno!</div>
-        </div>
-        
-        <div class="voice-section" id="voiceSection"> <div id="voiceLockNotice" class="locked-msg">🔒 Prvo potvrdite broj mobitela (SMS) da biste otključali ovaj korak</div>
-          <button class="big" onclick="speakInstructions()" style="background: linear-gradient(45deg,#00a8ff,#00ff88); margin-bottom:15px;">🔊 POSLUŠAJ UPUTE</button>
-          
-          <div id="micSupportMsg" style="margin-bottom:10px; font-size:0.95em; color:#ffaa00;"></div>
-          
-          <div id="voiceButtons" style="display:flex; flex-wrap:wrap;">
-            <button class="medium" onclick="startVoiceCheck(1)" id="voiceBtn1">🎤 GLASOVNA PROVJERA 1</button>
-            <button class="medium hidden" onclick="startVoiceCheck(2)" id="voiceBtn2">🎤 GLASOVNA PROVJERA 2</button>
-          </div>
-          
-          <div id="voiceStatus">⏳ Klikni gumb za glasovnu provjeru</div>
-          <div id="voiceStatus2" class="hidden"></div>
-        </div>
-        
+
         <button class="big" onclick="registerUser()" id="regBtn" disabled>🚀 PRIJAVITE SE ODMAH!</button>
         <button class="big" onclick="goNextPage()" id="nextPageBtn" disabled style="display:none;">🚀 SLJEDEĆA STRANICA</button>
       </div>
@@ -771,18 +659,20 @@ const cities = {
 // ======================
 // STANJE
 // ======================
-let voiceCheck1Done = false;
-let voiceCheck2Done = false;
+let voiceCheck1Done = true;
+let voiceCheck2Done = true;
 let emailVerified = false;
 let generatedCode = "";
 let phoneVerified = false;
-let generatedPhoneCode = ""; const cityGenitive = {"zagreb":"Zagreba","split":"Splita","rijeka":"Rijeke","osijek":"Osijeka","zadar":"Zadra","pula":"Pule","dubrovnik":"Dubrovnika","šibenik":"Šibenika","varaždin":"Varaždina","karlovac":"Karlovca","sarajevo":"Sarajeva","banja luka":"Banje Luke","mostar":"Mostara","tuzla":"Tuzle","zenica":"Zenice","bihać":"Bihaća","bijeljina":"Bijeljine","prijedor":"Prijedora","doboj":"Doboja","travnik":"Travnika","beograd":"Beograda","novi sad":"Novog Sada","niš":"Niša","kragujevac":"Kragujevca","subotica":"Subotice","zrenjanin":"Zrenjanina","pančevo":"Pančeva","čačak":"Čačka","novi pazar":"Novog Pazara","kraljevo":"Kraljeva"}; function getCityGenitive(city) { if (!city) return 'Rijeke'; return cityGenitive[city] || (city.charAt(0).toUpperCase() + city.slice(1)); } let verificationNumber = Math.floor(Math.random()*90)+10;
-let isPair = false;let restoringProgress = false; function updateStepLocks() { var voiceSection = document.getElementById('voiceSection'); var voiceLockNotice = document.getElementById('voiceLockNotice'); if (emailVerified) { voiceSection.classList.remove('locked-step'); voiceLockNotice.classList.add('hidden'); } else { voiceSection.classList.add('locked-step'); voiceLockNotice.classList.remove('hidden'); } }
+let generatedPhoneCode = "";
+let verificationNumber = Math.floor(Math.random()*90)+10;
+let isPair = false;
+let restoringProgress = false;
 
 // ======================
 // INICIJALIZACIJA
 // ======================
-window.onload = async function() { updateStepLocks()
+window.onload = async function() {
 const savedNick = localStorage.getItem('exyu_registered_nick');
   if (savedNick) {
     switchTab('login', document.getElementById('tabLogin'));
@@ -791,8 +681,6 @@ const savedNick = localStorage.getItem('exyu_registered_nick');
  restoringProgress = true;
   updateCities();
   handleGenderChange();
-  updateExamples();
-  checkMicSupport();
   restoreRegProgress();
   restoringProgress = false;
 
@@ -878,34 +766,6 @@ async function logoutFromBanner() {
   if (banner) banner.classList.remove('active');
 }
 
-// ======================
-// PROVJERA MIKROFONA
-// ======================
-function checkMicSupport() {
-  const msg = document.getElementById('micSupportMsg');
-  const hasSpeech = ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
-  const hasMedia = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
-  
-  if (!hasSpeech) {
-    msg.innerHTML = '❌ Preglednik <b>ne podržava</b> glasovnu provjeru. Molimo koristite preglednik koji podržava glasovnu provjeru (npr. Chrome).';
-  } else if (!hasMedia) {
-    msg.innerHTML = '❌ Mikrofon nije dostupan. Molimo omogućite pristup mikrofonu za nastavak registracije.';
-  } else {
-  msg.innerHTML = '✅ Mikrofon je podržan. Kliknite gumb za glasovnu provjeru.';  
-  }
-}
-function isSpeechSupported() {
-  return ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
-}
-async function requestMicAccess() {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    stream.getTracks().forEach(track => track.stop());
-    return true;
-  } catch (err) {
-    return false;
-  }
-}
 function togglePasswordVisibility(inputId, iconEl) {
   const input = document.getElementById(inputId);
   if (input.type === 'password') {
@@ -951,7 +811,6 @@ function updateCities() {
     opt.textContent = city;
     citySelect.appendChild(opt);
   });
-  updateExamples();
  if (!restoringProgress) saveRegProgress();
 }
 
@@ -964,36 +823,21 @@ function handleGenderChange() {
   const pairGenderGroup = document.getElementById('pairGenderGroup');
   const nick2Group = document.getElementById('nick2Group');
   const dob2Group = document.getElementById('dob2Group');
-  const voiceBtn2 = document.getElementById('voiceBtn2');
-  const ex2 = document.getElementById('ex2');
-  const ex3 = document.getElementById('ex3');
-  const voiceStatus2 = document.getElementById('voiceStatus2');
   
   if (isPair) {
     pairGenderGroup.classList.remove('hidden');
     nick2Group.classList.remove('hidden');
 	dob2Group.classList.remove('hidden');
-    voiceBtn2.classList.remove('hidden');
-    ex2.classList.remove('hidden');
-    ex3.classList.remove('hidden');
-    voiceStatus2.classList.remove('hidden');
-    voiceCheck2Done = false;
   } else {
     pairGenderGroup.classList.add('hidden');
     nick2Group.classList.add('hidden');
     dob2Group.classList.add('hidden');
-    voiceBtn2.classList.add('hidden');
-    ex2.classList.add('hidden');
-    ex3.classList.add('hidden');
-    voiceStatus2.classList.add('hidden');
-    voiceCheck2Done = true;
   }
-  updateExamples();
   checkAllReady();
   if (!restoringProgress) saveRegProgress();
 }
 // ======================
-// DINAMIČKI PRIMJERI
+// SPREMANJE NAPRETKA
 // ======================
 function saveRegProgress() {
   const data = {
@@ -1009,8 +853,6 @@ function saveRegProgress() {
     dob2Day: document.getElementById('dob2Day') ? document.getElementById('dob2Day').value : '',
     dob2Month: document.getElementById('dob2Month') ? document.getElementById('dob2Month').value : '',
     dob2Year: document.getElementById('dob2Year') ? document.getElementById('dob2Year').value : '',
-	voiceCheck1Done: voiceCheck1Done,
-    voiceCheck2Done: voiceCheck2Done,
     emailVerified: emailVerified,
     emailVerificationTicket: emailVerificationTicket,
   };
@@ -1037,68 +879,17 @@ function restoreRegProgress() {
     if (data.dob2Day && document.getElementById('dob2Day')) document.getElementById('dob2Day').value = data.dob2Day;
     if (data.dob2Month && document.getElementById('dob2Month')) document.getElementById('dob2Month').value = data.dob2Month;
     if (data.dob2Year && document.getElementById('dob2Year')) document.getElementById('dob2Year').value = data.dob2Year;
-	if (data.voiceCheck1Done) {
-      voiceCheck1Done = true;
-      document.getElementById('voiceStatus').innerHTML = '✅ <b>GLASOVNA PROVJERA 1 USPJEŠNO PROŠLA!</b> 🔒';
-      document.getElementById('voiceBtn1').style.background = 'linear-gradient(45deg,#00ff88,#00cc66)';
-      document.getElementById('voiceBtn1').textContent = '✅ OK';
-    }
-    if (data.voiceCheck2Done) {
-      voiceCheck2Done = true;
-      document.getElementById('voiceStatus2').innerHTML = '✅ <b>GLASOVNA PROVJERA 2 USPJEŠNO PROŠLA!</b> 🔒';
-      document.getElementById('voiceBtn2').style.background = 'linear-gradient(45deg,#00ff88,#00cc66)';
-      document.getElementById('voiceBtn2').textContent = '✅ OK';
-    }
     if (data.emailVerified) {
       emailVerified = true;
       emailVerificationTicket = data.emailVerificationTicket;
       document.getElementById('emailStatus').innerHTML = '<span class="success">✅ Email potvrđen!</span>';
       document.getElementById('btnSendCode').textContent = '✅ EMAIL POTVRĐEN';
-      updateStepLocks();
     }
     checkAllReady();
   } catch (e) { /* ignoriraj grešku */ }
   restoringProgress = false;
-} function updateExamples( ) {
-  const nick = document.getElementById('nick').value.trim() || 'Ivan';
-  const nick2 = document.getElementById('nick2').value.trim() || 'Iva';
-  const city = document.getElementById('city').value;
-  const cityName = getCityGenitive(city);
-  
-  document.getElementById('ex1').innerHTML = `👨 <b>Vaša rečenica:</b> "Ja sam ${nick} iz ${cityName}, broj ${verificationNumber}"`;
-  document.getElementById('ex2').innerHTML = `👩 <b>Rečenica druge osobe:</b> "Ja sam ${nick2} iz ${cityName}, broj ${verificationNumber}"`;
-  document.getElementById('ex3').innerHTML = `💑 <b>Par:</b> Oba moraju izgovoriti svoju rečenicu odvojeno!`;
-  var hint1El = document.getElementById('hint1');
-  var hint2El = document.getElementById('hint2');
-  if (hint1El) hint1El.textContent = `Upišite: Ja sam ${nick} iz ${cityName}`;
-  if (hint2El) hint2El.textContent = `Upišite: Ja sam ${nick2} iz ${cityName}`;
 }
-
-// ======================
-// ČUJ UPUTE (TTS)
-// ======================
-function speakInstructions() {
-  const nick = document.getElementById('nick').value.trim() || 'Ivan';
-  const nick2 = document.getElementById('nick2').value.trim() || 'Iva';
-  const city = document.getElementById('city').value;
-  const cityName = getCityGenitive(city);
-  if (!window.speechSynthesis) {
-    alert('Vaš preglednik ne podržava glasovnu reprodukciju.');
-    return;
-  }
-  window.speechSynthesis.cancel();
-  const msg1 = new SpeechSynthesisUtterance();
-  msg1.lang = 'hr-HR'; msg1.rate = 0.85; msg1.pitch = 1;
-  msg1.text = `Točno morate izgovoriti: Ja sam ${nick} iz 
-  ${cityName}, broj ${verificationNumber}.`;
-  window.speechSynthesis.speak(msg1);
-  if (isPair) {
-    const msg2 = new SpeechSynthesisUtterance();
-    msg2.lang = 'hr-HR'; msg2.rate = 0.85; msg2.pitch = 1.2;
-    msg2.text = `Druga osoba mora izgovoriti: Ja sam ${nick2} iz${cityName}, broj ${verificationNumber}.`;
-    window.speechSynthesis.speak(msg2);
-  }
-}
+function updateExamples() {}
 
 // ======================
 // EMAIL POTVRDA
@@ -1142,7 +933,7 @@ async function verifyEmailCode() {
     emailVerificationTicket = data.ticket;
     document.getElementById('emailStatus').innerHTML = '<span class="success">✅ Email potvrđen!</span>';
     document.getElementById('codeInputArea').classList.add('hidden');
-    document.getElementById('btnSendCode').textContent = '✅ EMAIL POTVRĐEN'; updateStepLocks();
+    document.getElementById('btnSendCode').textContent = '✅ EMAIL POTVRĐEN';
     checkAllReady();
 	    saveRegProgress();
   } catch (err) {
@@ -1153,103 +944,13 @@ async function verifyEmailCode() {
 
 let phoneVerificationTicket = null;
 
-
-
-// ======================
-// GLASOVNA PROVJERA
-// ======================
-async function startVoiceCheck(person) {
-  const nick = person === 1 ? document.getElementById('nick').value.trim() : document.getElementById('nick2').value.trim();
-  const city = document.getElementById('city').value;
-  const cityName = getCityGenitive(city);
-  
- if (!nick) { alert('Molimo upišite nick prije glasovne provjere!'); return; }
-if (!emailVerified) { alert('Molimo prvo potvrdite svoj email!'); return; }
-  const country = document.getElementById('country').value;
-  if (!country) { alert('Molimo odaberite državu!'); return; }
-  if (!city) { alert('Molimo odaberite grad!'); return; }
-  
-  const statusDiv = person === 1 ? document.getElementById('voiceStatus') : document.getElementById('voiceStatus2');
-  const btn = person === 1 ? document.getElementById('voiceBtn1') : document.getElementById('voiceBtn2');
-  const fallback = person === 1 ? document.getElementById('voiceFallback1') : document.getElementById('voiceFallback2');
-  
-  if (!isSpeechSupported()) {
-    statusDiv.innerHTML = `❌ Preglednik ne podržava glasovnu provjeru. Molimo koristite preglednik koji je podržava (npr. Chrome).`;
-    if (fallback) fallback.classList.remove('hidden');
-    return;
-  }
-  
-  statusDiv.innerHTML = `🎤 <b>Tražim dozvolu za mikrofon...</b>`;
-  const micAllowed = await requestMicAccess();
-  if (!micAllowed) {
-    statusDiv.innerHTML = `❌ Mikrofon nije dopušten! Molimo dopustite pristup mikrofonu u postavkama preglednika.`;
-    if (fallback) fallback.classList.remove('hidden');
-    return;
-  }
-  
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  const recognition = new SpeechRecognition();
-  recognition.continuous = false;
-  recognition.interimResults = false;
-  recognition.lang = 'hr-HR';
-  
-  statusDiv.innerHTML = `🎤 <b>SLUŠAM! Recite točno: "Ja sam ${nick} iz ${cityName}"</b>`;
-  btn.textContent = '🎤 Slušam...';
-  if (fallback) fallback.classList.add('hidden');
-  
-  recognition.onresult = (event) => {
-    const transcript = event.results[0][0].transcript.toLowerCase();
-    const hasJaSam = transcript.includes('ja sam');
-    const hasNick = transcript.includes(nick.toLowerCase());
-    const hasIz = transcript.includes('iz');
-    const hasCity = transcript.includes(cityName.toLowerCase()) || transcript.includes(city.toLowerCase()); const hasNumber = transcript.includes(String(verificationNumber));
-    
-    if (hasJaSam && hasNick && hasIz && hasCity && hasNumber) {
-      if (person === 1) voiceCheck1Done = true;
-      else voiceCheck2Done = true;
-      statusDiv.innerHTML = `✅ <b>GLASOVNA PROVJERA ${person} USPJEŠNO PROŠLA!</b> 🔒`;
-      btn.style.background = 'linear-gradient(45deg,#00ff88,#00cc66)';
-      btn.textContent = '✅ OK';
-      checkAllReady();
-	  saveRegProgress();
-    } else {
-      statusDiv.innerHTML = `❌ <b>NISI REKAO TOČNO!</b><br>Rečeno: "${transcript}"<br>Očekivano: "Ja sam ${nick} iz ${cityName}, broj ${verificationNumber}"`;
-      btn.textContent = '🎤 POKUŠAJ PONOVO';
-    }
-  };
-  
-  recognition.onerror = (err) => {
-    if (err.error === 'not-allowed') {
-      statusDiv.innerHTML = `❌ Mikrofon blokiran! Molimo dopustite pristup mikrofonu u postavkama preglednika.`;
-      if (fallback) fallback.classList.remove('hidden');
-    } else if (err.error === 'no-speech') {
-      statusDiv.innerHTML = `❌ Nije čut govor!<br>🎤 Pokušaj ponovno ili upiši tekst.`;
-      btn.textContent = '🎤 POKUŠAJ PONOVO';
-    } else {
-      statusDiv.innerHTML = `❌ Greška: ${err.error}. Molimo pokušajte ponovno.`;
-      if (fallback) fallback.classList.remove('hidden');
-    }
-  };
-  
-  recognition.onnomatch = () => {
-    statusDiv.innerHTML = `❌ Nije prepoznat govor! Molimo pokušajte ponovno i jasno izgovorite rečenicu.`;
-    btn.textContent = '🎤 POKUŠAJ PONOVO';
-  };
-  
-  try { recognition.start(); } 
-  catch (e) {
-    statusDiv.innerHTML = `❌ Greška pri pokretanju mikrofona! Molimo pokušajte ponovno.`;
-    if (fallback) fallback.classList.remove('hidden');
-  }
-}
-
 // ======================
 // PROVJERA SVIH ZADATAKA
 // ======================
 function checkAllReady() {
   const regBtn = document.getElementById('regBtn');
   const nextBtn = document.getElementById('nextPageBtn');
-  const allReady = voiceCheck1Done && voiceCheck2Done && emailVerified;
+  const allReady = emailVerified;
 
   if (allReady) {
     regBtn.style.display = 'none';
@@ -1261,9 +962,6 @@ function checkAllReady() {
     nextBtn.disabled = true;
     let missing = [];
     if (!emailVerified) missing.push('potvrdi email');
-    
-    if (!voiceCheck1Done) missing.push('provjera 1');
-    if (isPair && !voiceCheck2Done) missing.push('provjera 2');
     regBtn.textContent = '🚀 PRIJAVITE SE ODMAH! (' + missing.join(', ') + ')';
   }
 }
@@ -1303,9 +1001,6 @@ async function submitRegistration(triggerBtn) {
   // Ove provjere postoje i na frontendu radi boljeg UX-a (odmah vidljiva poruka),
   // ali server IH PONOVNO provjerava - frontend provjere same po sebi nisu sigurnosna mjera.
   if (!emailVerified) { alert('❌ Email nije potvrđen! Molimo potvrdite email prije registracije.'); return; }
-  
-  if (!voiceCheck1Done) { alert('❌ Glasovna provjera 1 nije završena! Molimo izgovorite rečenicu prije registracije.'); return; }
-  if (isPair && !voiceCheck2Done) { alert('❌ Glasovna provjera 2 nije završena! Druga osoba mora izgovoriti rečenicu prije registracije.'); return; }
 
   const boxes = document.querySelectorAll('.consentCheck');
   const allChecked = Array.from(boxes).every(b => b.checked);
@@ -1323,9 +1018,8 @@ async function submitRegistration(triggerBtn) {
       nick, nick2: isPair ? nick2 : '', email, password,
       gender: myGender, seekGender, country, city, birthDate,
       emailTicket: emailVerificationTicket,
-      
-      voice1Confirmed: voiceCheck1Done,
-      voice2Confirmed: voiceCheck2Done,
+      voice1Confirmed: true,
+      voice2Confirmed: true,
       consents,
     });
     window.exyuJustRegistered = true;
