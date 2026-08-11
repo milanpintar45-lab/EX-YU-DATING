@@ -1430,8 +1430,12 @@ function otherMediaThumb(item, isVideo){
       div.innerHTML = '<span class="v-icon">▶️</span><div class="v-info"><div class="v-title">Video</div><div class="v-meta">0:00</div></div>' +
         '<span title="Javno" style="margin-left:auto;font-size:11px;color:#8fffb0;">👁️</span>';
     } else {
-      var thumb = item.data_url ? '<img src="'+item.data_url+'" style="width:100%;height:100%;object-fit:cover;">' : '📷';
+    var thumb = item.data_url ? '<img src="'+item.data_url+'" style="width:100%;height:100%;object-fit:cover;">' : '📷';
       div.innerHTML = thumb + '<span title="Javno" style="position:absolute;top:4px;right:4px;font-size:12px;background:rgba(0,0,0,0.5);border-radius:50%;padding:2px 4px;">👁️</span>';
+      if(item.data_url){
+        div.style.cursor = 'zoom-in';
+        div.onclick = function(){ openAvatarLightbox(item.data_url); };
+      } 
     }
   } else {
     div.style.background = 'rgba(0,0,0,0.55)';
