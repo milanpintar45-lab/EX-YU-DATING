@@ -1049,6 +1049,20 @@ function setProfileAvatar(dataUrl){
   avatarEl.childNodes[0].textContent = '';
 }
 
+function openAvatarLightbox(url){
+  var overlay = document.getElementById('avatarLightboxOverlay');
+  if(!overlay){
+    overlay = document.createElement('div');
+    overlay.id = 'avatarLightboxOverlay';
+    overlay.style.cssText = 'display:flex;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999;align-items:center;justify-content:center;padding:20px;cursor:zoom-out;';
+    overlay.innerHTML = '<img id="avatarLightboxImg" style="max-width:90vw;max-height:90vh;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.6);">';
+    overlay.onclick = function(){ overlay.style.display = 'none'; };
+    document.body.appendChild(overlay);
+  }
+  document.getElementById('avatarLightboxImg').src = url;
+  overlay.style.display = 'flex';
+}
+
 function triggerGalleryUpload(kind){
   if(kind === 'photo' && myPhotos.length >= 8){ alert('Maksimalno 8 fotografija!'); return; }
   if(kind === 'video' && myVideos.length >= 5){ alert('Maksimalno 5 video zapisa!'); return; }
@@ -1213,6 +1227,7 @@ async function loadOtherProfile(nick){
   }
 
   if (data.avatarUrl) setProfileAvatar(data.avatarUrl);
+  window.exyuOtherAvatarUrl = data.avatarUrl || null;
   var spolValue = data.profileGender || data.gender;
   document.getElementById('spol').value = spolValue;
   document.getElementById('profileGender').textContent = gmap[spolValue] || 'Korisnik';
@@ -1386,12 +1401,18 @@ function renderVideos(){
     }
     await loadOtherProfile(viewedUser);
       showStep(2);
-      var avatarEl = document.getElementById('profileAvatar');
-      if(avatarEl){
+     var avatarEl = document.getElementById('profileAvatar');
+    if(avatarEl){
+      if(window.exyuOtherAvatarUrl){
+        avatarEl.onclick = function(){ openAvatarLightbox(window.exyuOtherAvatarUrl); };
+        avatarEl.style.cursor = 'zoom-in';
+        avatarEl.title = 'Kliknite za veći prikaz slike';
+      } else {
         avatarEl.onclick = null;
         avatarEl.style.cursor = 'default';
         avatarEl.removeAttribute('title');
       }
+    }
       var editHint = document.getElementById('avatarEditHint');
       if(editHint) editHint.style.display = 'none';
     
