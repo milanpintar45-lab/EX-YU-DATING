@@ -31,24 +31,24 @@ CREATE TABLE IF NOT EXISTS users (
 
   -- Detaljni profil (uređuje se na profil.html) - odvojeno od osnovnih registracijskih polja
   display_name        VARCHAR(100),
-  profile_gender      VARCHAR(10),   -- m / z / par / par-mm / par-zz (detaljnije od registracijskog 'gender')
-  partner_age         INT,           -- dob drugog partnera kod parova (samoprijavljeno, nije verificirano)
-  seeking              VARCHAR(10),   -- z / m / par / svi (detaljnije od registracijskog seek_gender)
-  height_range        VARCHAR(20),
-  weight_range        VARCHAR(20),
-  hair_color          VARCHAR(20),
-  eye_color           VARCHAR(20),
-  orientation         VARCHAR(20),
-  relationship_status VARCHAR(20),
-  bio                 TEXT,
-  personal_message    TEXT,
-  avatar_url          TEXT,          -- data URL - jednostavno rješenje dok se ne doda pravi file storage (S3 i sl.)
-  block_pokes         BOOLEAN NOT NULL DEFAULT FALSE,
-  contact_restriction VARCHAR(10) NOT NULL DEFAULT 'svi', -- 'svi' ili 'match' (koristi settings.html)
-  profile_visibility VARCHAR(10) NOT NULL DEFAULT 'svi',  -- 'svi' ili 'match' - tko vidi profil
-  show_online_status BOOLEAN NOT NULL DEFAULT TRUE,
+  profile_gender       VARCHAR(10),   -- m / z / par / par-mm / par-zz (detaljnije od registracijskog 'gender')
+  partner_age          INT,           -- dob drugog partnera kod parova (samoprijavljeno, nije verificirano)
+  seeking               VARCHAR(10),   -- z / m / par / svi (detaljnije od registracijskog seek_gender)
+  height_range         VARCHAR(20),
+  weight_range         VARCHAR(20),
+  hair_color            VARCHAR(20),
+  eye_color              VARCHAR(20),
+  orientation           VARCHAR(20),
+  relationship_status  VARCHAR(20),
+  bio                    TEXT,
+  personal_message       TEXT,
+  avatar_url             TEXT,          -- data URL - jednostavno rješenje dok se ne doda pravi file storage (S3 i sl.)
+  block_pokes            BOOLEAN NOT NULL DEFAULT FALSE,
+  contact_restriction  VARCHAR(10) NOT NULL DEFAULT 'svi', -- 'svi' ili 'match' (koristi settings.html)
+  profile_visibility  VARCHAR(10) NOT NULL DEFAULT 'svi',  -- 'svi' ili 'match' - tko vidi profil
+  show_online_status  BOOLEAN NOT NULL DEFAULT TRUE,
   browser_notifications BOOLEAN NOT NULL DEFAULT FALSE, -- korisnik SAM uključuje - obavijesti preglednika za poruke/bockanja/zahtjeve
-  extra_settings     JSONB NOT NULL DEFAULT '{}'::jsonb, -- notifMatch/notifLike/notifMsg i sl. (samo spremljeno, kao i u originalu)
+  extra_settings      JSONB NOT NULL DEFAULT '{}'::jsonb, -- notifMatch/notifLike/notifMsg i sl. (samo spremljeno, kao i u originalu)
 
   created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at          TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -151,6 +151,17 @@ CREATE TABLE IF NOT EXISTS videos (
   owner_reaction VARCHAR(10), -- 'like' / 'pass' / NULL - vlasnikova osobna oznaka, SAMO u galerija.html
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Video pozivi na čekanju (za "zvonjenje")
+CREATE TABLE IF NOT EXISTS calls (
+  id             SERIAL PRIMARY KEY,
+  from_user_id   INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  to_user_id     INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  room           VARCHAR(100) NOT NULL,
+  status         VARCHAR(15) NOT NULL DEFAULT 'ringing', -- ringing / accepted / declined / missed
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_calls_to ON calls(to_user_id, status);
 
 -- Bockanja (poke)
 CREATE TABLE IF NOT EXISTS pokes (

@@ -500,10 +500,10 @@ body {
       <div class="call-overlay" id="callOverlay">
         <div class="caller-avatar" id="callerAvatar">👩</div>
         <div class="caller-name" id="callerName">Ana</div>
-        <div class="caller-status">Zvoni…</div>
+        <div class="caller-status" id="callerStatusText">Zvoni…</div>
         <div class="call-actions">
-          <button type="button" class="call-btn-action decline" onclick="endCall()">📞</button>
-          <button type="button" class="call-btn-action accept" onclick="acceptCall()">📹</button>
+          <button type="button" class="call-btn-action decline" id="callDeclineBtn" onclick="handleDeclineClick()">📞</button>
+          <button type="button" class="call-btn-action accept" id="callAcceptBtn" onclick="handleAcceptClick()">📹</button>
         </div>
       </div>
 
@@ -593,7 +593,6 @@ function startGroupCall() {
 
   const frameWrap = document.getElementById('groupCallFrameWrap');
   document.getElementById('groupCallFrame').style.display = 'none';
-  document.getElementById('groupCallFrame').style.display = 'none';
 
   groupCallApi = new JitsiMeetExternalAPI('meet.jit.si', {
     roomName: room,
@@ -678,37 +677,87 @@ function initLocalCamera(){
 }
 
 // ======================
-// 1 NA 1 POZIV (Jitsi Meet — stvaran video)
+// 1 NA 1 POZIV (Jitsi Meet — stvaran video, sa pravim zvonjenjem preko servera)
 // ======================
-function startCall(name){
+let myActiveCallId = null;
+let myActiveCallPoll = null;
+let incomingCallId = null;
+
+async function startCall(name){
   currentContact = name;
   const overlay = document.getElementById('callOverlay');
   const avatar = document.getElementById('callerAvatar');
   const cname = document.getElementById('callerName');
-  const status = document.getElementById('callStatus');
+  const statusText = document.getElementById('callerStatusText');
+  const declineBtn = document.getElementById('callDeclineBtn');
+  const acceptBtn = document.getElementById('callAcceptBtn');
 
   var genderIcon = '👤';
   var u = knownUsers.find(function(x){ return x.nick === name; });
   if(u){ genderIcon = u.gender==='z' ? '👩' : (u.gender==='p' ? '💑' : '👨'); }
   avatar.textContent = genderIcon;
   cname.textContent = name;
+  statusText.textContent = 'Zove se…';
+  acceptBtn.style.display = 'none';
   overlay.classList.add('show');
 
-  // Nakon 1.5 sekunde "zvoni" otvori stvarni Jitsi poziv
-  setTimeout(function(){
+  try {
+    var data = await api('POST', '/calls/start', { toNick: name });
+    myActiveCallId = data.callId;
+
+    myActiveCallPoll = setInterval(async function(){
+      try {
+        var s = await api('GET', '/calls/' + myActiveCallId + '/status');
+        if (s.call.status === 'accepted') {
+          clearInterval(myActiveCallPoll);
+          myActiveCallPoll = null;
+          overlay.classList.remove('show');
+          acceptBtn.style.display = '';
+          openOneOnOneCall(name, genderIcon, s.call.room);
+        } else if (s.call.status === 'declined') {
+          clearInterval(myActiveCallPoll);
+          myActiveCallPoll = null;
+          overlay.classList.remove('show');
+          acceptBtn.style.display = '';
+          alert('❌ ' + name + ' je odbio/la poziv.');
+        }
+      } catch(e){}
+    }, 2000);
+
+    // Ako se ne javi u 30 sekundi, otkaži
+    setTimeout(function(){
+      if (myActiveCallPoll) {
+        clearInterval(myActiveCallPoll);
+        myActiveCallPoll = null;
+        overlay.classList.remove('show');
+        acceptBtn.style.display = '';
+        if (myActiveCallId) { api('POST', '/calls/' + myActiveCallId + '/cancel', {}).catch(function(){}); }
+      }
+    }, 30000);
+  } catch(e) {
     overlay.classList.remove('show');
-    openOneOnOneCall(name, genderIcon);
-  }, 1500);
+    acceptBtn.style.display = '';
+    alert('❌ ' + e.message);
+  }
 }
 
-function openOneOnOneCall(name, genderIcon){
+function cancelOutgoingCall(){
+  if (myActiveCallPoll) { clearInterval(myActiveCallPoll); myActiveCallPoll = null; }
+  if (myActiveCallId) { api('POST', '/calls/' + myActiveCallId + '/cancel', {}).catch(function(){}); myActiveCallId = null; }
+  document.getElementById('callOverlay').classList.remove('show');
+  document.getElementById('callAcceptBtn').style.display = '';
+}
+
+function openOneOnOneCall(name, genderIcon, room){
   callActive = true;
   // Ako je grupni poziv aktivan, prekini ga
   endGroupCall();
 
-  var me = exyuSelfNickForCall().replace(/[^a-zA-Z0-9]/g,'');
-  var other = name.replace(/[^a-zA-Z0-9]/g,'');
-  var room = 'exyudate-1on1-' + (me < other ? me + '-' + other : other + '-' + me) + '-' + Math.random().toString(36).substring(2,6);
+  if (!room) {
+    var me = exyuSelfNickForCall().replace(/[^a-zA-Z0-9]/g,'');
+    var other = name.replace(/[^a-zA-Z0-9]/g,'');
+    room = 'exyudate-1on1-' + (me < other ? me + '-' + other : other + '-' + me) + '-' + Math.random().toString(36).substring(2,6);
+  }
   var url = 'https://meet.jit.si/' + room + '#config.prejoinPageEnabled=false&config.startWithAudioMuted=false&config.startWithVideoMuted=false&config.disableDeepLinking=true&userInfo.displayName="' + encodeURIComponent(exyuSelfNickForCall()) + '"';
 
   document.getElementById('groupCallBox').classList.add('hidden');
@@ -720,19 +769,69 @@ function openOneOnOneCall(name, genderIcon){
   status.innerHTML = '<div class="live-dot"></div><span>🎥 Stvarni video poziv s ' + name + ' (Jitsi Meet)</span>';
 }
 
-function acceptCall(){
+function handleAcceptClick(){
+  if (incomingCallId) { acceptIncomingCall(); }
+}
+function handleDeclineClick(){
+  if (incomingCallId) { declineIncomingCall(); }
+  else { cancelOutgoingCall(); }
+}
+
+async function acceptIncomingCall(){
+  var callId = incomingCallId;
+  var name = currentContact;
+  var genderIcon = document.getElementById('callerAvatar').textContent;
   document.getElementById('callOverlay').classList.remove('show');
-  // acceptCall se koristi za dolazne pozive — u ovom demo flowu otvori isti 1on1
-  if(currentContact){
-    var genderIcon = document.getElementById('callerAvatar').textContent;
-    openOneOnOneCall(currentContact, genderIcon);
+  document.getElementById('callAcceptBtn').style.display = '';
+  incomingCallId = null;
+  try {
+    var data = await api('POST', '/calls/' + callId + '/accept');
+    openOneOnOneCall(name, genderIcon, data.room);
+  } catch(e) {
+    alert('❌ ' + e.message);
   }
 }
+async function declineIncomingCall(){
+  var callId = incomingCallId;
+  document.getElementById('callOverlay').classList.remove('show');
+  document.getElementById('callAcceptBtn').style.display = '';
+  incomingCallId = null;
+  try { await api('POST', '/calls/' + callId + '/decline'); } catch(e){}
+}
+
+function checkIncomingCalls(){
+  if (callActive || incomingCallId) return; // već u pozivu ili već zvoni - preskoči
+  api('GET', '/calls/incoming').then(function(data){
+    if (data.call && !incomingCallId && !callActive) {
+      incomingCallId = data.call.id;
+      currentContact = data.call.from_nick;
+      var overlay = document.getElementById('callOverlay');
+      var avatar = document.getElementById('callerAvatar');
+      var cname = document.getElementById('callerName');
+      var statusText = document.getElementById('callerStatusText');
+      var acceptBtn = document.getElementById('callAcceptBtn');
+
+      var genderIcon = '👤';
+      var u = knownUsers.find(function(x){ return x.nick === data.call.from_nick; });
+      if(u){ genderIcon = u.gender==='z' ? '👩' : (u.gender==='p' ? '💑' : '👨'); }
+      avatar.textContent = genderIcon;
+      cname.textContent = data.call.from_nick;
+      statusText.textContent = 'Vas zove…';
+      acceptBtn.style.display = '';
+      overlay.classList.add('show');
+    }
+  }).catch(function(){});
+}
+setInterval(checkIncomingCalls, 3000);
 
 function endCall(){
   document.getElementById('callOverlay').classList.remove('show');
+  document.getElementById('callAcceptBtn').style.display = '';
   callActive = false;
   currentContact = null;
+  incomingCallId = null;
+  if (myActiveCallPoll) { clearInterval(myActiveCallPoll); myActiveCallPoll = null; }
+  myActiveCallId = null;
 
   // Zaustavi Jitsi iframe
   document.getElementById('oneOnOneFrame').src = '';
