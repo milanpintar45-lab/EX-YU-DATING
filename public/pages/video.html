@@ -615,7 +615,7 @@ function joinGroupCallFromLink(url){
   document.getElementById('groupCallLink').value = url;
   document.getElementById('groupCallInviteRow').classList.remove('hidden');
   document.getElementById('groupCallFrameWrap').classList.remove('hidden');
-  document.getElementById('groupCallFrame').src = url + '#config.prejoinPageEnabled=false';
+  document.getElementById('groupCallFrame').src = url + '#config.prejoinPageEnabled=false&config.disableDeepLinking=true';
 }
 function copyGroupCallLink(){
   var input = document.getElementById('groupCallLink');
@@ -707,7 +707,7 @@ function openOneOnOneCall(name, genderIcon){
   var me = exyuSelfNickForCall().replace(/[^a-zA-Z0-9]/g,'');
   var other = name.replace(/[^a-zA-Z0-9]/g,'');
   var room = 'exyudate-1on1-' + (me < other ? me + '-' + other : other + '-' + me) + '-' + Math.random().toString(36).substring(2,6);
-  var url = 'https://meet.jit.si/' + room + '#config.prejoinPageEnabled=false&config.startWithAudioMuted=false&config.startWithVideoMuted=false';
+  var url = 'https://meet.jit.si/' + room + '#config.prejoinPageEnabled=false&config.startWithAudioMuted=false&config.startWithVideoMuted=false&config.disableDeepLinking=true';
 
   document.getElementById('groupCallBox').classList.add('hidden');
   document.getElementById('videoGrid').style.display = 'none';
