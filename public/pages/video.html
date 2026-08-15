@@ -931,6 +931,16 @@ document.addEventListener('DOMContentLoaded', function(){
   var params = new URLSearchParams(window.location.search);
   var target = params.get('user');
   if(target){ startCall(target); }
+
+  // Ako smo upravo primili poziv na drugoj stranici, uđi direktno u sobu
+  var joinRoom = params.get('joinRoom');
+  var withUser = params.get('withUser');
+  if(joinRoom){
+    var genderIcon = '👤';
+    var u = knownUsers.find(function(x){ return x.nick === withUser; });
+    if(u){ genderIcon = u.gender==='z' ? '👩' : (u.gender==='p' ? '💑' : '👨'); }
+    openOneOnOneCall(withUser || 'korisnik', genderIcon, joinRoom);
+  }
 })();
 
 </script>
