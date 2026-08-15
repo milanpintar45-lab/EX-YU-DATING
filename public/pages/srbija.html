@@ -698,6 +698,7 @@ function profileCard(p){
     </div>
     ${p.is_online ? '<div class="dot-online" title="online"></div>' : ''}
     <div class="card-actions">
+      <button type="button" class="act-btn act-msg" data-act="msg" title="Pošalji poruku">💬</button>
       <button type="button" class="act-btn act-report" data-act="report" title="Prijavi profil">🚩</button>
       <button type="button" class="act-btn act-block" data-act="block" title="Blokiraj">🚫</button>
     </div>
@@ -970,7 +971,8 @@ async function declineIncomingCallGlobal(){
       if(card){
         var name = card.getAttribute('data-name');
         var act = btn.getAttribute('data-act');
-        if(act==='report') window.exyuReport(name);
+        if(act==='msg') window.location.href = 'chat.html?user=' + encodeURIComponent(name);
+        else if(act==='report') window.exyuReport(name);
         else if(act==='block') window.exyuBlock(name);
       }
       return;
