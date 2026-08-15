@@ -23,6 +23,8 @@
   --muted:#b8a4d4;
   --line:rgba(162,60,255,0.45);
   --panel:rgba(45,0,87,0.4);
+  --danger:#ff3366;
+  --success:#00ff88;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;}
@@ -370,7 +372,7 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
 html {
   background: linear-gradient(135deg,#1a0033 0%,#2d0057 50%,#4a0a7a 100%);
   background-attachment: fixed;
-  overflow-y: scroll; /* scrollbar uvijek prisutan → nema layout shiftova */
+  overflow-y: scroll;
 }
 
 /* 2. View Transitions API (Chrome 111+) — čista crossfade, bez pokreta */
@@ -445,12 +447,51 @@ body {
 }
 .above-chat-img img{position:relative;display:block;max-width:100%;max-height:340px;width:auto;height:auto;object-fit:contain;margin:0 auto;}
 .above-chat-img .above-chat-placeholder{position:relative;z-index:1;color:#fff;font-size:14px;font-weight:600;text-align:center;padding:14px;}
+
+/* DOLAZNI POZIV - overlay za "zvonjenje" na svim stranicama */
+.call-overlay{
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,0.85);
+  display:none;flex-direction:column;
+  align-items:center;justify-content:center;
+  z-index:99999;backdrop-filter:blur(6px);
+}
+.call-overlay.show{display:flex;}
+.call-overlay .caller-avatar{
+  font-size:80px;margin-bottom:12px;
+  animation:pulse 2s infinite;
+}
+.call-overlay .caller-name{
+  font-size:22px;color:#fff;font-weight:700;margin-bottom:4px;
+}
+.call-overlay .caller-status{
+  font-size:14px;color:var(--muted);margin-bottom:24px;
+}
+.call-actions{
+  display:flex;gap:16px;
+}
+.call-btn-action{
+  width:64px;height:64px;border-radius:50%;
+  border:none;display:flex;align-items:center;justify-content:center;
+  font-size:28px;cursor:pointer;transition:all .2s;
+}
+.call-btn-action.accept{
+  background:var(--success);color:#000;box-shadow:0 0 20px rgba(0,255,136,0.4);
+}
+.call-btn-action.decline{
+  background:var(--danger);color:#fff;box-shadow:0 0 20px rgba(255,51,102,0.4);
+}
+.call-btn-action:hover{transform:scale(1.1);}
+@keyframes pulse{
+  0%{transform:scale(1);}
+  50%{transform:scale(1.1);}
+  100%{transform:scale(1);}
+}
 </style>
 </head>
 <body>
 <div class="app">
 
-  <!-- HERO BANNER - video: media/hero-banner.mp4 -->
   <div class="hero-banner" style="background-image:linear-gradient(135deg, #0d2a52, #4da6ff);">
     <video autoplay muted loop playsinline src="media/hero-banner.mp4"></video>
     <div class="hero-overlay"></div>
@@ -613,6 +654,17 @@ body {
 
 </div>
 
+<!-- DOLAZNI POZIV OVERLAY -->
+<div class="call-overlay" id="callOverlay">
+  <div class="caller-avatar" id="callerAvatar">👤</div>
+  <div class="caller-name" id="callerName"></div>
+  <div class="caller-status" id="callerStatusText">Vas zove…</div>
+  <div class="call-actions">
+    <button type="button" class="call-btn-action decline" onclick="declineIncomingCallGlobal()">📞</button>
+    <button type="button" class="call-btn-action accept" onclick="acceptIncomingCallGlobal()">📹</button>
+  </div>
+</div>
+
 <script>
 const API_BASE = '/api';
 async function api(method, path, body) {
@@ -705,7 +757,6 @@ async function render(filter){
 	var expandLink = document.getElementById('chatExpandLink');
   if (expandLink) expandLink.href = 'prosireni-chat.html?country=hr' + (filter !== 'SVI' ? '&county=' + encodeURIComponent(filter) : '');
 
-  // Chat kolona - javna soba za državu/županiju (dijeli podatke s prosireni-chat.html)
   try {
     const qsChat = new URLSearchParams({ country: COUNTRY_CODE, limit: '20' });
     if (filter !== 'SVI') qsChat.set('county', filter);
@@ -717,7 +768,6 @@ async function render(filter){
     document.getElementById('chatCol').innerHTML = '<div class="empty">Greška pri učitavanju chata</div>';
   }
 }
-// Wire up search/filter/sort controls
 ['nickSearch'].forEach(function(id){
   var el = document.getElementById(id);
   if(el) el.addEventListener('input', function(){ render(activeCountyTop()); });
@@ -731,9 +781,7 @@ function activeCountyTop(){
   return a ? a.dataset.county : 'SVI';
 }
 
-// Initial render
 render("SVI");
-// Wire up county clicks
 document.querySelectorAll('#countyList a').forEach(a=>{
   a.addEventListener('click', e=>{
     e.preventDefault();
@@ -742,12 +790,9 @@ document.querySelectorAll('#countyList a').forEach(a=>{
     render(a.dataset.county);
   });
 });
-// Dodaj expand linkove svakoj županiji
 document.querySelectorAll('#countyList a[data-county]:not(.svi)').forEach(function(a){
   var c=a.dataset.county;
   var enc=encodeURIComponent(c);
-  var wrap=document.createElement('span');
-  wrap.style.cssText='display:inline-flex;gap:4px;align-items:center;';
   var expand=document.createElement('a');
   expand.href='na-mrezi.html?country=hr&county='+enc;
   expand.textContent='↗';
@@ -760,32 +805,28 @@ document.querySelectorAll('#countyList a[data-county]:not(.svi)').forEach(functi
   a.parentNode.insertBefore(expand,a.nextSibling);
 });
 
-// ===== JAVNI CHAT PO DRŽAVI + PRIJATELJI + ADMIN =====
 (function(){
  async function sendMsg(){
   const inp = document.getElementById('chatInput');
   const text = (inp.value||'').trim();
   if(!text) return;
   const county = activeCountyTop();
-  
   try{
     await api('POST', '/country-chat', { country: COUNTRY_CODE, county: county, body: text });
     inp.value = '';
     render(activeCountyTop());
   } catch(e){ alert('❌ ' + e.message); }
-} 
+}
   const sendBtn = document.getElementById('chatSendBtn');
   const inp = document.getElementById('chatInput');
   if(sendBtn) sendBtn.addEventListener('click', sendMsg);
   if(inp) inp.addEventListener('keydown', function(e){ if(e.key==='Enter') sendMsg(); });
 
-  // Broj "prijatelja" (korisnici iz iste države)
   api('GET', '/users/friends-count').then(function(fc){
     const cnt = document.getElementById('myFriendsCount');
     if(cnt) cnt.textContent = fc.count;
   }).catch(function(){});
 
-  // Admin - vrati na dobrodošlicu (samo za stvarnog admina, provjereno kasnije preko /auth/me)
   const adminBtn = document.getElementById('adminBackReg');
   if(adminBtn){
     adminBtn.addEventListener('click', function(e){
@@ -795,6 +836,43 @@ document.querySelectorAll('#countyList a[data-county]:not(.svi)').forEach(functi
     });
   }
 })();
+</script>
+
+<!-- DOLAZNI POZIV - "zvono" koje radi na ovoj stranici -->
+<script>
+let incomingCallIdGlobal = null;
+function checkIncomingCallsGlobal(){
+  if (incomingCallIdGlobal) return;
+  api('GET', '/calls/incoming').then(function(data){
+    if (data.call && !incomingCallIdGlobal) {
+      incomingCallIdGlobal = data.call.id;
+      window.exyuIncomingCallRoom = data.call.room;
+      window.exyuIncomingCallFrom = data.call.from_nick;
+      document.getElementById('callerAvatar').textContent = '👤';
+      document.getElementById('callerName').textContent = data.call.from_nick;
+      document.getElementById('callOverlay').classList.add('show');
+    }
+  }).catch(function(){});
+}
+setInterval(checkIncomingCallsGlobal, 3000);
+
+async function acceptIncomingCallGlobal(){
+  var callId = incomingCallIdGlobal;
+  document.getElementById('callOverlay').classList.remove('show');
+  try {
+    var data = await api('POST', '/calls/' + callId + '/accept');
+    window.location.href = 'video.html?joinRoom=' + encodeURIComponent(data.room) + '&withUser=' + encodeURIComponent(window.exyuIncomingCallFrom || '');
+  } catch(e) {
+    alert('❌ ' + e.message);
+    incomingCallIdGlobal = null;
+  }
+}
+async function declineIncomingCallGlobal(){
+  var callId = incomingCallIdGlobal;
+  document.getElementById('callOverlay').classList.remove('show');
+  incomingCallIdGlobal = null;
+  try { await api('POST', '/calls/' + callId + '/decline'); } catch(e){}
+}
 </script>
 
 <!-- MATCHING / REPORT / BLOCK / NOTIFIKACIJE ENGINE -->
@@ -931,9 +1009,6 @@ document.querySelectorAll('#countyList a[data-county]:not(.svi)').forEach(functi
     if (window.exyuUpdateFriendReqBadge) window.exyuUpdateFriendReqBadge();
     if (window.exyuUpdatePokesBadge) window.exyuUpdatePokesBadge();
 
-  // Obavijesti preglednika (opt-in) - provjerava nove poruke/bockanja/zahtjeve svakih 20s
-  // i prikazuje pravu obavijest preglednika, ali SAMO ako je korisnik to sam uključio u postavkama
-  // I ako je dao dopuštenje pregledniku.
   (async function(){
     if (!('Notification' in window)) return;
     let notifEnabled = false;
