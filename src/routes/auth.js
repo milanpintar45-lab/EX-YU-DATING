@@ -223,7 +223,7 @@ router.post('/register', registerLimiter, async (req, res) => {
   }
 
   const dup = await db.query(
-    'SELECT id FROM users WHERE nick = $1 OR email = $2 OR (phone = $3 AND phone IS NOT NULL)',
+    'SELECT id FROM users WHERE nick = $1 OR email = $2 OR (phone = $3 AND phone IS NOT NULL AND phone != \'\')',
     [cleanNick, cleanEmail, cleanPhone]
   );
   if (dup.rows.length > 0) {
