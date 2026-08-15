@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>EX YU DATE — Moj Profil</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fsnts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -19,7 +19,7 @@
   --purple-100:#e9c6ff;
   --pink:#ff6b9d;
   --text:#e9c6ff;
-  --muted:#b8a4d4;
+  --muted:#b8a4d4;s
   --line:rgba(162,60,255,0.45);
   --panel:rgba(45,0,87,0.4);
   --green:#22c55e;
@@ -580,7 +580,7 @@ body {
 
       <div class="profile-header">
       <div class="profile-avatar" id="profileAvatar" onclick="openAvatarPicker()" style="cursor:pointer;position:relative;overflow:hidden;" title="Kliknite za promjenu profilne slike">👤
-  <div id="avatarEditHint" style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.55);font-size:10px;padding:2px 0;text-align:center;">✏️ Promjeni</div>
+  <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.55);font-size:10px;padding:2px 0;text-align:center;">✏️ Promjeni</div>
   <button type="button" id="btnDeleteUser" onclick="event.stopPropagation();deleteOtherUser()" title="Izbaci korisnika (samo admin)" style="display:none;position:absolute;top:-8px;right:-8px;width:30px;height:30px;border-radius:50%;background:#dc2626;color:#fff;border:2px solid #1a0033;cursor:pointer;font-size:14px;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.5);z-index:5;">⛔</button>
 </div>
 <input type="file" id="avatarUploadInput" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)">
@@ -1049,20 +1049,6 @@ function setProfileAvatar(dataUrl){
   avatarEl.childNodes[0].textContent = '';
 }
 
-function openAvatarLightbox(url){
-  var overlay = document.getElementById('avatarLightboxOverlay');
-  if(!overlay){
-    overlay = document.createElement('div');
-    overlay.id = 'avatarLightboxOverlay';
-    overlay.style.cssText = 'display:flex;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999;align-items:center;justify-content:center;padding:20px;cursor:zoom-out;';
-    overlay.innerHTML = '<img id="avatarLightboxImg" style="max-width:90vw;max-height:90vh;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.6);">';
-    overlay.onclick = function(){ overlay.style.display = 'none'; };
-    document.body.appendChild(overlay);
-  }
-  document.getElementById('avatarLightboxImg').src = url;
-  overlay.style.display = 'flex';
-}
-
 function triggerGalleryUpload(kind){
   if(kind === 'photo' && myPhotos.length >= 8){ alert('Maksimalno 8 fotografija!'); return; }
   if(kind === 'video' && myVideos.length >= 5){ alert('Maksimalno 5 video zapisa!'); return; }
@@ -1227,7 +1213,6 @@ async function loadOtherProfile(nick){
   }
 
   if (data.avatarUrl) setProfileAvatar(data.avatarUrl);
-  window.exyuOtherAvatarUrl = data.avatarUrl || null;
   var spolValue = data.profileGender || data.gender;
   document.getElementById('spol').value = spolValue;
   document.getElementById('profileGender').textContent = gmap[spolValue] || 'Korisnik';
@@ -1400,22 +1385,15 @@ function renderVideos(){
       if(delBtn) delBtn.style.display = 'flex';
     }
     await loadOtherProfile(viewedUser);
-      showStep(2);
-     var avatarEl = document.getElementById('profileAvatar');
-    if(avatarEl){
-      if(window.exyuOtherAvatarUrl){
-        avatarEl.onclick = function(){ openAvatarLightbox(window.exyuOtherAvatarUrl); };
-        avatarEl.style.cursor = 'zoom-in';
-        avatarEl.title = 'Kliknite za veći prikaz slike';
-      } else {
-        avatarEl.onclick = null;
-        avatarEl.style.cursor = 'default';
-        avatarEl.removeAttribute('title');
-      }
+    var avatarEl = document.getElementById('profileAvatar');
+    if (avatarEl) {
+      avatarEl.onclick = null;
+      avatarEl.style.cursor = 'default';
+      avatarEl.removeAttribute('title');
+      var ov = avatarEl.querySelector('div');
+      if (ov) ov.style.display = 'none';
     }
-      var editHint = document.getElementById('avatarEditHint');
-      if(editHint) editHint.style.display = 'none';
-    
+    showStep(2);
   }
 })();
 
@@ -1430,12 +1408,8 @@ function otherMediaThumb(item, isVideo){
       div.innerHTML = '<span class="v-icon">▶️</span><div class="v-info"><div class="v-title">Video</div><div class="v-meta">0:00</div></div>' +
         '<span title="Javno" style="margin-left:auto;font-size:11px;color:#8fffb0;">👁️</span>';
     } else {
-    var thumb = item.data_url ? '<img src="'+item.data_url+'" style="width:100%;height:100%;object-fit:cover;">' : '📷';
+      var thumb = item.data_url ? '<img src="'+item.data_url+'" style="width:100%;height:100%;object-fit:cover;">' : '📷';
       div.innerHTML = thumb + '<span title="Javno" style="position:absolute;top:4px;right:4px;font-size:12px;background:rgba(0,0,0,0.5);border-radius:50%;padding:2px 4px;">👁️</span>';
-      if(item.data_url){
-        div.style.cursor = 'zoom-in';
-        div.onclick = function(){ openAvatarLightbox(item.data_url); };
-      } 
     }
   } else {
     div.style.background = 'rgba(0,0,0,0.55)';
