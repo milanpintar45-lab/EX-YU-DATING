@@ -1076,7 +1076,7 @@ async function declineIncomingCallGlobal(){
   };
   window.exyuOpenPokes = async function(){
     document.getElementById('exyuPokesModal2').classList.add('on');
-    var list = document.getElementById('exyuPokesList2');
+    var list = document.getElementById('exyuPokesList2');F
     list.innerHTML = 'Učitavam...';
     try {
       var data = await api('GET', '/moderation/pokes');
