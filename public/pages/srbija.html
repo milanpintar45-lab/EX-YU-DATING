@@ -520,7 +520,8 @@ body {
   <div class="middle-row">
     <div class="search-row">
       <label>Traži po nicku</label>
-      <input type="text" id="nickSearch" placeholder="Upiši nick…">
+     <input type="text" id="nickSearch" placeholder="Upiši nick..." style="width:120px;flex:0 0 auto;">
+     <button type="button" id="nickSearchBtn" style="padding:6px 14px;border-radius:8px;border:none;background:#a23cff;color:#fff;font-size:13px;font-weight:600;cursor:pointer;">Potraži</button>
     </div>
   </div>
 
@@ -805,6 +806,8 @@ document.querySelectorAll('#countyList a[data-county]:not(.svi)').forEach(functi
   var el = document.getElementById(id);
   if(el) el.addEventListener('input', function(){ render(activeCountyTop()); });
 });
+var nickSearchBtn = document.getElementById('nickSearchBtn');
+if (nickSearchBtn) nickSearchBtn.addEventListener('click', function(){ render(activeCountyTop()); });
 ['genderFilter','ageFilter','onlineFilter','sortFilter'].forEach(function(id){
   var el = document.getElementById(id);
   if(el) el.addEventListener('change', function(){ render(activeCountyTop()); });
