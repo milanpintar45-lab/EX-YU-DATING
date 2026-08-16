@@ -74,6 +74,7 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
   box-shadow:0 0 15px rgba(255,45,149,0.45);
 }
 .sidebar-nav a .icon{font-size:18px; width:24px; text-align:center;}
+.sidebar-pending-badge{background:#f59e0b;color:#000;font-weight:800;font-size:11px;padding:2px 7px;border-radius:10px;margin-left:auto;display:none;}
 
 .sidebar-footer{
   padding:14px 16px; border-top:1px solid rgba(162,60,255,0.35);
@@ -451,7 +452,7 @@ window.exyuAdminReady = (async function(){
   </div>
   <div class="sidebar-nav">
     <a href="#" class="active" data-section="dashboard"><span class="icon">📊</span> Dashboard</a>
-    <a href="#" data-section="users"><span class="icon">👥</span> Korisnici</a>
+    <a href="#" data-section="users"><span class="icon">👥</span> Korisnici <span class="sidebar-pending-badge" id="sidebarPendingBadge"></span></a>
     <a href="#" data-section="messages"><span class="icon">💬</span> Poruke</a>
     <a href="#" data-section="photos"><span class="icon">📸</span> Slike</a>
     <a href="#" data-section="videos"><span class="icon">🎬</span> Videi</a>
@@ -515,11 +516,6 @@ window.exyuAdminReady = (async function(){
           <button type="button" onclick="adminReloadMsgs()" style="background:rgba(162,60,255,0.3);color:#fff;border:1px solid rgba(162,60,255,0.5);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:12px;">🔄 Osvježi</button>
         </div>
         <div id="adminMsgList" style="max-height:350px;overflow-y:auto;"></div>
-      </div>
-
-      <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(162,60,255,0.4);border-radius:16px;padding:20px;margin-bottom:20px;">
-        <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.6em;color:#fff;margin-bottom:14px;">👥 Registrirani korisnici (kontrola)</h2>
-        <div id="adminUserList"></div>
       </div>
 
       <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(162,60,255,0.4);border-radius:16px;padding:20px;margin-bottom:20px;">
@@ -616,34 +612,8 @@ window.exyuAdminReady = (async function(){
             list.innerHTML = '<div style="text-align:center;color:#b8a4d4;padding:20px;">Greška pri učitavanju.</div>';
           }
         };
-        window.adminKick = async function(nick){
-          if(!confirm('Izbaciti korisnika "'+nick+'"?')) return;
-          try {
-            await api('DELETE', '/users/' + encodeURIComponent(nick));
-            renderUsers();
-            if(typeof renderUsersTable === 'function') renderUsersTable('');
-            alert('Korisnik "'+nick+'" izbačen.');
-          } catch(e) { alert('❌ ' + e.message); }
-        };
-        async function renderUsers(){
-          var list = document.getElementById('adminUserList');
-          try {
-            var data = await api('GET', '/admin/users');
-            var users = data.users || [];
-            if(users.length===0){ list.innerHTML='<div style="text-align:center;color:#b8a4d4;padding:20px;font-style:italic;">Nema registriranih korisnika.</div>'; return; }
-            list.innerHTML = users.map(function(u){
-              return '<div style="display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,0.3);padding:10px 14px;border-radius:8px;margin-bottom:8px;border:1px solid rgba(162,60,255,0.3);">'+
-                '<div><b style="color:#fff;">'+esc(u.nick)+'</b> <span style="color:#b8a4d4;font-size:12px;">('+esc(u.email||'-')+')</span></div>'+
-                '<button type="button" onclick="adminKick(\''+esc(u.nick)+'\')" style="background:#ef4444;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:700;">🚫 Izbaci</button>'+
-              '</div>';
-            }).join('');
-          } catch(e) {
-            list.innerHTML = '<div style="text-align:center;color:#b8a4d4;padding:20px;">Greška pri učitavanju.</div>';
-          }
-        }
         window.exyuAdminReady.then(function(){
           adminReloadMsgs();
-          renderUsers();
           setInterval(adminReloadMsgs, 15000);
         });
       })();
@@ -821,7 +791,7 @@ window.exyuAdminReady = (async function(){
       </div>
       <div class="table-wrap" id="photosTableWrap">
         <table>
-          <thead><tr><th>Korisnik</th><th>Slika</th><th>Veličina</th><th>Datum</th><th>Status</th><th>Akcija</th></tr></thead>
+          <thead><tr><th>Korisnik</th><th>Slika</th><th>Izvor</th><th>Datum</th><th>Status</th><th>Akcija</th></tr></thead>
           <tbody id="photosBody"><tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px;">Nema slika za prikaz.</td></tr></tbody>
         </table>
       </div>
@@ -840,7 +810,7 @@ window.exyuAdminReady = (async function(){
       </div>
       <div class="table-wrap" id="videosTableWrap">
         <table>
-          <thead><tr><th>Korisnik</th><th>Video</th><th>Trajanje</th><th>Datum</th><th>Status</th><th>Akcija</th></tr></thead>
+          <thead><tr><th>Korisnik</th><th>Video</th><th>Izvor</th><th>Datum</th><th>Status</th><th>Akcija</th></tr></thead>
           <tbody id="videosBody"><tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px;">Nema videa za prikaz.</td></tr></tbody>
         </table>
       </div>
@@ -1163,6 +1133,13 @@ async function renderUsersTable(filterText){
   catch(e) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px;">Greška pri učitavanju.</td></tr>'; return; }
   _cachedAdminUsers = users;
 
+  var pendingBadge = document.getElementById('sidebarPendingBadge');
+  if(pendingBadge){
+    var pendingCount = users.filter(function(u){ return u.status === 'pending'; }).length;
+    pendingBadge.textContent = pendingCount;
+    pendingBadge.style.display = pendingCount > 0 ? 'inline-block' : 'none';
+  }
+
   var q = (filterText || '').toLowerCase().trim();
   if(q){
     users = users.filter(function(u){
@@ -1187,7 +1164,7 @@ async function renderUsersTable(filterText){
       ? '<button type="button" class="action-btn" title="Odobri" onclick="adminApproveUser(\'' + u.nick + '\')">✅</button>' +
         '<button type="button" class="action-btn delete" title="Odbij" onclick="adminRejectUser(\'' + u.nick + '\')">⛔</button>'
       : '';
-   </td>' +return '<tr>' +
+    return '<tr>' +
       '<td><div class="user-cell"><div class="user-avatar">👤</div><div><div class="user-name" style="cursor:pointer;text-decoration:underline;" onclick="window.location.href=\'profil.html?user=\' + encodeURIComponent(\'' + u.nick + '\')">' + (u.nick||'—') + '</div><div class="user-meta">' + (u.email||'—') + '</div></div></div></td>' +
       '<td>' + (countryFlag[u.country]||'') + ' ' + (u.country||'—') + '</td>' +
       '<td>' + (u.city||'—') + '</td>' +
@@ -1244,9 +1221,10 @@ async function renderPhotosTable(){
   if(!tbody) return;
   var data;
   try { data = await api('GET', '/admin/media'); } catch(e) { return; }
+  var srcLabel = { profile: '👤 Profil', gallery: '🖼️ Galerija' };
   var rows = (data.photos || []).map(function(p){
     var thumb = p.data_url ? '<img src="'+p.data_url+'" style="max-height:60px;border-radius:6px;">' : '📷 (bez slike)';
-    return '<tr><td>'+p.nick+'</td><td>'+thumb+'</td><td>—</td><td>'+new Date(p.created_at).toLocaleDateString('hr-HR')+'</td><td style="color:var(--green);">'+p.privacy+'</td><td><button type="button" class="btn btn-sm btn-danger" onclick="adminDeleteMedia(\'photo\','+p.id+',this)">Obriši</button></td></tr>';
+    return '<tr><td>'+p.nick+'</td><td>'+thumb+'</td><td>'+(srcLabel[p.source]||p.source||'—')+'</td><td>'+new Date(p.created_at).toLocaleDateString('hr-HR')+'</td><td style="color:var(--green);">'+p.privacy+'</td><td><button type="button" class="btn btn-sm btn-danger" onclick="adminDeleteMedia(\'photo\','+p.id+',this)">Obriši</button></td></tr>';
   });
   tbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px;">Nema slika za prikaz.</td></tr>';
 }
@@ -1255,8 +1233,9 @@ async function renderVideosTable(){
   if(!tbody) return;
   var data;
   try { data = await api('GET', '/admin/media'); } catch(e) { return; }
+  var srcLabel = { profile: '👤 Profil', gallery: '🖼️ Galerija' };
   var rows = (data.videos || []).map(function(v){
-    return '<tr><td>'+v.nick+'</td><td>Video (placeholder)</td><td>—</td><td>'+new Date(v.created_at).toLocaleDateString('hr-HR')+'</td><td style="color:var(--green);">'+v.privacy+'</td><td><button type="button" class="btn btn-sm btn-danger" onclick="adminDeleteMedia(\'video\','+v.id+',this)">Obriši</button></td></tr>';
+    return '<tr><td>'+v.nick+'</td><td>Video (placeholder)</td><td>'+(srcLabel[v.source]||v.source||'—')+'</td><td>'+new Date(v.created_at).toLocaleDateString('hr-HR')+'</td><td style="color:var(--green);">'+v.privacy+'</td><td><button type="button" class="btn btn-sm btn-danger" onclick="adminDeleteMedia(\'video\','+v.id+',this)">Obriši</button></td></tr>';
   });
   tbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px;">Nema videa za prikaz.</td></tr>';
 }
