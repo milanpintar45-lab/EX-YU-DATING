@@ -450,42 +450,7 @@ body {
         <a href="prosireni-oglasnik.html" class="open">otvori sve →</a>
       </div> 
       <div class="col-body">
-        <div class="ad-item">
-          <div class="profile-card">
-            <div class="avatar">👤</div>
-            <div class="info">
-              <div class="name">Marko</div>
-              <div class="meta">Tražim ozbiljnu vezu · Zagreb</div>
-            </div>
-          </div>
-        </div>
-        <div class="ad-item">
-          <div class="profile-card">
-            <div class="avatar">👤</div>
-            <div class="info">
-              <div class="name">Ana</div>
-              <div class="meta">Družba za kavu · Sarajevo</div>
-            </div>
-          </div>
-        </div>
-        <div class="ad-item">
-          <div class="profile-card">
-            <div class="avatar">👤</div>
-            <div class="info">
-              <div class="name">Ivan</div>
-              <div class="meta">Putovanja i izleti · Beograd</div>
-            </div>
-          </div>
-        </div>
-        <div class="ad-item">
-          <div class="profile-card">
-            <div class="avatar">👤</div>
-            <div class="info">
-              <div class="name">Petar</div>
-              <div class="meta">Novi početak · Split</div>
-            </div>
-          </div>
-        </div>
+        <div class="empty">Nema oglasa za prikaz.</div>
       </div>
     </div>
 
@@ -512,10 +477,7 @@ body {
         <a href="chat.html" class="open">otvori sve →</a>
       </div>
       <div class="col-body">
-        <div class="chat-card"><div class="who">Sara · Beograd</div><div class="msg">Bok, kako si? :)</div></div>
-        <div class="chat-card"><div class="who">Luka · Split</div><div class="msg">Vidimo se večeras?</div></div>
-        <div class="chat-card"><div class="who">Maja · Sarajevo</div><div class="msg">Hvala na poruci!</div></div>
-        <div class="chat-card"><div class="who">Filip · Zagreb</div><div class="msg">Pozdrav svima!</div></div>
+        <div class="empty">Nema poruka za prikaz.</div>
       </div>
     </div>
 
@@ -523,38 +485,7 @@ body {
     <div class="col">
       <div class="col-header">NA MREŽI</div>
       <div class="col-body">
-        <div class="profile-card">
-          <div class="avatar">👤</div>
-          <div class="info">
-            <div class="name">Ana, 28</div>
-            <div class="meta">Sarajevo</div>
-          </div>
-          <div class="dot-online"></div>
-        </div>
-        <div class="profile-card">
-          <div class="avatar">👤</div>
-          <div class="info">
-            <div class="name">Marko, 32</div>
-            <div class="meta">Zagreb</div>
-          </div>
-          <div class="dot-online"></div>
-        </div>
-        <div class="profile-card">
-          <div class="avatar">👤</div>
-          <div class="info">
-            <div class="name">Luka, 33</div>
-            <div class="meta">Split</div>
-          </div>
-          <div class="dot-online"></div>
-        </div>
-        <div class="profile-card">
-          <div class="avatar">👤</div>
-          <div class="info">
-            <div class="name">Sara, 24</div>
-            <div class="meta">Beograd</div>
-          </div>
-          <div class="dot-online"></div>
-        </div>
+        <div class="empty">Nema korisnika online.</div>
       </div>
     </div>
 
@@ -969,7 +900,7 @@ if (searchBtn) searchBtn.addEventListener('click', runNickSearch);  searchInput.
 <div class="exyu-modal" id="exyuAdminModal">
   <div class="exyu-modal-box">
     <h3>✉️ Poruka adminu</h3>
-    <p style="margin-bottom:12px;font-size:14px;color:#b8a4d4;">Napišite pitanje ili prijavu — admin (marko) će je vidjeti u svojim porukama.</p>
+    <p style="margin-bottom:12px;font-size:14px;color:#b8a4d4;">Napišite pitanje ili prijavu — admin će je vidjeti u svojim porukama.</p>
     <textarea id="exyuAdminText" placeholder="Vaša poruka..."></textarea>
     <div class="exyu-modal-actions">
       <button type="button" class="exyu-btn-cancel" onclick="exyuCloseAdmin()">Odustani</button>
@@ -985,7 +916,7 @@ if (searchBtn) searchBtn.addEventListener('click', runNickSearch);  searchInput.
     var t = document.getElementById('exyuAdminText').value.trim();
     if(!t){ alert('Napišite poruku!'); return; }
     try {
-      await api('POST', '/messages', { toNick: 'marko', body: t });
+      await api('POST', '/messages', { toNick: 'admin', body: t });
       exyuCloseAdmin();
       alert('✅ Poruka poslana adminu!');
       updateBadge();
