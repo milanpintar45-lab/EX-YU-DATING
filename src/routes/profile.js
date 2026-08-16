@@ -23,14 +23,21 @@ function computeAge(birthDate) {
 
 // ============================================
 // GET /api/profile/me
+// Vraća SAMO slike/video s izvorom "profile" (privatna galerija na profilu)
 // ============================================
 router.get('/me', requireAuth, async (req, res) => {
   const result = await db.query('SELECT * FROM users WHERE id = $1', [req.user.userId]);
   const u = result.rows[0];
   if (!u) return res.status(404).json({ error: 'Korisnik ne postoji.' });
 
-  const photos = await db.query('SELECT id, privacy, data_url, owner_reaction FROM photos WHERE user_id = $1 ORDER BY id', [u.id]);
-  const videos = await db.query('SELECT id, privacy, data_url, owner_reaction FROM videos WHERE user_id = $1 ORDER BY id', [u.id]);
+  const photos = await db.query(
+    `SELECT id, privacy, data_url, owner_reaction FROM photos WHERE user_id = $1 AND source = 'profile' ORDER BY id`,
+    [u.id]
+  );
+  const videos = await db.query(
+    `SELECT id, privacy, data_url, owner_reaction FROM videos WHERE user_id = $1 AND source = 'profile' ORDER BY id`,
+    [u.id]
+  );
 
   res.json({
     nick: u.nick, email: u.email, city: u.city, country: u.country,
@@ -93,17 +100,18 @@ router.post('/avatar', requireAuth, async (req, res) => {
 });
 
 // ============================================
-// GALERIJA / VIDEO - dodavanje i promjena privatnosti (placeholder stavke)
+// PROFIL GALERIJA / VIDEO (privatno - vidi se samo unutar profila)
+// source = 'profile'
 // ============================================
 router.post('/photos', requireAuth, async (req, res) => {
-  const count = await db.query('SELECT count(*) FROM photos WHERE user_id = $1', [req.user.userId]);
+  const count = await db.query(`SELECT count(*) FROM photos WHERE user_id = $1 AND source = 'profile'`, [req.user.userId]);
   if (Number(count.rows[0].count) >= 8) return res.status(400).json({ error: 'Maksimalno 8 fotografija!' });
   const dataUrl = req.body.dataUrl || null;
   if (dataUrl && dataUrl.length > 5 * 1024 * 1024) {
     return res.status(400).json({ error: 'Slika je prevelika (max ~4MB).' });
   }
   const insert = await db.query(
-    'INSERT INTO photos (user_id, data_url) VALUES ($1, $2) RETURNING id, privacy, data_url',
+    `INSERT INTO photos (user_id, data_url, source) VALUES ($1, $2, 'profile') RETURNING id, privacy, data_url`,
     [req.user.userId, dataUrl]
   );
   res.json({ photo: insert.rows[0] });
@@ -122,14 +130,14 @@ router.patch('/photos/:id', requireAuth, async (req, res) => {
   res.json({ privacy: next });
 });
 router.post('/videos', requireAuth, async (req, res) => {
-  const count = await db.query('SELECT count(*) FROM videos WHERE user_id = $1', [req.user.userId]);
+  const count = await db.query(`SELECT count(*) FROM videos WHERE user_id = $1 AND source = 'profile'`, [req.user.userId]);
   if (Number(count.rows[0].count) >= 5) return res.status(400).json({ error: 'Maksimalno 5 video zapisa!' });
   const dataUrl = req.body.dataUrl || null;
   if (dataUrl && dataUrl.length > 15 * 1024 * 1024) {
     return res.status(400).json({ error: 'Video je prevelik (max ~11MB) - za veće datoteke treba pravi file storage.' });
   }
   const insert = await db.query(
-    'INSERT INTO videos (user_id, data_url) VALUES ($1, $2) RETURNING id, privacy, data_url',
+    `INSERT INTO videos (user_id, data_url, source) VALUES ($1, $2, 'profile') RETURNING id, privacy, data_url`,
     [req.user.userId, dataUrl]
   );
   res.json({ video: insert.rows[0] });
@@ -146,6 +154,48 @@ router.patch('/videos/:id', requireAuth, async (req, res) => {
   const next = cycle[(cycle.indexOf(result.rows[0].privacy) + 1) % cycle.length];
   await db.query('UPDATE videos SET privacy = $1 WHERE id = $2', [next, req.params.id]);
   res.json({ privacy: next });
+});
+
+// ============================================
+// JAVNA GALERIJA (galerija.html) - vidljivo svima na sajtu, ODVOJENO od profila
+// source = 'gallery'
+// ============================================
+router.get('/gallery/me', requireAuth, async (req, res) => {
+  const photos = await db.query(
+    `SELECT id, privacy, data_url, owner_reaction FROM photos WHERE user_id = $1 AND source = 'gallery' ORDER BY id`,
+    [req.user.userId]
+  );
+  const videos = await db.query(
+    `SELECT id, privacy, data_url, owner_reaction FROM videos WHERE user_id = $1 AND source = 'gallery' ORDER BY id`,
+    [req.user.userId]
+  );
+  res.json({ photos: photos.rows, videos: videos.rows });
+});
+router.post('/gallery/photos', requireAuth, async (req, res) => {
+  const count = await db.query(`SELECT count(*) FROM photos WHERE user_id = $1 AND source = 'gallery'`, [req.user.userId]);
+  if (Number(count.rows[0].count) >= 8) return res.status(400).json({ error: 'Maksimalno 8 fotografija!' });
+  const dataUrl = req.body.dataUrl || null;
+  if (dataUrl && dataUrl.length > 5 * 1024 * 1024) {
+    return res.status(400).json({ error: 'Slika je prevelika (max ~4MB).' });
+  }
+  const insert = await db.query(
+    `INSERT INTO photos (user_id, data_url, source) VALUES ($1, $2, 'gallery') RETURNING id, privacy, data_url`,
+    [req.user.userId, dataUrl]
+  );
+  res.json({ photo: insert.rows[0] });
+});
+router.post('/gallery/videos', requireAuth, async (req, res) => {
+  const count = await db.query(`SELECT count(*) FROM videos WHERE user_id = $1 AND source = 'gallery'`, [req.user.userId]);
+  if (Number(count.rows[0].count) >= 5) return res.status(400).json({ error: 'Maksimalno 5 video zapisa!' });
+  const dataUrl = req.body.dataUrl || null;
+  if (dataUrl && dataUrl.length > 15 * 1024 * 1024) {
+    return res.status(400).json({ error: 'Video je prevelik (max ~11MB) - za veće datoteke treba pravi file storage.' });
+  }
+  const insert = await db.query(
+    `INSERT INTO videos (user_id, data_url, source) VALUES ($1, $2, 'gallery') RETURNING id, privacy, data_url`,
+    [req.user.userId, dataUrl]
+  );
+  res.json({ video: insert.rows[0] });
 });
 
 // ============================================
@@ -173,6 +223,7 @@ router.patch('/videos/:id/reaction', requireAuth, async (req, res) => {
 
 // ============================================
 // GET /api/profile/:nick  - javni pregled (poštuje privatnost galerije/videa i blokove)
+// Prikazuje SAMO "profile" izvor (privatna galerija profila), ne javnu galeriju
 // ============================================
 router.get('/:nick', requireAuth, async (req, res) => {
   const result = await db.query('SELECT * FROM users WHERE nick = $1', [req.params.nick]);
@@ -204,8 +255,14 @@ router.get('/:nick', requireAuth, async (req, res) => {
     return false;
   }
 
-  const photos = await db.query('SELECT id, privacy, data_url FROM photos WHERE user_id = $1 ORDER BY id', [u.id]);
-  const videos = await db.query('SELECT id, privacy, data_url FROM videos WHERE user_id = $1 ORDER BY id', [u.id]);
+  const photos = await db.query(
+    `SELECT id, privacy, data_url FROM photos WHERE user_id = $1 AND source = 'profile' ORDER BY id`,
+    [u.id]
+  );
+  const videos = await db.query(
+    `SELECT id, privacy, data_url FROM videos WHERE user_id = $1 AND source = 'profile' ORDER BY id`,
+    [u.id]
+  );
 
   const canContact = !isBlocked && (u.contact_restriction !== 'match' || isMatch);
 
