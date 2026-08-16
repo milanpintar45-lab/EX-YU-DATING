@@ -630,7 +630,7 @@ document.getElementById('slikeInput').addEventListener('change', async function(
   readFilesAs(e.target.files, async function(list){
     for (const dataUrl of list) {
       try {
-        const res = await api('POST', '/profile/photos', { dataUrl });
+        const res = await api('POST', '/profile/gallery/photos', { dataUrl });
         myPhotosG.push(res.photo);
       } catch(err) { alert('❌ ' + err.message); break; }
     }
@@ -643,7 +643,7 @@ document.getElementById('videaInput').addEventListener('change', async function(
   readFilesAs(e.target.files, async function(list){
     for (const dataUrl of list) {
       try {
-        const res = await api('POST', '/profile/videos', { dataUrl });
+        const res = await api('POST', '/profile/gallery/videos', { dataUrl });
         myVideosG.push(res.video);
       } catch(err) { alert('❌ ' + err.message); break; }
     }
@@ -669,9 +669,9 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeLi
 
 (async function(){
   try {
-    const me = await api('GET', '/profile/me');
-    myPhotosG = me.photos || [];
-    myVideosG = me.videos || [];
+    const gal = await api('GET', '/profile/gallery/me');
+    myPhotosG = gal.photos || [];
+    myVideosG = gal.videos || [];
   } catch(e) {
     window.location.href = '../index.html';
     return;
@@ -839,7 +839,7 @@ async function declineIncomingCallGlobal(){
 <div class="exyu-modal" id="exyuAdminModal">
   <div class="exyu-modal-box">
     <h3>✉️ Poruka adminu</h3>
-    <p style="margin-bottom:12px;font-size:14px;color:#b8a4d4;">Napišite pitanje ili prijavu — admin (marko) će je vidjeti u svojim porukama.</p>
+    <p style="margin-bottom:12px;font-size:14px;color:#b8a4d4;">Napišite pitanje ili prijavu — admin će je vidjeti u svojim porukama.</p>
     <textarea id="exyuAdminText" placeholder="Vaša poruka..."></textarea>
     <div class="exyu-modal-actions">
       <button type="button" class="exyu-btn-cancel" onclick="exyuCloseAdmin()">Odustani</button>
@@ -904,7 +904,7 @@ async function declineIncomingCallGlobal(){
     var t = document.getElementById('exyuAdminText').value.trim();
     if(!t){ alert('Napišite poruku!'); return; }
     try {
-      await api('POST', '/messages', { toNick: 'marko', body: t });
+      await api('POST', '/messages', { toNick: 'admin', body: t });
       exyuCloseAdmin();
       alert('✅ Poruka poslana adminu!');
     } catch (err) { alert('❌ ' + err.message); }
