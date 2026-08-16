@@ -22,8 +22,8 @@
   --muted:#b8a4d4;
   --line:rgba(162,60,255,0.45);
   --panel:rgba(45,0,87,0.4);
-  --msg-own:rgba(162,60,255,0.25);
-  --msg-other:rgba(255,255,255,0.06);
+  --msg-own:rgba(162,60,255,0.15);
+  --msg-other:rgba(255,255,255,0.05);
   --danger:#ff3366;
   --success:#00ff88;
 }
@@ -236,34 +236,34 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
   padding:18px 22px;
   display:flex;
   flex-direction:column;
-  gap:14px;
+  gap:8px;
 }
+
+/* Poruke prikazane kao velika tablica (redovi preko cijele širine),
+   ne kao uski "oblačići" poravnati sa strane */
 .msg-bubble{
-  max-width:72%;
+  width:100%;
+  max-width:100%;
   padding:10px 14px;
-  border-radius:12px;
+  border-radius:8px;
   font-size:14px;
   line-height:1.5;
   position:relative;
   word-break:break-word;
+  background:var(--msg-other);
+  border:1px solid rgba(162,60,255,0.3);
+  border-left:3px solid var(--purple-500);
 }
 .msg-bubble.own{
-  align-self:flex-end;
   background:var(--msg-own);
-  border:1px solid rgba(162,60,255,0.5);
-  border-bottom-right-radius:3px;
-}
-.msg-bubble.other{
-  align-self:flex-start;
-  background:var(--msg-other);
-  border:1px solid rgba(162,60,255,0.35);
-  border-bottom-left-radius:3px;
+  border-left:3px solid var(--pink);
 }
 .msg-bubble .sender{
-  font-size:11px;
-  color:var(--purple-300);
-  font-weight:600;
-  margin-bottom:3px;
+  font-size:13px;
+  color:#ffe27a;
+  font-weight:700;
+  margin-bottom:4px;
+  text-shadow:0 0 6px rgba(255,226,122,0.5);
 }
 .msg-bubble .time{
   font-size:10px;
@@ -273,7 +273,8 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
 }
 .msg-bubble .msg-delete{
   position:absolute;
-  top:-8px;
+  top:8px;
+  right:10px;
   width:20px;
   height:20px;
   border-radius:50%;
@@ -291,8 +292,6 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
 }
 .msg-bubble:hover .msg-delete{ opacity:1; }
 .msg-bubble .msg-delete:hover{ transform:scale(1.15); background:#ff2d55; }
-.msg-bubble.own .msg-delete{ right:-8px; }
-.msg-bubble.other .msg-delete{ left:-8px; }
 .typing-indicator{
   display:flex;
   align-items:center;
@@ -379,7 +378,6 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
 @media (max-width:600px){
   .chat-header{padding:10px 14px;}
   .chat-messages{padding:12px 14px;}
-  .msg-bubble{max-width:85%;}
   html,body{height:100%;}
   body{padding:0;}
   .app{height:100vh;min-height:100vh;border-radius:0;}
@@ -651,9 +649,10 @@ function renderWithMentions(text){
 }
 
 function bubbleHtml(m){
+  var senderName = m.own ? (window.exyuMeNick || 'Ja') : activeName;
   return '<div class="msg-bubble ' + (m.own?'own':'other') + '" data-msg-id="' + m.id + '">' +
     (m.own ? '<span class="msg-delete" title="Izbriši poruku" onclick="deleteMessage(\'' + m.id + '\')">✕</span>' : '') +
-    (!m.own?'<div class="sender">'+escHtml(activeName)+'</div>':'') +
+    '<div class="sender">'+escHtml(senderName)+'</div>' +
     renderWithMentions(m.body) +
     '<div class="time">'+fmtTime(m.created_at)+'</div>' +
     '</div>';
@@ -808,6 +807,7 @@ async function loadMyMiniProfile(){
   var params = new URLSearchParams(window.location.search);
   var target = params.get('user');
   if(target) activeName = target;
+  try { var meAuth = await api('GET', '/auth/me'); window.exyuMeNick = meAuth.nick; } catch(e){}
   await loadMyMiniProfile();
   await buildConvoList();
   renderMessages(activeName || '');
