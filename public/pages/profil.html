@@ -1199,6 +1199,7 @@ async function loadProfile(){
 }
 
 async function loadOtherProfile(nick){
+window.exyuTargetUser = nick;
   document.getElementById('profileNick').textContent = nick;
   document.getElementById('profileAvatar').textContent = nick.charAt(0).toUpperCase();
   var editBtn = document.getElementById('editToggle');
