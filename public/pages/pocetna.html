@@ -484,8 +484,8 @@ body {
     <!-- COLUMN 4: NA MREŽI -->
     <div class="col">
       <div class="col-header">NA MREŽI</div>
-      <div class="col-body">
-        <div class="empty">Nema korisnika online.</div>
+      <div class="col-body" id="homeOnlineCol">
+        <div class="empty">Učitavam...</div>
       </div>
     </div>
 
@@ -519,6 +519,40 @@ body {
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error || 'Greška.');
     return data;
+  }
+
+  function escHome(t){ return String(t).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]); }); }
+
+  function homeProfileCard(p){
+    var giMap={m:'👨',z:'👩',p:'💑'};
+    var genderIcon = giMap[p.gender] || '👤';
+    var metaText = p.city ? (p.city.charAt(0).toUpperCase()+p.city.slice(1)) : '';
+    var countryLabel = {hr:'HR', ba:'BiH', rs:'RS'}[p.country] || '';
+    if (countryLabel) metaText = metaText ? (metaText + ' · ' + countryLabel) : countryLabel;
+    return '<div class="profile-card" style="cursor:pointer;" onclick="window.location.href=\'profil.html?user=' + encodeURIComponent(p.nick) + '\'">' +
+      '<div class="avatar">' + genderIcon + '</div>' +
+      '<div class="info"><div class="name">' + escHome(p.nick) + (p.age ? ', '+p.age : '') + '</div>' +
+      '<div class="meta">' + escHome(metaText) + '</div></div>' +
+      '<div class="dot-online" title="online"></div>' +
+    '</div>';
+  }
+
+  async function loadHomeOnlineUsers(){
+    var col = document.getElementById('homeOnlineCol');
+    if (!col) return;
+    var countries = ['hr','ba','rs'];
+    var all = [];
+    for (var i = 0; i < countries.length; i++) {
+      try {
+        var data = await api('GET', '/users?' + new URLSearchParams({ country: countries[i], onlineOnly: 'true' }));
+        all = all.concat(data.users || []);
+      } catch (e) { /* preskoči tu državu ako ne uspije, ostale se svejedno prikažu */ }
+    }
+    if (all.length === 0) {
+      col.innerHTML = '<div class="empty">Nema korisnika online.</div>';
+      return;
+    }
+    col.innerHTML = all.slice(0, 12).map(homeProfileCard).join('');
   }
 
   (async function(){
@@ -649,6 +683,10 @@ if (searchBtn) searchBtn.addEventListener('click', runNickSearch);  searchInput.
         statBoxes[3].textContent = stats.men;
       }
     } catch(e) {}
+
+    // NA MREŽI - stvarni online korisnici iz sve tri države
+    loadHomeOnlineUsers();
+    setInterval(loadHomeOnlineUsers, 30000);
 
     // 3 admin gumba (registracija/prva stranica/admin panel) - vidljivo SAMO stvarnom adminu
     var adminQuickButtons = document.getElementById('adminQuickButtons');
