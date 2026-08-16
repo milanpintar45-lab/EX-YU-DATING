@@ -181,8 +181,6 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
 }
 .btn-msg{background:var(--green);color:#fff;}
 .btn-msg:hover{background:#16a34a;box-shadow:0 0 15px rgba(34,197,94,0.4);}
-.btn-friend{background:#a23cff;color:#fff;}
-.btn-friend:hover{background:#8a2be2;box-shadow:0 0 15px rgba(162,60,255,0.4);}
 .btn-video{background:var(--blue);color:#fff;}
 .btn-video:hover{background:#2563eb;box-shadow:0 0 15px rgba(59,130,246,0.4);}
 .btn-poke{background:var(--orange);color:#fff;}
@@ -620,8 +618,6 @@ body {
             <span id="coupleInfo" style="display:none;"> • Par (M: <span id="mAge"></span> / Ž: <span id="zAge"></span>)</span>
           </div>
           <div class="profile-actions-top" id="profileActionsTop">
-            <button type="button" class="btn-msg" onclick="openChat()">💬 Poruka</button>
-            <button type="button" class="btn-friend" id="btnFriendRequest" onclick="sendFriendRequest()">🤝 Dodaj prijatelja</button>
             <button type="button" class="btn-video" onclick="openVideo()">📹 Video</button>
             <button type="button" class="btn-poke" onclick="pokeUser()">👉 Bockaj</button>
             <button type="button" class="btn-block" onclick="blockUser()">🚫 Blokiraj</button>
@@ -1202,7 +1198,6 @@ async function loadProfile(){
 }
 
 async function loadOtherProfile(nick){
-window.exyuTargetUser = nick;
   document.getElementById('profileNick').textContent = nick;
   document.getElementById('profileAvatar').textContent = nick.charAt(0).toUpperCase();
   var editBtn = document.getElementById('editToggle');
@@ -1246,6 +1241,13 @@ window.exyuTargetUser = nick;
     if(el) el.style.display = 'none';
   });
 
+  // Sakrij "Gotovo" gumbe ispod Kratkog opisa i Osobne poruke - to su gumbi
+  // za spremanje SVOG profila, ne smiju biti vidljivi dok se gleda tuđi profil
+  ['kratkiOpisDoneBtn','osobnaPorukaDoneBtn'].forEach(function(id){
+    var btn = document.getElementById(id);
+    if(btn) btn.style.display = 'none';
+  });
+
   applyContactRestrictions(data);
   renderOtherMedia(data);
 }
@@ -1285,26 +1287,6 @@ function blockUser(){
 function reportOtherUser(){
   if(!window.exyuTargetUser){ alert('Ovo je vaš profil.'); return; }
   if(window.exyuReport) window.exyuReport(window.exyuTargetUser);
-}
-async function sendFriendRequest(){
-  if(!window.exyuTargetUser){ alert('Ovo je vaš profil.'); return; }
-  var btn = document.getElementById('btnFriendRequest');
-  var original = btn.textContent;
-  btn.disabled = true;
-  try {
-    var res = await api('POST', '/friends/request', { toNick: window.exyuTargetUser });
-    if (res.autoAccepted) {
-      alert('🎉 Sada ste prijatelji s korisnikom "' + window.exyuTargetUser + '"!');
-      btn.textContent = '✅ Prijatelji';
-    } else {
-      alert('🤝 Zahtjev za prijateljstvo je poslan korisniku "' + window.exyuTargetUser + '"!');
-      btn.textContent = '✅ Zahtjev poslan';
-    }
-  } catch (err) {
-    alert('❌ ' + err.message);
-    btn.disabled = false;
-    btn.textContent = original;
-  }
 }
 async function deleteOtherUser(){
   if(!window.exyuTargetUser){ alert('Ovo je vaš profil.'); return; }
