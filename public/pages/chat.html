@@ -712,7 +712,20 @@ async function sendMessage(){
   const input = document.getElementById('msgInput');
   const text = input.value.trim();
   if(!text) return;
-  if(!activeName){ alert('Odaberite razgovor prije slanja poruke.'); return; }
+
+  // Ako nitko nije odabran s liste, automatski uzmi prvi razgovor s liste
+  // (korisnik može odmah pisati, ne mora prvo ništa označavati)
+  if(!activeName){
+    var firstItem = document.querySelector('.convo-item');
+    if(firstItem){
+      document.querySelectorAll('.convo-item').forEach(function(i){ i.classList.remove('active'); });
+      firstItem.classList.add('active');
+      activeName = firstItem.dataset.name;
+    } else {
+      // Nema nikoga na listi razgovora - nema kome poslati poruku
+      return;
+    }
+  }
 
   try {
     await api('POST', '/messages', { toNick: activeName, body: text });
@@ -961,7 +974,7 @@ async function declineIncomingCallGlobal(){
 <div class="exyu-modal" id="exyuAdminModal">
   <div class="exyu-modal-box">
     <h3>✉️ Poruka adminu</h3>
-    <p style="margin-bottom:12px;font-size:14px;color:#b8a4d4;">Napišite pitanje ili prijavu — admin (marko) će je vidjeti u svojim porukama.</p>
+    <p style="margin-bottom:12px;font-size:14px;color:#b8a4d4;">Napišite pitanje ili prijavu — admin će je vidjeti u svojim porukama.</p>
     <textarea id="exyuAdminText" placeholder="Vaša poruka..."></textarea>
     <div class="exyu-modal-actions">
       <button type="button" class="exyu-btn-cancel" onclick="exyuCloseAdmin()">Odustani</button>
@@ -1026,7 +1039,7 @@ async function declineIncomingCallGlobal(){
     var t = document.getElementById('exyuAdminText').value.trim();
     if(!t){ alert('Napišite poruku!'); return; }
     try {
-      await api('POST', '/messages', { toNick: 'marko', body: t });
+      await api('POST', '/messages', { toNick: 'admin', body: t });
       exyuCloseAdmin();
       alert('✅ Poruka poslana adminu!');
     } catch (err) { alert('❌ ' + err.message); }
