@@ -362,20 +362,6 @@ body {
   to   { opacity: 1; }
 }
 
-/* MALI "TV" VIDEO U PRAZNOM SREDNJEM PROSTORU ZAGLAVLJA */
-.title-wrap-tv{
-  width:100%;
-  max-width:220px; 
-  margin:0 auto;
-  aspect-ratio:16/9;
-  border-radius:10px;
-  overflow:hidden;
-  border:2px solid rgba(162,60,255,0.5);
-  box-shadow:0 6px 20px rgba(162,60,255,0.4);
-  background:#000;
-}
-.title-wrap-tv video{width:100%;height:100%;object-fit:cover;display:block;}
-
 /* HERO BANNER - puna širina, video na vrhu stranice */
 .hero-banner{
   position:relative;
@@ -397,6 +383,7 @@ body {
 }
 @media(max-width:600px){ .hero-banner{ height:140px; } }
 </style>
+<script src="https://unpkg.com/@daily-co/daily-js"></script>
 </head>
 <body>
 <div class="app">
@@ -463,16 +450,14 @@ body {
         <button type="button" class="ctrl-btn" style="width:auto;padding:8px 16px;border-radius:10px;font-size:13px;" onclick="copyGroupCallLink()">🔗 Kopiraj pozivnicu</button>
         <button type="button" class="ctrl-btn end" style="width:auto;padding:8px 16px;border-radius:10px;font-size:13px;" onclick="endGroupCall()">📞 Završi grupni poziv</button>
       </div>
-      <div id="groupCallFrameWrap" class="hidden" style="margin-top:14px;border-radius:14px;overflow:hidden;border:1px solid rgba(162,60,255,0.3);">
-        <iframe id="groupCallFrame" style="width:100%;height:480px;border:0;" allow="camera; microphone; fullscreen; display-capture"></iframe>
+      <div id="groupCallFrameWrap" class="hidden" style="margin-top:14px;border-radius:14px;overflow:hidden;border:1px solid rgba(162,60,255,0.3);min-height:480px;">
       </div>
     </div>
 
     <!-- VIDEO AREA -->
     <div class="video-area">
-      <!-- 1 NA 1 JITSI IFRAME (skriven po defaultu) -->
+      <!-- 1 NA 1 DAILY.CO POZIV (skriven po defaultu) -->
       <div id="oneOnOneFrameWrap" class="hidden" style="flex:1;display:flex;flex-direction:column;min-height:0;border-radius:14px;overflow:hidden;border:1px solid rgba(162,60,255,0.3);margin:14px;">
-        <iframe id="oneOnOneFrame" style="width:100%;height:100%;min-height:420px;border:0;flex:1;" allow="camera; microphone; fullscreen; display-capture"></iframe>
       </div>
 
       <div class="video-grid" id="videoGrid">
@@ -513,18 +498,6 @@ body {
           <span>Poziv nije aktivan</span>
         </div>
         <div class="ctrl-wrap">
-          <button type="button" class="ctrl-btn" id="micBtn" title="Isključi/uključi mikrofon">🎙</button>
-          <div class="ctrl-label">Mikrofon</div>
-        </div>
-        <div class="ctrl-wrap">
-          <button type="button" class="ctrl-btn" id="camBtn" title="Isključi/uključi kameru">📷</button>
-          <div class="ctrl-label">Kamera</div>
-        </div>
-        <div class="ctrl-wrap">
-          <button type="button" class="ctrl-btn" id="shareBtn" title="Dijeli zaslon">🖥</button>
-          <div class="ctrl-label">Zaslon</div>
-        </div>
-        <div class="ctrl-wrap">
           <button type="button" class="ctrl-btn end" id="endBtn" onclick="endCall()" title="Prekini poziv">📞</button>
           <div class="ctrl-label">Prekini</div>
         </div>
@@ -539,17 +512,6 @@ body {
 
 </div>
 
-<!-- DOLAZNI POZIV OVERLAY -->
-<div class="call-overlay" id="callOverlay">
-  <div class="caller-avatar" id="callerAvatar">👤</div>
-  <div class="caller-name" id="callerName"></div>
-  <div class="caller-status" id="callerStatusText">Vas zove…</div>
-  <div class="call-actions">
-    <button type="button" class="call-btn-action decline" onclick="declineIncomingCallGlobal()">📞</button>
-    <button type="button" class="call-btn-action accept" onclick="acceptIncomingCallGlobal()">📹</button>
-  </div>
-</div>
-
 <script>
 const API_BASE = '/api';
 async function api(method, path, body) {
@@ -562,7 +524,7 @@ async function api(method, path, body) {
 }
 
 let myNickForCall = 'gost';
-let knownUsers = []; // popunjeno iz /api/users, koristi se za avatar/gender u pozivima
+let knownUsers = [];
 function exyuSelfNickForCall(){ return myNickForCall; }
 
 function escHtml(t){ return String(t).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]); }); }
@@ -582,7 +544,6 @@ async function loadContacts(){
   try {
     var data = await api('GET', '/users');
     knownUsers = data.users || [];
-    // Online prvo
     knownUsers.sort(function(a,b){ return (b.is_online?1:0)-(a.is_online?1:0); });
     list.innerHTML = knownUsers.length ? knownUsers.map(contactCard).join('') : '<div style="padding:20px;text-align:center;color:var(--muted);">Nema drugih korisnika.</div>';
   } catch(e) {
@@ -590,43 +551,45 @@ async function loadContacts(){
   }
 }
 
+// ======================
+// GRUPNI POZIV (Daily.co)
+// ======================
 let groupCallApi = null;
-const MAX_GROUP_CALL_PEOPLE = 5;
 
-function startGroupCall() {
+async function startGroupCall() {
   if(callActive){ endCall(); }
-  var room = 'exyudate-' + exyuSelfNickForCall().replace(/[^a-zA-Z0-9]/g,'') + '-' + Math.random().toString(36).substring(2,8);
-  var url = 'https://meet.jit.si/' + room;
-  document.getElementById('groupCallLink').value = url;
-  document.getElementById('groupCallInviteRow').classList.remove('hidden');
-  document.getElementById('groupCallFrameWrap').classList.remove('hidden');
+  document.getElementById('startGroupCallBtn').disabled = true;
+  try {
+    var data = await api('POST', '/calls/group/create', {});
+    var url = data.url;
+    document.getElementById('groupCallLink').value = url;
+    document.getElementById('groupCallInviteRow').classList.remove('hidden');
+    const frameWrap = document.getElementById('groupCallFrameWrap');
+    frameWrap.classList.remove('hidden');
+    frameWrap.innerHTML = '';
 
-  const frameWrap = document.getElementById('groupCallFrameWrap');
-  document.getElementById('groupCallFrame').style.display = 'none';
-
-  groupCallApi = new JitsiMeetExternalAPI('meet.jit.si', {
-    roomName: room,
-    parentNode: frameWrap,
-    width: '100%',
-    height: 480,
-    configOverwrite: { prejoinPageEnabled: false },
-    userInfo: { displayName: exyuSelfNickForCall() }
-  });
-
-  groupCallApi.addEventListener('participantJoined', function(participant) {
-    const count = groupCallApi.getNumberOfParticipants();
-    if (count > MAX_GROUP_CALL_PEOPLE) {
-      groupCallApi.executeCommand('kickParticipant', participant.id);
-    }
-  });
-
-  document.getElementById('startGroupCallBtn').textContent = '📹 Novi grupni poziv';
+    groupCallApi = DailyIframe.createFrame(frameWrap, {
+      showLeaveButton: true,
+      iframeStyle: { width: '100%', height: '480px', border: '0' }
+    });
+    await groupCallApi.join({ url: url, userName: exyuSelfNickForCall() });
+    document.getElementById('startGroupCallBtn').textContent = '📹 Novi grupni poziv';
+  } catch(e) {
+    alert('❌ ' + e.message);
+  }
+  document.getElementById('startGroupCallBtn').disabled = false;
 }
-function joinGroupCallFromLink(url){
+async function joinGroupCallFromLink(url){
   document.getElementById('groupCallLink').value = url;
   document.getElementById('groupCallInviteRow').classList.remove('hidden');
-  document.getElementById('groupCallFrameWrap').classList.remove('hidden');
-  document.getElementById('groupCallFrame').src = url + '#config.prejoinPageEnabled=false&userInfo.displayName="' + encodeURIComponent(exyuSelfNickForCall()) + '"';
+  const frameWrap = document.getElementById('groupCallFrameWrap');
+  frameWrap.classList.remove('hidden');
+  frameWrap.innerHTML = '';
+  groupCallApi = DailyIframe.createFrame(frameWrap, {
+    showLeaveButton: true,
+    iframeStyle: { width: '100%', height: '480px', border: '0' }
+  });
+  await groupCallApi.join({ url: url, userName: exyuSelfNickForCall() });
 }
 function copyGroupCallLink(){
   var input = document.getElementById('groupCallLink');
@@ -640,12 +603,12 @@ function copyGroupCallLink(){
   }
 }
 function endGroupCall(){
-  document.getElementById('groupCallFrame').src = '';
+  if (groupCallApi) { try { groupCallApi.destroy(); } catch(e){} groupCallApi = null; }
+  document.getElementById('groupCallFrameWrap').innerHTML = '';
   document.getElementById('groupCallFrameWrap').classList.add('hidden');
   document.getElementById('groupCallInviteRow').classList.add('hidden');
   document.getElementById('startGroupCallBtn').textContent = '➕ Pokreni grupni poziv';
 }
-// Ako je korisnik otvorio stranicu s ?join=URL (klik na pozivnicu), automatski se pridruži
 (function(){
   var params = new URLSearchParams(window.location.search);
   var joinUrl = params.get('join');
@@ -653,15 +616,11 @@ function endGroupCall(){
 })();
 
 let callActive = false;
-let micOn = true;
-let camOn = true;
 let currentContact = null;
 let localStream = null;
-let screenStream = null;
+let oneOnOneApi = null;
 
-// ======================
-// LOKALNA KAMERA (getUserMedia)
-// ======================
+// Lokalna kamera - samo za prikaz "sebe" prije nego poziv počne
 function initLocalCamera(){
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     document.getElementById('localCamText').textContent = 'Kamera nije podržana u ovom pregledniku';
@@ -676,18 +635,16 @@ function initLocalCamera(){
       document.getElementById('localAvatar').style.display = 'none';
       document.getElementById('localPlaceholder').style.display = 'none';
       document.getElementById('localCamText').textContent = 'Kamera aktivna';
-      // default label
       var me = exyuSelfNickForCall();
       document.getElementById('localLabel').textContent = '🧑 ' + me + ' (Ti)';
     })
     .catch(function(err){
-      console.log('Kamera nije dostupna:', err);
       document.getElementById('localCamText').textContent = 'Kamera nije dostupna (dozvoli pristup)';
     });
 }
 
 // ======================
-// 1 NA 1 POZIV (Jitsi Meet — stvaran video, sa pravim zvonjenjem preko servera)
+// 1 NA 1 POZIV (Daily.co — stvaran video, sa pravim zvonjenjem preko servera)
 // ======================
 let myActiveCallId = null;
 let myActiveCallPoll = null;
@@ -699,7 +656,6 @@ async function startCall(name){
   const avatar = document.getElementById('callerAvatar');
   const cname = document.getElementById('callerName');
   const statusText = document.getElementById('callerStatusText');
-  const declineBtn = document.getElementById('callDeclineBtn');
   const acceptBtn = document.getElementById('callAcceptBtn');
 
   var genderIcon = '👤';
@@ -723,7 +679,7 @@ async function startCall(name){
           myActiveCallPoll = null;
           overlay.classList.remove('show');
           acceptBtn.style.display = '';
-          openOneOnOneCall(name, genderIcon, s.call.room);
+          openOneOnOneCall(name, s.call.room);
         } else if (s.call.status === 'declined') {
           clearInterval(myActiveCallPoll);
           myActiveCallPoll = null;
@@ -734,7 +690,6 @@ async function startCall(name){
       } catch(e){}
     }, 2000);
 
-    // Ako se ne javi u 30 sekundi, otkaži
     setTimeout(function(){
       if (myActiveCallPoll) {
         clearInterval(myActiveCallPoll);
@@ -758,25 +713,34 @@ function cancelOutgoingCall(){
   document.getElementById('callAcceptBtn').style.display = '';
 }
 
-function openOneOnOneCall(name, genderIcon, room){
+async function openOneOnOneCall(name, room){
   callActive = true;
-  // Ako je grupni poziv aktivan, prekini ga
   endGroupCall();
-
-  if (!room) {
-    var me = exyuSelfNickForCall().replace(/[^a-zA-Z0-9]/g,'');
-    var other = name.replace(/[^a-zA-Z0-9]/g,'');
-    room = 'exyudate-1on1-' + (me < other ? me + '-' + other : other + '-' + me) + '-' + Math.random().toString(36).substring(2,6);
-  }
-  var url = 'https://meet.jit.si/' + room + '#config.prejoinPageEnabled=false&userInfo.displayName="' + encodeURIComponent(exyuSelfNickForCall()) + '"';
 
   document.getElementById('groupCallBox').classList.add('hidden');
   document.getElementById('videoGrid').style.display = 'none';
-  document.getElementById('oneOnOneFrameWrap').classList.remove('hidden');
-  document.getElementById('oneOnOneFrame').src = url;
+  const frameWrap = document.getElementById('oneOnOneFrameWrap');
+  frameWrap.classList.remove('hidden');
+  frameWrap.innerHTML = '';
+
+  if (oneOnOneApi) { try { oneOnOneApi.destroy(); } catch(e){} oneOnOneApi = null; }
+
+  oneOnOneApi = DailyIframe.createFrame(frameWrap, {
+    showLeaveButton: true,
+    iframeStyle: { width: '100%', height: '100%', border: '0' }
+  });
+  oneOnOneApi.on('left-meeting', function(){ endCall(); });
+
+  try {
+    await oneOnOneApi.join({ url: room, userName: exyuSelfNickForCall() });
+  } catch(e) {
+    alert('❌ Greška pri spajanju na video poziv: ' + e.message);
+    endCall();
+    return;
+  }
 
   var status = document.getElementById('callStatus');
-  status.innerHTML = '<div class="live-dot"></div><span>🎥 Stvarni video poziv s ' + name + ' (Jitsi Meet)</span>';
+  status.innerHTML = '<div class="live-dot"></div><span>🎥 Stvarni video poziv s ' + name + '</span>';
 }
 
 function handleAcceptClick(){
@@ -790,13 +754,12 @@ function handleDeclineClick(){
 async function acceptIncomingCall(){
   var callId = incomingCallId;
   var name = currentContact;
-  var genderIcon = document.getElementById('callerAvatar').textContent;
   document.getElementById('callOverlay').classList.remove('show');
   document.getElementById('callAcceptBtn').style.display = '';
   incomingCallId = null;
   try {
     var data = await api('POST', '/calls/' + callId + '/accept');
-    openOneOnOneCall(name, genderIcon, data.room);
+    openOneOnOneCall(name, data.room);
   } catch(e) {
     alert('❌ ' + e.message);
   }
@@ -810,7 +773,7 @@ async function declineIncomingCall(){
 }
 
 function checkIncomingCalls(){
-  if (callActive || incomingCallId) return; // već u pozivu ili već zvoni - preskoči
+  if (callActive || incomingCallId) return;
   api('GET', '/calls/incoming').then(function(data){
     if (data.call && !incomingCallId && !callActive) {
       incomingCallId = data.call.id;
@@ -843,88 +806,20 @@ function endCall(){
   if (myActiveCallPoll) { clearInterval(myActiveCallPoll); myActiveCallPoll = null; }
   myActiveCallId = null;
 
-  // Zaustavi Jitsi iframe
-  document.getElementById('oneOnOneFrame').src = '';
+  if (oneOnOneApi) { try { oneOnOneApi.destroy(); } catch(e){} oneOnOneApi = null; }
+  document.getElementById('oneOnOneFrameWrap').innerHTML = '';
   document.getElementById('oneOnOneFrameWrap').classList.add('hidden');
   document.getElementById('videoGrid').style.display = 'grid';
   document.getElementById('groupCallBox').classList.remove('hidden');
 
-  // Resetiraj remote feed
   document.getElementById('remoteAvatar').textContent = '👤';
   document.getElementById('remoteText').textContent = 'Odaberite kontakt i pokrenite poziv';
   document.getElementById('remoteLabel').textContent = '👤 Udaljeni korisnik';
 
   var status = document.getElementById('callStatus');
   status.innerHTML = '<div class="live-dot"></div><span>Poziv nije aktivan</span>';
-
-  // Reset gumbi
-  var micBtn = document.getElementById('micBtn');
-  var camBtn = document.getElementById('camBtn');
-  var shareBtn = document.getElementById('shareBtn');
-  micBtn.classList.remove('active'); camBtn.classList.remove('active'); shareBtn.classList.remove('active');
-  micBtn.textContent = '🎙'; camBtn.textContent = '📷';
-  micOn = true; camOn = true;
-
-  // Zaustavi screen share ako je aktivan
-  if(screenStream){
-    screenStream.getTracks().forEach(function(t){ t.stop(); });
-    screenStream = null;
-  }
 }
 
-// ======================
-// KONTROLE (stvarno rade na lokalnoj kameri)
-// ======================
-document.getElementById('micBtn').addEventListener('click', function(){
-  micOn = !micOn;
-  this.classList.toggle('active', !micOn);
-  this.textContent = micOn ? '🎙' : '🎙‍♂️';
-  if(localStream){
-    localStream.getAudioTracks().forEach(function(t){ t.enabled = micOn; });
-  }
-});
-
-document.getElementById('camBtn').addEventListener('click', function(){
-  camOn = !camOn;
-  this.classList.toggle('active', !camOn);
-  this.textContent = camOn ? '📷' : '📵';
-  if(localStream){
-    localStream.getVideoTracks().forEach(function(t){ t.enabled = camOn; });
-  }
-  var video = document.getElementById('localVideo');
-  if(video) video.style.opacity = camOn ? '1' : '0.3';
-});
-
-document.getElementById('shareBtn').addEventListener('click', function(){
-  var self = this;
-  if(screenStream){
-    // Zaustavi dijeljenje
-    screenStream.getTracks().forEach(function(t){ t.stop(); });
-    screenStream = null;
-    self.classList.remove('active');
-    alert('🖥 Dijeljenje zaslona zaustavljeno.');
-    return;
-  }
-  if(!navigator.mediaDevices.getDisplayMedia){
-    alert('⚠️ Dijeljenje zaslona nije podržano u ovom pregledniku.');
-    return;
-  }
-  navigator.mediaDevices.getDisplayMedia({video:true, audio:true})
-    .then(function(stream){
-      screenStream = stream;
-      self.classList.add('active');
-      alert('🖥 Zaslon se dijeli! Napomena: u Jitsi pozivu koristite gumb za dijeljenje unutar iframe-a za bolju integraciju.');
-      stream.getVideoTracks()[0].onended = function(){
-        screenStream = null;
-        self.classList.remove('active');
-      };
-    })
-    .catch(function(err){
-      alert('❌ Dijeljenje zaslona odbijeno ili nije dostupno.');
-    });
-});
-
-// Pokreni lokalnu kameru odmah po učitavanju stranice
 document.addEventListener('DOMContentLoaded', function(){
   initLocalCamera();
 });
@@ -937,7 +832,6 @@ document.addEventListener('DOMContentLoaded', function(){
 
   await loadContacts();
 
-  // Auto-start call if a target user is passed via ?user=NICK
   var params = new URLSearchParams(window.location.search);
   var target = params.get('user');
   if(target){ startCall(target); }
@@ -1004,9 +898,6 @@ api('GET', '/users/friends-count').then(function(fc){
   if (window.exyuUpdateFriendReqBadge) window.exyuUpdateFriendReqBadge();
   if (window.exyuUpdatePokesBadge) window.exyuUpdatePokesBadge();
 
-  // Obavijesti preglednika (opt-in) - provjerava nove poruke/bockanja/zahtjeve svakih 20s
-  // i prikazuje pravu obavijest preglednika, ali SAMO ako je korisnik to sam uključio u postavkama
-  // I ako je dao dopuštenje pregledniku.
   (async function(){
     if (!('Notification' in window)) return;
     let notifEnabled = false;
@@ -1035,7 +926,7 @@ api('GET', '/users/friends-count').then(function(fc){
           new Notification('EX YU DATE', { body: 'Imate novi zahtjev za prijateljstvo! 🤝' });
         }
         lastFriendReqCount = freqCount;
-      } catch(e) { /* korisnik se možda odjavio - tiho preskoči */ }
+      } catch(e) { }
     }
     pollNotifications();
     setInterval(pollNotifications, 20000);
@@ -1064,7 +955,7 @@ api('GET', '/users/friends-count').then(function(fc){
 <div class="exyu-modal" id="exyuAdminModal">
   <div class="exyu-modal-box">
     <h3>✉️ Poruka adminu</h3>
-    <p style="margin-bottom:12px;font-size:14px;color:#b8a4d4;">Napišite pitanje ili prijavu — admin (marko) će je vidjeti u svojim porukama.</p>
+    <p style="margin-bottom:12px;font-size:14px;color:#b8a4d4;">Napišite pitanje ili prijavu — admin će je vidjeti u svojim porukama.</p>
     <textarea id="exyuAdminText" placeholder="Vaša poruka..."></textarea>
     <div class="exyu-modal-actions">
       <button type="button" class="exyu-btn-cancel" onclick="exyuCloseAdmin()">Odustani</button>
@@ -1072,8 +963,57 @@ api('GET', '/users/friends-count').then(function(fc){
     </div>
   </div>
 </div>
+<div class="exyu-modal" id="exyuFriendReqModal">
+  <div class="exyu-modal-box">
+    <h3>🤝 Zahtjevi za prijateljstvo</h3>
+    <div id="exyuFriendReqList" style="max-height:400px;overflow-y:auto;"></div>
+    <div class="exyu-modal-actions" style="margin-top:14px;">
+      <button type="button" class="exyu-btn-cancel" onclick="document.getElementById('exyuFriendReqModal').classList.remove('on')" style="flex:1;">Zatvori</button>
+    </div>
+  </div>
+</div>
+<div class="exyu-modal" id="exyuGiftsModal">
+  <div class="exyu-modal-box">
+    <h3>🎁 Pokloni</h3>
+    <p style="margin-bottom:10px;font-size:13px;color:#b8a4d4;">Pošalji poklon</p>
+    <div style="display:flex;gap:8px;margin-bottom:10px;">
+      <input type="text" id="giftToNick" placeholder="Nick primatelja" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(162,60,255,0.4);background:rgba(255,255,255,0.08);color:#fff;">
+      <select id="giftType" style="padding:10px;border-radius:8px;border:1px solid rgba(162,60,255,0.4);background:rgba(255,255,255,0.08);color:#fff;">
+        <option value="ruza">🌹 Ruža</option>
+        <option value="srce">❤️ Srce</option>
+        <option value="dijamant">💎 Dijamant</option>
+        <option value="medvjedic">🧸 Medvjedić</option>
+        <option value="sampanjac">🍾 Šampanjac</option>
+      </select>
+    </div>
+    <textarea id="giftMessage" placeholder="Poruka uz poklon (opcionalno)..." style="width:100%;min-height:60px;padding:10px;border-radius:8px;border:1px solid rgba(162,60,255,0.4);background:rgba(255,255,255,0.08);color:#fff;font-family:inherit;margin-bottom:10px;"></textarea>
+    <button type="button" class="exyu-btn-send" onclick="exyuSendGift()" style="width:100%;margin-bottom:14px;">Pošalji poklon</button>
+    <div style="font-weight:700;color:#c57dff;font-size:13px;margin-bottom:8px;">Primljeni pokloni</div>
+    <div id="exyuGiftsList" style="max-height:250px;overflow-y:auto;"></div>
+    <div class="exyu-modal-actions" style="margin-top:14px;">
+      <button type="button" class="exyu-btn-cancel" onclick="document.getElementById('exyuGiftsModal').classList.remove('on')" style="flex:1;">Zatvori</button>
+    </div>
+  </div>
+</div>
+<div class="exyu-modal" id="exyuPokesModal2">
+  <div class="exyu-modal-box">
+    <h3>👉 Bockanja</h3>
+    <div style="display:flex;gap:8px;margin-bottom:14px;">
+      <input type="text" id="pokeToNick" placeholder="Nick korisnika za bockanje" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(162,60,255,0.4);background:rgba(255,255,255,0.08);color:#fff;">
+      <button type="button" class="exyu-btn-send" onclick="exyuSendPoke()" style="width:auto;padding:10px 18px;">Bocni</button>
+    </div>
+    <div id="exyuPokesList2" style="max-height:350px;overflow-y:auto;"></div>
+    <div class="exyu-modal-actions" style="margin-top:14px;">
+      <button type="button" class="exyu-btn-cancel" onclick="document.getElementById('exyuPokesModal2').classList.remove('on')" style="flex:1;">Zatvori</button>
+    </div>
+  </div>
+</div>
 <script>
 (function(){
+  function esc(t){ return String(t).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]); }); }
+  var GIFT_ICONS = { ruza:'🌹', srce:'❤️', dijamant:'💎', medvjedic:'🧸', sampanjac:'🍾' };
+  var GIFT_LABELS = { ruza:'Ruža', srce:'Srce', dijamant:'Dijamant', medvjedic:'Medvjedić', sampanjac:'Šampanjac' };
+
   window.exyuOpenAdmin = function(){ document.getElementById('exyuAdminModal').classList.add('on'); };
   window.exyuCloseAdmin = function(){ document.getElementById('exyuAdminModal').classList.remove('on'); document.getElementById('exyuAdminText').value=''; };
   window.exyuSendAdmin = async function(){
@@ -1085,12 +1025,113 @@ api('GET', '/users/friends-count').then(function(fc){
       alert('✅ Poruka poslana adminu!');
     } catch (err) { alert('❌ ' + err.message); }
   };
+
+  window.exyuUpdateFriendReqBadge = async function(){
+    try {
+      var data = await api('GET', '/friends/requests');
+      var b = document.getElementById('friendReqBadge');
+      if (b) b.textContent = (data.requests || []).length;
+    } catch(e){}
+  };
+  window.exyuOpenFriendRequests = async function(){
+    var list = document.getElementById('exyuFriendReqList');
+    list.innerHTML = 'Učitavam...';
+    document.getElementById('exyuFriendReqModal').classList.add('on');
+    try {
+      var data = await api('GET', '/friends/requests');
+      var reqs = data.requests || [];
+      list.innerHTML = reqs.length ? reqs.map(function(r){
+        return '<div class="exyu-msg-item"><div class="from">' + esc(r.from_nick) + '</div>' +
+          '<div class="exyu-modal-actions" style="margin-top:8px;">' +
+            '<button type="button" class="exyu-btn-send" style="padding:8px 14px;font-size:13px;" onclick="exyuAcceptFriendReq(' + r.id + ')">✅ Prihvati</button>' +
+            '<button type="button" class="exyu-btn-cancel" style="padding:8px 14px;font-size:13px;" onclick="exyuDeclineFriendReq(' + r.id + ')">✖ Odbij</button>' +
+          '</div></div>';
+      }).join('') : '<div class="exyu-empty">Nema zahtjeva na čekanju.</div>';
+    } catch(e) { list.innerHTML = '<div class="exyu-empty">Greška pri učitavanju.</div>'; }
+  };
+  window.exyuAcceptFriendReq = async function(id){
+    try { await api('POST', '/friends/requests/' + id + '/accept'); window.exyuOpenFriendRequests(); window.exyuUpdateFriendReqBadge(); }
+    catch(e){ alert('❌ ' + e.message); }
+  };
+  window.exyuDeclineFriendReq = async function(id){
+    try { await api('POST', '/friends/requests/' + id + '/decline'); window.exyuOpenFriendRequests(); window.exyuUpdateFriendReqBadge(); }
+    catch(e){ alert('❌ ' + e.message); }
+  };
+
+  window.exyuOpenGifts = async function(){
+    document.getElementById('exyuGiftsModal').classList.add('on');
+    var list = document.getElementById('exyuGiftsList');
+    list.innerHTML = 'Učitavam...';
+    try {
+      var data = await api('GET', '/gifts/received');
+      var gifts = data.gifts || [];
+      list.innerHTML = gifts.length ? gifts.map(function(g){
+        return '<div class="exyu-msg-item"><div class="from">' + (GIFT_ICONS[g.gift_type]||'🎁') + ' ' + GIFT_LABELS[g.gift_type] + ' od ' + esc(g.from_nick) + '</div>' +
+          (g.message ? '<div class="txt">' + esc(g.message) + '</div>' : '') +
+          '<div class="time">' + new Date(g.created_at).toLocaleString('hr-HR') + '</div></div>';
+      }).join('') : '<div class="exyu-empty">Nema primljenih poklona.</div>';
+    } catch(e) { list.innerHTML = '<div class="exyu-empty">Greška pri učitavanju.</div>'; }
+  };
+  window.exyuSendGift = async function(){
+    var toNick = document.getElementById('giftToNick').value.trim();
+    var giftType = document.getElementById('giftType').value;
+    var message = document.getElementById('giftMessage').value.trim();
+    if(!toNick){ alert('Upišite nick primatelja!'); return; }
+    try {
+      await api('POST', '/gifts', { toNick: toNick, giftType: giftType, message: message });
+      alert('🎁 Poklon poslan!');
+      document.getElementById('giftToNick').value = '';
+      document.getElementById('giftMessage').value = '';
+    } catch(e) { alert('❌ ' + e.message); }
+  };
+
+  window.exyuUpdatePokesBadge = async function(){
+    try {
+      var data = await api('GET', '/moderation/notifications');
+      var n = (data.notifications || []).filter(function(x){ return x.type === 'poke' && !x.read_at; }).length;
+      var b = document.getElementById('pokesBadge');
+      if (b) b.textContent = n;
+    } catch(e){}
+  };
+  window.exyuOpenPokes = async function(){
+    document.getElementById('exyuPokesModal2').classList.add('on');
+    var list = document.getElementById('exyuPokesList2');
+    list.innerHTML = 'Učitavam...';
+    try {
+      var data = await api('GET', '/moderation/pokes');
+      var received = data.received || [], sent = data.sent || [];
+      var html = '<div style="font-weight:700;color:#c57dff;font-size:13px;margin-bottom:8px;">Primljena bockanja (' + received.length + ')</div>';
+      html += received.length ? received.map(function(p){
+        return '<div class="exyu-msg-item"><div class="from">' + esc(p.from_nick) + '</div><div class="time">' + new Date(p.created_at).toLocaleString('hr-HR') + '</div></div>';
+      }).join('') : '<div class="exyu-empty" style="padding:12px;">Nema primljenih bockanja.</div>';
+      html += '<div style="font-weight:700;color:#c57dff;font-size:13px;margin:14px 0 8px;">Poslana bockanja (' + sent.length + ')</div>';
+      html += sent.length ? sent.map(function(p){
+        return '<div class="exyu-msg-item"><div class="from">' + esc(p.to_nick) + '</div><div class="time">' + new Date(p.created_at).toLocaleString('hr-HR') + '</div></div>';
+      }).join('') : '<div class="exyu-empty" style="padding:12px;">Niste nikoga bocnuli.</div>';
+      list.innerHTML = html;
+      await api('POST', '/moderation/notifications/mark-read');
+      window.exyuUpdatePokesBadge();
+    } catch(e) { list.innerHTML = '<div class="exyu-empty">Greška pri učitavanju.</div>'; }
+  };
+  window.exyuSendPoke = async function(){
+    var nick = document.getElementById('pokeToNick').value.trim();
+    if(!nick){ alert('Upišite nick!'); return; }
+    try {
+      await api('POST', '/moderation/poke', { toNick: nick });
+      alert('👉 Bocnuo/la si korisnika "' + nick + '"!');
+      document.getElementById('pokeToNick').value = '';
+      window.exyuOpenPokes();
+    } catch(e) { alert('❌ ' + e.message); }
+  };
+
+  document.getElementById('exyuFriendReqModal').addEventListener('click', function(e){ if(e.target === this) this.classList.remove('on'); });
+  document.getElementById('exyuGiftsModal').addEventListener('click', function(e){ if(e.target === this) this.classList.remove('on'); });
+  document.getElementById('exyuPokesModal2').addEventListener('click', function(e){ if(e.target === this) this.classList.remove('on'); });
 })();
 </script>
 
 <script>
 (function(){
-  /* Hover prefetch — počni učitavati stranicu čim miš prijeđe na link */
   var prefetched = {};
   document.addEventListener('mouseover', function(e){
     var a = e.target.closest('a[href]');
@@ -1106,7 +1147,6 @@ api('GET', '/users/friends-count').then(function(fc){
     document.head.appendChild(l);
   }, { passive: true });
 
-  /* Fallback za preglednike bez View Transitions API */
   if (!document.startViewTransition) {
     document.addEventListener('click', function(e){
       if (e.defaultPrevented) return;
@@ -1124,8 +1164,6 @@ api('GET', '/users/friends-count').then(function(fc){
     });
   }
 
-  /* Ako view transitions JEST aktivan, ugasi body animaciju —
-     preglednik već radi crossfade, dupla animacija = trzaj */
   if (document.startViewTransition) {
     var s = document.createElement('style');
     s.textContent = 'body{animation:none!important;}';
