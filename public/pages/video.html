@@ -465,15 +465,13 @@ body {
         <button type="button" class="ctrl-btn end" style="width:auto;padding:8px 16px;border-radius:10px;font-size:13px;" onclick="endGroupCall()">📞 Završi grupni poziv</button>
       </div>
       <div id="groupCallFrameWrap" class="hidden" style="margin-top:14px;border-radius:14px;overflow:hidden;border:1px solid rgba(162,60,255,0.3);">
-        <iframe id="groupCallFrame" style="width:100%;height:480px;border:0;" allow="camera; microphone; fullscreen; display-capture"></iframe>
       </div>
     </div>
 
     <!-- VIDEO AREA -->
     <div class="video-area">
-      <!-- 1 NA 1 JITSI IFRAME (skriven po defaultu) -->
+      <!-- 1 NA 1 JITSI (JitsiMeetExternalAPI - pouzdanije, ne pita za ime) - skriven po defaultu -->
       <div id="oneOnOneFrameWrap" class="hidden" style="flex:1;display:flex;flex-direction:column;min-height:0;border-radius:14px;overflow:hidden;border:1px solid rgba(162,60,255,0.3);margin:14px;">
-        <iframe id="oneOnOneFrame" style="width:100%;height:100%;min-height:420px;border:0;flex:1;" allow="camera; microphone; fullscreen; display-capture"></iframe>
       </div>
 
       <div class="video-grid" id="videoGrid">
@@ -555,6 +553,30 @@ let myNickForCall = 'gost';
 let knownUsers = []; // popunjeno iz /api/users, koristi se za avatar/gender u pozivima
 function exyuSelfNickForCall(){ return myNickForCall; }
 
+// Zajedničke postavke za SVE Jitsi pozive (1-na-1 i grupne):
+// - bez ekrana za unos imena prije ulaska (prejoin)
+// - bez Jitsi loga/oznake
+// - viša rezolucija videa (do Full HD kad mreža dozvoljava)
+function jitsiConfigOverwrite(){
+  return {
+    prejoinPageEnabled: false,
+    prejoinConfig: { enabled: false },
+    disableDeepLinking: true,
+    resolution: 1080,
+    constraints: { video: { height: { ideal: 1080, max: 1080, min: 240 } } }
+  };
+}
+function jitsiInterfaceConfigOverwrite(){
+  return {
+    SHOW_JITSI_WATERMARK: false,
+    SHOW_WATERMARK_FOR_GUESTS: false,
+    SHOW_BRAND_WATERMARK: false,
+    HIDE_DEEP_LINKING_LOGO: true,
+    DISPLAY_WELCOME_PAGE_CONTENT: false,
+    MOBILE_APP_PROMO: false
+  };
+}
+
 function escHtml(t){ return String(t).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]); }); }
 function contactCard(u){
   var giMap = {m:'👨', z:'👩', p:'💑'};
@@ -592,33 +614,15 @@ function startGroupCall() {
   document.getElementById('groupCallFrameWrap').classList.remove('hidden');
 
   const frameWrap = document.getElementById('groupCallFrameWrap');
-  document.getElementById('groupCallFrame').style.display = 'none';
+  frameWrap.innerHTML = '';
 
   groupCallApi = new JitsiMeetExternalAPI('meet.jit.si', {
     roomName: room,
     parentNode: frameWrap,
     width: '100%',
     height: 480,
-    configOverwrite: {
-      prejoinPageEnabled: false,
-      disableDeepLinking: true,
-      // Viša rezolucija videa (Full HD kad mreža dozvoljava)
-      resolution: 1080,
-      constraints: {
-        video: {
-          height: { ideal: 1080, max: 1080, min: 240 }
-        }
-      }
-    },
-    interfaceConfigOverwrite: {
-      // Sakrij Jitsi oznaku/logo i "watermark"
-      SHOW_JITSI_WATERMARK: false,
-      SHOW_WATERMARK_FOR_GUESTS: false,
-      SHOW_BRAND_WATERMARK: false,
-      HIDE_DEEP_LINKING_LOGO: true,
-      DISPLAY_WELCOME_PAGE_CONTENT: false,
-      MOBILE_APP_PROMO: false
-    },
+    configOverwrite: jitsiConfigOverwrite(),
+    interfaceConfigOverwrite: jitsiInterfaceConfigOverwrite(),
     userInfo: { displayName: exyuSelfNickForCall() }
   });
 
@@ -632,10 +636,21 @@ function startGroupCall() {
   document.getElementById('startGroupCallBtn').textContent = '📹 Novi grupni poziv';
 }
 function joinGroupCallFromLink(url){
+  var room = url.split('/').pop();
   document.getElementById('groupCallLink').value = url;
   document.getElementById('groupCallInviteRow').classList.remove('hidden');
   document.getElementById('groupCallFrameWrap').classList.remove('hidden');
-  document.getElementById('groupCallFrame').src = url + '#config.prejoinPageEnabled=false&config.disableDeepLinking=true&config.resolution=1080&config.constraints.video.height.ideal=1080&config.constraints.video.height.max=1080&interfaceConfig.SHOW_JITSI_WATERMARK=false&interfaceConfig.SHOW_WATERMARK_FOR_GUESTS=false&interfaceConfig.SHOW_BRAND_WATERMARK=false&interfaceConfig.HIDE_DEEP_LINKING_LOGO=true&interfaceConfig.DISPLAY_WELCOME_PAGE_CONTENT=false&interfaceConfig.MOBILE_APP_PROMO=false&userInfo.displayName="' + encodeURIComponent(exyuSelfNickForCall()) + '"';
+  const frameWrap = document.getElementById('groupCallFrameWrap');
+  frameWrap.innerHTML = '';
+  groupCallApi = new JitsiMeetExternalAPI('meet.jit.si', {
+    roomName: room,
+    parentNode: frameWrap,
+    width: '100%',
+    height: 480,
+    configOverwrite: jitsiConfigOverwrite(),
+    interfaceConfigOverwrite: jitsiInterfaceConfigOverwrite(),
+    userInfo: { displayName: exyuSelfNickForCall() }
+  });
 }
 function copyGroupCallLink(){
   var input = document.getElementById('groupCallLink');
@@ -649,7 +664,8 @@ function copyGroupCallLink(){
   }
 }
 function endGroupCall(){
-  document.getElementById('groupCallFrame').src = '';
+  if (groupCallApi) { try { groupCallApi.dispose(); } catch(e){} groupCallApi = null; }
+  document.getElementById('groupCallFrameWrap').innerHTML = '';
   document.getElementById('groupCallFrameWrap').classList.add('hidden');
   document.getElementById('groupCallInviteRow').classList.add('hidden');
   document.getElementById('startGroupCallBtn').textContent = '➕ Pokreni grupni poziv';
@@ -667,6 +683,7 @@ let camOn = true;
 let currentContact = null;
 let localStream = null;
 let screenStream = null;
+let oneOnOneApi = null;
 
 // ======================
 // LOKALNA KAMERA (getUserMedia)
@@ -696,7 +713,7 @@ function initLocalCamera(){
 }
 
 // ======================
-// 1 NA 1 POZIV (Jitsi Meet — stvaran video, sa pravim zvonjenjem preko servera)
+// 1 NA 1 POZIV (Jitsi Meet — JitsiMeetExternalAPI, sa pravim zvonjenjem preko servera)
 // ======================
 let myActiveCallId = null;
 let myActiveCallPoll = null;
@@ -777,27 +794,25 @@ function openOneOnOneCall(name, genderIcon, room){
     var other = name.replace(/[^a-zA-Z0-9]/g,'');
     room = 'exyudate-1on1-' + (me < other ? me + '-' + other : other + '-' + me) + '-' + Math.random().toString(36).substring(2,6);
   }
-  // Config parametri u hash-u: bez prejoin ekrana, bez Jitsi loga/watermarka, viša rezolucija videa
-  var url = 'https://meet.jit.si/' + room +
-    '#config.prejoinPageEnabled=false' +
-    '&config.startWithAudioMuted=false' +
-    '&config.startWithVideoMuted=false' +
-    '&config.disableDeepLinking=true' +
-    '&config.resolution=1080' +
-    '&config.constraints.video.height.ideal=1080' +
-    '&config.constraints.video.height.max=1080' +
-    '&interfaceConfig.SHOW_JITSI_WATERMARK=false' +
-    '&interfaceConfig.SHOW_WATERMARK_FOR_GUESTS=false' +
-    '&interfaceConfig.SHOW_BRAND_WATERMARK=false' +
-    '&interfaceConfig.HIDE_DEEP_LINKING_LOGO=true' +
-    '&interfaceConfig.DISPLAY_WELCOME_PAGE_CONTENT=false' +
-    '&interfaceConfig.MOBILE_APP_PROMO=false' +
-    '&userInfo.displayName="' + encodeURIComponent(exyuSelfNickForCall()) + '"';
 
   document.getElementById('groupCallBox').classList.add('hidden');
   document.getElementById('videoGrid').style.display = 'none';
-  document.getElementById('oneOnOneFrameWrap').classList.remove('hidden');
-  document.getElementById('oneOnOneFrame').src = url;
+  const frameWrap = document.getElementById('oneOnOneFrameWrap');
+  frameWrap.classList.remove('hidden');
+  frameWrap.innerHTML = '';
+
+  if (oneOnOneApi) { try { oneOnOneApi.dispose(); } catch(e){} oneOnOneApi = null; }
+
+  // JitsiMeetExternalAPI - pouzdano preskače ekran za unos imena i primjenjuje sve postavke
+  oneOnOneApi = new JitsiMeetExternalAPI('meet.jit.si', {
+    roomName: room,
+    parentNode: frameWrap,
+    width: '100%',
+    height: '100%',
+    configOverwrite: jitsiConfigOverwrite(),
+    interfaceConfigOverwrite: jitsiInterfaceConfigOverwrite(),
+    userInfo: { displayName: exyuSelfNickForCall() }
+  });
 
   var status = document.getElementById('callStatus');
   status.innerHTML = '<div class="live-dot"></div><span>🎥 Stvarni video poziv s ' + name + ' (Jitsi Meet)</span>';
@@ -867,8 +882,9 @@ function endCall(){
   if (myActiveCallPoll) { clearInterval(myActiveCallPoll); myActiveCallPoll = null; }
   myActiveCallId = null;
 
-  // Zaustavi Jitsi iframe
-  document.getElementById('oneOnOneFrame').src = '';
+  // Zaustavi Jitsi 1-na-1 poziv
+  if (oneOnOneApi) { try { oneOnOneApi.dispose(); } catch(e){} oneOnOneApi = null; }
+  document.getElementById('oneOnOneFrameWrap').innerHTML = '';
   document.getElementById('oneOnOneFrameWrap').classList.add('hidden');
   document.getElementById('videoGrid').style.display = 'grid';
   document.getElementById('groupCallBox').classList.remove('hidden');
@@ -1145,7 +1161,7 @@ api('GET', '/users/friends-count').then(function(fc){
 (function(){
   function esc(t){ return String(t).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]); }); }
   var GIFT_ICONS = { ruza:'🌹', srce:'❤️', dijamant:'💎', medvjedic:'🧸', sampanjac:'🍾' };
-  var GIFT_LABELS = { ruza:'Ruža', srce:'❤️', dijamant:'💎', medvjedic:'🧸', sampanjac:'🍾' };
+  var GIFT_LABELS = { ruza:'Ruža', srce:'Srce', dijamant:'Dijamant', medvjedic:'Medvjedić', sampanjac:'Šampanjac' };
 
   window.exyuOpenAdmin = function(){ document.getElementById('exyuAdminModal').classList.add('on'); };
   window.exyuCloseAdmin = function(){ document.getElementById('exyuAdminModal').classList.remove('on'); document.getElementById('exyuAdminText').value=''; };
