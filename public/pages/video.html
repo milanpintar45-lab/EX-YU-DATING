@@ -563,7 +563,11 @@ function jitsiConfigOverwrite(){
     prejoinConfig: { enabled: false },
     disableDeepLinking: true,
     resolution: 1080,
-    constraints: { video: { height: { ideal: 1080, max: 1080, min: 240 } } }
+    constraints: { video: { height: { ideal: 1080, max: 1080, min: 240 } } },
+    // Isključi izravnu (P2P) vezu - zna zapeti iza strožih firewalla/antivirusa.
+    // Poziv umjesto toga uvijek ide preko Jitsijevog posrednog servera - sporije za spajanje,
+    // ali puno pouzdanije kroz mrežne zapreke.
+    p2p: { enabled: false }
   };
 }
 function jitsiInterfaceConfigOverwrite(){
