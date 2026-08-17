@@ -476,8 +476,12 @@ body {
         <a href="chat.html">Chat</a>
         <a href="chat.html" class="open">otvori sve →</a>
       </div>
-      <div class="col-body">
-        <div class="empty">Nema poruka za prikaz.</div>
+      <div class="col-body" id="homeChatCol">
+        <div class="empty">Učitavam...</div>
+      </div>
+      <div class="chat-input-wrap" style="margin-top:8px;display:flex;gap:6px;">
+        <input type="text" id="homeChatInput" placeholder="Napiši poruku…" style="flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(162,60,255,0.4);border-radius:8px;padding:8px 10px;color:#fff;font-family:inherit;font-size:13px;outline:none;">
+        <button type="button" id="homeChatSendBtn" style="background:linear-gradient(180deg,var(--purple-500),var(--purple-600));color:#fff;border:none;border-radius:8px;padding:8px 14px;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:inherit;font-size:13px;">POŠALJI</button>
       </div>
     </div>
 
@@ -553,6 +557,38 @@ body {
       return;
     }
     col.innerHTML = all.slice(0, 12).map(homeProfileCard).join('');
+  }
+
+  // ===== CHAT NA POČETNOJ - piše u chat matične države korisnika =====
+  var homeChatCountry = null;
+
+  function homeChatCard(c){
+    return '<div class="chat-card"><div class="who">' + escHome(c.who) +
+      '<span style="color:var(--muted);font-weight:400"> · ' + escHome(c.city||'') + '</span></div>' +
+      '<div class="msg">' + escHome(c.body) + '</div></div>';
+  }
+
+  async function loadHomeChat(){
+    var col = document.getElementById('homeChatCol');
+    if (!col || !homeChatCountry) return;
+    try {
+      var data = await api('GET', '/country-chat?country=' + homeChatCountry + '&limit=8');
+      var list = data.messages || [];
+      col.innerHTML = list.length ? list.map(homeChatCard).join('') : '<div class="empty">Nema poruka za prikaz.</div>';
+    } catch(e) {
+      col.innerHTML = '<div class="empty">Greška pri učitavanju chata.</div>';
+    }
+  }
+
+  async function sendHomeChat(){
+    var input = document.getElementById('homeChatInput');
+    var text = input.value.trim();
+    if (!text || !homeChatCountry) return;
+    try {
+      await api('POST', '/country-chat', { country: homeChatCountry, county: 'SVI', body: text });
+      input.value = '';
+      loadHomeChat();
+    } catch(e) { alert('❌ ' + e.message); }
   }
 
   (async function(){
@@ -687,6 +723,18 @@ if (searchBtn) searchBtn.addEventListener('click', runNickSearch);  searchInput.
     // NA MREŽI - stvarni online korisnici iz sve tri države
     loadHomeOnlineUsers();
     setInterval(loadHomeOnlineUsers, 30000);
+
+    // CHAT - dohvati matičnu državu korisnika pa učitaj/omogući pisanje u njen chat
+    try {
+      var myProfile = await api('GET', '/profile/me');
+      homeChatCountry = myProfile.country;
+      loadHomeChat();
+      setInterval(loadHomeChat, 10000);
+    } catch(e) {
+      document.getElementById('homeChatCol').innerHTML = '<div class="empty">Greška pri učitavanju chata.</div>';
+    }
+    document.getElementById('homeChatSendBtn').addEventListener('click', sendHomeChat);
+    document.getElementById('homeChatInput').addEventListener('keydown', function(e){ if(e.key==='Enter') sendHomeChat(); });
 
     // 3 admin gumba (registracija/prva stranica/admin panel) - vidljivo SAMO stvarnom adminu
     var adminQuickButtons = document.getElementById('adminQuickButtons');
