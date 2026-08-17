@@ -818,6 +818,19 @@ function endCall(){
 
   var status = document.getElementById('callStatus');
   status.innerHTML = '<div class="live-dot"></div><span>Poziv nije aktivan</span>';
+
+  // Ugasi i lokalnu kameru (pregled "Ti") - inače kamerica na uređaju
+  // ostaje upaljena i nakon što je poziv prekinut
+  if (localStream) {
+    localStream.getTracks().forEach(function(t){ t.stop(); });
+    localStream = null;
+  }
+  var localVideoEl = document.getElementById('localVideo');
+  if (localVideoEl) { localVideoEl.srcObject = null; localVideoEl.style.display = 'none'; }
+  var localAvatarEl = document.getElementById('localAvatar');
+  if (localAvatarEl) localAvatarEl.style.display = '';
+  var localPlaceholderEl = document.getElementById('localPlaceholder');
+  if (localPlaceholderEl) { localPlaceholderEl.style.display = ''; document.getElementById('localCamText').textContent = 'Kamera isključena'; }
 }
 
 document.addEventListener('DOMContentLoaded', function(){
