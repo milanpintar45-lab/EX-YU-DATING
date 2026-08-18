@@ -646,6 +646,19 @@ function initLocalCamera(){
     });
 }
 
+// Gasi "pregled sebe" (sirovi getUserMedia pregled kamere/mikrofona) da bi
+// pravi video poziv (Daily.co) mogao slobodno preuzeti kameru/mikrofon.
+// Bez ovoga, na mnogim mobitelima kamera ostaje "zauzeta" pregledom i pravi
+// poziv se ne uspije spojiti (korisnik vidi da mu se poziv "resetira").
+function stopLocalPreview(){
+  if (localStream) {
+    localStream.getTracks().forEach(function(t){ t.stop(); });
+    localStream = null;
+  }
+  var localVideoEl = document.getElementById('localVideo');
+  if (localVideoEl) { localVideoEl.srcObject = null; localVideoEl.style.display = 'none'; }
+}
+
 // ======================
 // 1 NA 1 POZIV (Daily.co — stvaran video, sa pravim zvonjenjem preko servera)
 // ======================
@@ -719,6 +732,11 @@ function cancelOutgoingCall(){
 async function openOneOnOneCall(name, room){
   callActive = true;
   endGroupCall();
+
+  // VAŽNO: ugasi pregled kamere PRIJE otvaranja pravog poziva, da Daily.co
+  // može slobodno preuzeti kameru/mikrofon (inače na mobitelu ponekad
+  // "puca" spajanje jer je kamera već zauzeta pregledom).
+  stopLocalPreview();
 
   document.getElementById('groupCallBox').classList.add('hidden');
   document.getElementById('videoGrid').style.display = 'none';
@@ -833,12 +851,7 @@ function endCall(){
 
   // Ugasi i lokalnu kameru (pregled "Ti") - inače kamerica na uređaju
   // ostaje upaljena i nakon što je poziv prekinut
-  if (localStream) {
-    localStream.getTracks().forEach(function(t){ t.stop(); });
-    localStream = null;
-  }
-  var localVideoEl = document.getElementById('localVideo');
-  if (localVideoEl) { localVideoEl.srcObject = null; localVideoEl.style.display = 'none'; }
+  stopLocalPreview();
   var localAvatarEl = document.getElementById('localAvatar');
   if (localAvatarEl) localAvatarEl.style.display = '';
   var localPlaceholderEl = document.getElementById('localPlaceholder');
