@@ -758,7 +758,7 @@ async function openOneOnOneCall(name, room){
     endCall();
     return;
   }
-  oneOnOneApi.on('left-meeting', function(){ endCall(); });
+  oneOnOneApi.on('left-meeting', function(ev){ alert('ℹ️ DEBUG: napustio/la si poziv. Razlog: ' + JSON.stringify(ev && ev.action ? ev.action : ev)); endCall(); });
   oneOnOneApi.on('error', function(e){ alert('❌ Greška u pozivu: ' + (e && e.errorMsg ? e.errorMsg : 'nepoznata greška')); endCall(); });
 
   try {
