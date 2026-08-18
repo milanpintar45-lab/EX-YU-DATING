@@ -725,11 +725,20 @@ async function openOneOnOneCall(name, room){
 
   if (oneOnOneApi) { try { oneOnOneApi.destroy(); } catch(e){} oneOnOneApi = null; }
 
-  oneOnOneApi = DailyIframe.createFrame(frameWrap, {
-    showLeaveButton: true,
-    iframeStyle: { width: '100%', height: '100%', border: '0' }
-  });
+  try {
+    oneOnOneApi = DailyIframe.createFrame(frameWrap, {
+      showLeaveButton: true,
+      iframeStyle: { width: '100%', height: '100%', border: '0' }
+    });
+  } catch(e) {
+    // Ostala je "zaglavljena" prijašnja veza - nasilno je uništi i probaj još jednom
+    alert('⚠️ Rješavam prijašnju vezu, probaj poziv ponovno za par sekundi.');
+    try { if (window.DailyIframe && DailyIframe.getCallInstance) { var stale = DailyIframe.getCallInstance(); if (stale) stale.destroy(); } } catch(e2){}
+    endCall();
+    return;
+  }
   oneOnOneApi.on('left-meeting', function(){ endCall(); });
+  oneOnOneApi.on('error', function(e){ alert('❌ Greška u pozivu: ' + (e && e.errorMsg ? e.errorMsg : 'nepoznata greška')); endCall(); });
 
   try {
     await oneOnOneApi.join({ url: room, userName: exyuSelfNickForCall() });
@@ -759,7 +768,7 @@ async function acceptIncomingCall(){
   incomingCallId = null;
   try {
     var data = await api('POST', '/calls/' + callId + '/accept');
-    openOneOnOneCall(name, data.room);
+    await openOneOnOneCall(name, data.room);
   } catch(e) {
     alert('❌ ' + e.message);
   }
