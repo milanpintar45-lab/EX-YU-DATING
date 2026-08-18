@@ -572,6 +572,14 @@ async function startGroupCall() {
     frameWrap.classList.remove('hidden');
     frameWrap.innerHTML = '';
 
+    try {
+      if (window.DailyIframe && DailyIframe.getCallInstance) {
+        var existingG = DailyIframe.getCallInstance();
+        if (existingG) { try { existingG.destroy(); } catch(eDestroyG){} }
+      }
+    } catch(eCheckG){}
+    await new Promise(function(r){ setTimeout(r, 300); });
+
     groupCallApi = DailyIframe.createFrame(frameWrap, {
       showLeaveButton: true,
       iframeStyle: { width: '100%', height: '480px', border: '0' }
@@ -756,6 +764,23 @@ async function openOneOnOneCall(name, room){
   frameWrap.innerHTML = '';
 
   if (oneOnOneApi) { try { oneOnOneApi.destroy(); } catch(e){} oneOnOneApi = null; }
+
+  // PROAKTIVNO čišćenje: ako je od prijašnjeg poziva (na ovoj stranici, u ovoj
+  // sesiji preglednika) ostala "zaglavljena" Daily veza koju naš kod ne zna
+  // (npr. varijabla je resetirana ali sam poziv u pozadini nije do kraja
+  // uništen), Daily.co dozvoljava samo JEDNU aktivnu vezu po stranici -
+  // svaki sljedeći pokušaj tad puca s greškom "Cannot read properties of
+  // null (reading 'postMessage')". Zato prije stvaranja NOVE veze provjerimo
+  // postoji li već neka i, ako da, prvo je uništimo.
+  try {
+    if (window.DailyIframe && DailyIframe.getCallInstance) {
+      var existing = DailyIframe.getCallInstance();
+      if (existing) { try { existing.destroy(); } catch(eDestroy){} }
+    }
+  } catch(eCheck){}
+  // Daily.co treba kratak trenutak da stvarno oslobodi staru vezu prije
+  // nego što se pokuša stvoriti nova
+  await new Promise(function(r){ setTimeout(r, 300); });
 
   try {
     oneOnOneApi = DailyIframe.createFrame(frameWrap, {
