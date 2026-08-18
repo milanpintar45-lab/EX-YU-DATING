@@ -570,20 +570,26 @@ async function startGroupCall() {
     document.getElementById('groupCallInviteRow').classList.remove('hidden');
     const frameWrap = document.getElementById('groupCallFrameWrap');
     frameWrap.classList.remove('hidden');
-    frameWrap.innerHTML = '';
 
-    try {
-      if (window.DailyIframe && DailyIframe.getCallInstance) {
-        var existingG = DailyIframe.getCallInstance();
-        if (existingG) { try { existingG.destroy(); } catch(eDestroyG){} }
-      }
-    } catch(eCheckG){}
-    await new Promise(function(r){ setTimeout(r, 300); });
-
-    groupCallApi = DailyIframe.createFrame(frameWrap, {
-      showLeaveButton: true,
-      iframeStyle: { width: '100%', height: '480px', border: '0' }
-    });
+    var gFrame = null, gLastErr = null;
+    for (var gAttempt = 1; gAttempt <= 4 && !gFrame; gAttempt++) {
+      try {
+        if (window.DailyIframe && DailyIframe.getCallInstance) {
+          var existingG = DailyIframe.getCallInstance();
+          if (existingG) { try { existingG.destroy(); } catch(eDestroyG){} }
+        }
+      } catch(eCheckG){}
+      if (gAttempt > 1) { await new Promise(function(r){ setTimeout(r, 600); }); }
+      frameWrap.innerHTML = '';
+      try {
+        gFrame = DailyIframe.createFrame(frameWrap, {
+          showLeaveButton: true,
+          iframeStyle: { width: '100%', height: '480px', border: '0' }
+        });
+      } catch(e) { gLastErr = e; gFrame = null; }
+    }
+    if (!gFrame) { throw (gLastErr || new Error('Nije uspjelo stvoriti grupni poziv.')); }
+    groupCallApi = gFrame;
     await groupCallApi.join({ url: url, userName: exyuSelfNickForCall() });
     document.getElementById('startGroupCallBtn').textContent = '📹 Novi grupni poziv';
   } catch(e) {
@@ -765,35 +771,40 @@ async function openOneOnOneCall(name, room){
 
   if (oneOnOneApi) { try { oneOnOneApi.destroy(); } catch(e){} oneOnOneApi = null; }
 
-  // PROAKTIVNO čišćenje: ako je od prijašnjeg poziva (na ovoj stranici, u ovoj
-  // sesiji preglednika) ostala "zaglavljena" Daily veza koju naš kod ne zna
-  // (npr. varijabla je resetirana ali sam poziv u pozadini nije do kraja
-  // uništen), Daily.co dozvoljava samo JEDNU aktivnu vezu po stranici -
-  // svaki sljedeći pokušaj tad puca s greškom "Cannot read properties of
-  // null (reading 'postMessage')". Zato prije stvaranja NOVE veze provjerimo
-  // postoji li već neka i, ako da, prvo je uništimo.
-  try {
-    if (window.DailyIframe && DailyIframe.getCallInstance) {
-      var existing = DailyIframe.getCallInstance();
-      if (existing) { try { existing.destroy(); } catch(eDestroy){} }
+  // Ovo je POZNATA, potvrđena "nasumična" greška u samom Daily.co sustavu
+  // (prijavljena na njihovom službenom GitHubu: "Cannot read properties of
+  // null (reading 'postMessage')" - njihov odgovor: "refreshing the page
+  // solves it, seems quite random"). Umjesto da tražimo od korisnika da
+  // ručno osvježi stranicu, kod ovdje AUTOMATSKI pokuša ponovno u pozadini,
+  // do 4 puta, prije nego što stvarno odustane.
+  var frame = null;
+  var lastErr = null;
+  for (var attempt = 1; attempt <= 4 && !frame; attempt++) {
+    try {
+      if (window.DailyIframe && DailyIframe.getCallInstance) {
+        var existing = DailyIframe.getCallInstance();
+        if (existing) { try { existing.destroy(); } catch(eDestroy){} }
+      }
+    } catch(eCheck){}
+    if (attempt > 1) { await new Promise(function(r){ setTimeout(r, 600); }); }
+    frameWrap.innerHTML = '';
+    try {
+      frame = DailyIframe.createFrame(frameWrap, {
+        showLeaveButton: true,
+        iframeStyle: { width: '100%', height: '100%', border: '0' }
+      });
+    } catch(e) {
+      lastErr = e;
+      frame = null;
     }
-  } catch(eCheck){}
-  // Daily.co treba kratak trenutak da stvarno oslobodi staru vezu prije
-  // nego što se pokuša stvoriti nova
-  await new Promise(function(r){ setTimeout(r, 300); });
+  }
 
-  try {
-    oneOnOneApi = DailyIframe.createFrame(frameWrap, {
-      showLeaveButton: true,
-      iframeStyle: { width: '100%', height: '100%', border: '0' }
-    });
-  } catch(e) {
-    // Ostala je "zaglavljena" prijašnja veza - nasilno je uništi i probaj još jednom
-    exyuDebugLog('⚠️ DEBUG (createFrame): Rješavam prijašnju vezu, probaj poziv ponovno za par sekundi. Detalji: ' + (e && e.message ? e.message : e));
-    try { if (window.DailyIframe && DailyIframe.getCallInstance) { var stale = DailyIframe.getCallInstance(); if (stale) stale.destroy(); } } catch(e2){}
+  if (!frame) {
+    exyuDebugLog('❌ DEBUG (createFrame): Nije uspjelo ni nakon 4 pokušaja. Detalji: ' + (lastErr && lastErr.message ? lastErr.message : lastErr));
     endCall();
     return;
   }
+  oneOnOneApi = frame;
   oneOnOneApi.on('left-meeting', function(ev){ exyuDebugLog('ℹ️ DEBUG (left-meeting): napustio/la si poziv. Razlog: ' + JSON.stringify(ev && ev.action ? ev.action : ev)); endCall(); });
   oneOnOneApi.on('error', function(e){ exyuDebugLog('❌ DEBUG (error event): ' + (e && e.errorMsg ? e.errorMsg : JSON.stringify(e))); endCall(); });
 
