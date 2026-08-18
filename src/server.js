@@ -46,7 +46,17 @@ app.use(attachUser);
 // neovisno o specifičnim, strožim limiterima na pojedinim rutama (login, registracija, itd.)
 app.use('/api', globalApiLimiter);
 // Statičke datoteke (index.html, pages/*)
-app.use(express.static(path.join(__dirname, '..', 'public')));
+// VAŽNO (popravak "stare verzije sajta"): HTML stranice i sw.js MORAJU se uvijek
+// iznova provjeriti sa serverom prije prikaza - bez ovoga preglednik sam "nagađa"
+// i zna satima/danima prikazivati staru spremljenu verziju bez ikakvog pitanja
+// serveru, čak i kad je na serveru već postavljena nova verzija koda.
+app.use(express.static(path.join(__dirname, '..', 'public'), {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.html') || filePath.endsWith('sw.js')) {
+      res.setHeader('Cache-Control', 'no-cache');
+    }
+  },
+}));
 app.use('/api/auth', authRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/messages', messagesRoutes);
