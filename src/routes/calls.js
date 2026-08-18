@@ -26,6 +26,8 @@ async function createDailyRoom(roomName) {
         enable_chat: false,
         start_video_off: false,
         start_audio_off: false,
+        // Preskoči Dailyjev ekran "Do you want to join?" - korisnik ulazi izravno u poziv
+        enable_prejoin_ui: false,
       },
     }),
   });
