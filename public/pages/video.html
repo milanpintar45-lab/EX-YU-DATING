@@ -463,7 +463,6 @@ body {
       <div id="oneOnOneFrameWrap" class="hidden" style="flex:1;display:flex;flex-direction:column;min-height:0;border-radius:14px;overflow:hidden;border:1px solid rgba(162,60,255,0.3);margin:14px;">
       </div>
 
-      <div id="exyuDebugBox" style="display:none;position:absolute;top:8px;left:8px;right:8px;z-index:999;background:#ff3366;color:#fff;padding:12px 16px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 6px 20px rgba(0,0,0,0.5);word-break:break-word;"></div>
       <div class="video-grid" id="videoGrid">
         <div class="video-feed local">
           <video id="localVideo" autoplay muted playsinline style="width:100%;height:100%;object-fit:cover;border-radius:14px;display:none;"></video>
@@ -633,16 +632,6 @@ function endGroupCall(){
   if (joinUrl) { joinGroupCallFromLink(decodeURIComponent(joinUrl)); }
 })();
 
-// Prikazuje poruku vidljivo na ekranu (traka na vrhu) umjesto alert() -
-// na nekim uređajima/pregledateljima alert() ne radi ili se ne vidi,
-// pa ovo koristimo za dijagnosticiranje problema s pozivom.
-function exyuDebugLog(msg){
-  var box = document.getElementById('exyuDebugBox');
-  if (!box) { alert(msg); return; }
-  box.textContent = msg;
-  box.style.display = 'block';
-}
-
 let callActive = false;
 let currentContact = null;
 let localStream = null;
@@ -800,18 +789,18 @@ async function openOneOnOneCall(name, room){
   }
 
   if (!frame) {
-    exyuDebugLog('❌ DEBUG (createFrame): Nije uspjelo ni nakon 4 pokušaja. Detalji: ' + (lastErr && lastErr.message ? lastErr.message : lastErr));
+    alert('❌ Nismo se uspjeli spojiti na video poziv. Molimo pokušajte ponovno.');
     endCall();
     return;
   }
   oneOnOneApi = frame;
-  oneOnOneApi.on('left-meeting', function(ev){ exyuDebugLog('ℹ️ DEBUG (left-meeting): napustio/la si poziv. Razlog: ' + JSON.stringify(ev && ev.action ? ev.action : ev)); endCall(); });
-  oneOnOneApi.on('error', function(e){ exyuDebugLog('❌ DEBUG (error event): ' + (e && e.errorMsg ? e.errorMsg : JSON.stringify(e))); endCall(); });
+  oneOnOneApi.on('left-meeting', function(){ endCall(); });
+  oneOnOneApi.on('error', function(e){ alert('❌ Greška u pozivu: ' + (e && e.errorMsg ? e.errorMsg : 'nepoznata greška')); endCall(); });
 
   try {
     await oneOnOneApi.join({ url: room, userName: exyuSelfNickForCall() });
   } catch(e) {
-    exyuDebugLog('❌ DEBUG (join): Greška pri spajanju na video poziv: ' + e.message);
+    alert('❌ Greška pri spajanju na video poziv: ' + e.message);
     endCall();
     return;
   }
@@ -838,7 +827,7 @@ async function acceptIncomingCall(){
     var data = await api('POST', '/calls/' + callId + '/accept');
     await openOneOnOneCall(name, data.room);
   } catch(e) {
-    exyuDebugLog('❌ DEBUG (accept): ' + e.message);
+    alert('❌ ' + e.message);
   }
 }
 async function declineIncomingCall(){
