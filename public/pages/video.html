@@ -523,7 +523,7 @@ body {
           <div class="live-dot"></div>
           <span>Poziv nije aktivan</span>
         </div>
-        <div class="ctrl-wrap">
+        <div class="ctrl-wrap hidden" id="endCallWrap">
           <button type="button" class="ctrl-btn end" id="endBtn" onclick="endCall()" title="Prekini poziv">📞</button>
           <div class="ctrl-label">Prekini</div>
         </div>
@@ -614,6 +614,7 @@ async function startGroupCall() {
     groupCallApi = gFrame;
     await groupCallApi.join({ url: url, userName: exyuSelfNickForCall() });
     document.getElementById('startGroupCallBtn').textContent = '📹 Novi grupni poziv';
+    document.getElementById('endCallWrap').classList.remove('hidden');
   } catch(e) {
     alert('❌ ' + e.message);
   }
@@ -630,6 +631,7 @@ async function joinGroupCallFromLink(url){
     iframeStyle: { width: '100%', height: '480px', border: '0' }
   });
   await groupCallApi.join({ url: url, userName: exyuSelfNickForCall() });
+  document.getElementById('endCallWrap').classList.remove('hidden');
 }
 function copyGroupCallLink(){
   var input = document.getElementById('groupCallLink');
@@ -648,6 +650,7 @@ function endGroupCall(){
   document.getElementById('groupCallFrameWrap').classList.add('hidden');
   document.getElementById('groupCallInviteRow').classList.add('hidden');
   document.getElementById('startGroupCallBtn').textContent = '➕ Pokreni grupni poziv';
+  document.getElementById('endCallWrap').classList.add('hidden');
 }
 (function(){
   var params = new URLSearchParams(window.location.search);
@@ -830,6 +833,7 @@ async function openOneOnOneCall(name, room){
 
   var status = document.getElementById('callStatus');
   status.innerHTML = '<div class="live-dot"></div><span>🎥 Stvarni video poziv s ' + name + '</span>';
+  document.getElementById('endCallWrap').classList.remove('hidden');
 }
 
 function handleAcceptClick(){
@@ -889,6 +893,7 @@ setInterval(checkIncomingCalls, 3000);
 function endCall(){
   document.getElementById('callOverlay').classList.remove('show');
   document.getElementById('callAcceptBtn').style.display = '';
+  document.getElementById('endCallWrap').classList.add('hidden');
   callActive = false;
   currentContact = null;
   incomingCallId = null;
