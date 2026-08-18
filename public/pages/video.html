@@ -389,6 +389,29 @@ body {
 <script src="https://unpkg.com/@daily-co/daily-js"></script>
 </head>
 <body>
+<script>
+// Automatski ukloni bilo koji STARI service worker koji je ostao instaliran
+// na ovom uređaju od prije (ranija verzija sw.js) - bez ovoga, korisnik
+// mora ručno brisati podatke preglednika da bi vidio najnoviji kod.
+// Radi se odmah, u pozadini, potpuno nevidljivo za korisnika.
+(function(){
+  if (!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.getRegistrations().then(function(regs){
+    if (!regs.length) return;
+    var hadOld = false;
+    regs.forEach(function(reg){ hadOld = true; reg.unregister(); });
+    if (hadOld && !sessionStorage.getItem('exyuSwCleared')) {
+      sessionStorage.setItem('exyuSwCleared', '1');
+      // Osvježi stranicu jednom da se osigura čist učitani kod bez starog SW-a
+      window.location.reload();
+    }
+  }).catch(function(){});
+  if (window.caches && caches.keys) {
+    caches.keys().then(function(keys){ keys.forEach(function(k){ caches.delete(k); }); }).catch(function(){});
+  }
+})();
+</script>
+
 <div class="app">
 
   <div class="hero-banner">
