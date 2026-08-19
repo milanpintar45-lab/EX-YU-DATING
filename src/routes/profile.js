@@ -129,6 +129,38 @@ router.patch('/photos/:id', requireAuth, async (req, res) => {
   await db.query('UPDATE photos SET privacy = $1 WHERE id = $2', [next, req.params.id]);
   res.json({ privacy: next });
 });
+
+// ============================================
+// ŠIFRA (kod) ZA SLIKE I VIDEO - vlasnik zaključava, dijeli kod s kim želi
+// ============================================
+router.post('/photos/:id/lock', requireAuth, async (req, res) => {
+  const code = String(req.body.code || '').trim();
+  if (!code) return res.status(400).json({ error: 'Šifra ne smije biti prazna.' });
+  const result = await db.query(
+    `UPDATE photos SET privacy = 'kod', access_code = $1 WHERE id = $2 AND user_id = $3 RETURNING id`,
+    [code, req.params.id, req.user.userId]
+  );
+  if (result.rows.length === 0) return res.status(404).json({ error: 'Nije pronađeno.' });
+  res.json({ ok: true, privacy: 'kod' });
+});
+router.post('/photos/:id/unlock', requireAuth, async (req, res) => {
+  const result = await db.query(
+    `UPDATE photos SET privacy = 'javno', access_code = NULL WHERE id = $1 AND user_id = $2 RETURNING id`,
+    [req.params.id, req.user.userId]
+  );
+  if (result.rows.length === 0) return res.status(404).json({ error: 'Nije pronađeno.' });
+  res.json({ ok: true, privacy: 'javno' });
+});
+router.post('/photos/:id/check-code', requireAuth, async (req, res) => {
+  const code = String(req.body.code || '').trim();
+  const result = await db.query('SELECT data_url, access_code FROM photos WHERE id = $1', [req.params.id]);
+  if (result.rows.length === 0) return res.status(404).json({ error: 'Nije pronađeno.' });
+  if (!result.rows[0].access_code || result.rows[0].access_code !== code) {
+    return res.status(403).json({ error: 'Pogrešna šifra.' });
+  }
+  res.json({ ok: true, dataUrl: result.rows[0].data_url });
+});
+
 router.post('/videos', requireAuth, async (req, res) => {
   const count = await db.query(`SELECT count(*) FROM videos WHERE user_id = $1 AND source = 'profile'`, [req.user.userId]);
   if (Number(count.rows[0].count) >= 5) return res.status(400).json({ error: 'Maksimalno 5 video zapisa!' });
@@ -154,6 +186,33 @@ router.patch('/videos/:id', requireAuth, async (req, res) => {
   const next = cycle[(cycle.indexOf(result.rows[0].privacy) + 1) % cycle.length];
   await db.query('UPDATE videos SET privacy = $1 WHERE id = $2', [next, req.params.id]);
   res.json({ privacy: next });
+});
+router.post('/videos/:id/lock', requireAuth, async (req, res) => {
+  const code = String(req.body.code || '').trim();
+  if (!code) return res.status(400).json({ error: 'Šifra ne smije biti prazna.' });
+  const result = await db.query(
+    `UPDATE videos SET privacy = 'kod', access_code = $1 WHERE id = $2 AND user_id = $3 RETURNING id`,
+    [code, req.params.id, req.user.userId]
+  );
+  if (result.rows.length === 0) return res.status(404).json({ error: 'Nije pronađeno.' });
+  res.json({ ok: true, privacy: 'kod' });
+});
+router.post('/videos/:id/unlock', requireAuth, async (req, res) => {
+  const result = await db.query(
+    `UPDATE videos SET privacy = 'javno', access_code = NULL WHERE id = $1 AND user_id = $2 RETURNING id`,
+    [req.params.id, req.user.userId]
+  );
+  if (result.rows.length === 0) return res.status(404).json({ error: 'Nije pronađeno.' });
+  res.json({ ok: true, privacy: 'javno' });
+});
+router.post('/videos/:id/check-code', requireAuth, async (req, res) => {
+  const code = String(req.body.code || '').trim();
+  const result = await db.query('SELECT data_url, access_code FROM videos WHERE id = $1', [req.params.id]);
+  if (result.rows.length === 0) return res.status(404).json({ error: 'Nije pronađeno.' });
+  if (!result.rows[0].access_code || result.rows[0].access_code !== code) {
+    return res.status(403).json({ error: 'Pogrešna šifra.' });
+  }
+  res.json({ ok: true, dataUrl: result.rows[0].data_url });
 });
 
 // ============================================
@@ -252,7 +311,7 @@ router.get('/:nick', requireAuth, async (req, res) => {
   function visible(privacy) {
     if (privacy === 'javno') return true;
     if (privacy === 'matchevi') return isMatch;
-    return false;
+    return false; // 'privatno' i 'kod' nikad nisu automatski vidljivi
   }
 
   const photos = await db.query(
