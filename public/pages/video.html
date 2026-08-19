@@ -486,7 +486,7 @@ body {
       <div id="oneOnOneFrameWrap" class="hidden" style="flex:1;display:flex;flex-direction:column;min-height:0;border-radius:14px;overflow:hidden;border:1px solid rgba(162,60,255,0.3);margin:14px;">
       </div>
 
-      <div class="video-grid" id="videoGrid">
+      <div class="video-grid hidden" id="videoGrid">
         <div class="video-feed local">
           <video id="localVideo" autoplay muted playsinline style="width:100%;height:100%;object-fit:cover;border-radius:14px;display:none;"></video>
           <div class="video-avatar" id="localAvatar">🧑</div>
@@ -504,6 +504,9 @@ body {
           </div>
           <div class="video-label" id="remoteLabel">👤 Udaljeni korisnik</div>
         </div>
+      </div>
+      <div id="emptyCallArea" style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:16px;">
+        Odaberite kontakt i pokrenite poziv
       </div>
 
       <!-- CALL OVERLAY -->
@@ -857,6 +860,8 @@ async function openOneOnOneCall(name, room){
 
   document.getElementById('groupCallBox').classList.add('hidden');
   document.getElementById('videoGrid').style.display = 'none';
+  var emptyAreaEl = document.getElementById('emptyCallArea');
+  if (emptyAreaEl) emptyAreaEl.style.display = 'none';
   const frameWrap = document.getElementById('oneOnOneFrameWrap');
   frameWrap.classList.remove('hidden');
   frameWrap.innerHTML = '';
@@ -1011,7 +1016,8 @@ function endCall(){
   if (oneOnOneApi) { try { oneOnOneApi.destroy(); } catch(e){} oneOnOneApi = null; }
   document.getElementById('oneOnOneFrameWrap').innerHTML = '';
   document.getElementById('oneOnOneFrameWrap').classList.add('hidden');
-  document.getElementById('videoGrid').style.display = 'grid';
+  var emptyAreaEl2 = document.getElementById('emptyCallArea');
+  if (emptyAreaEl2) emptyAreaEl2.style.display = 'flex';
   document.getElementById('groupCallBox').classList.remove('hidden');
 
   document.getElementById('remoteAvatar').textContent = '👤';
@@ -1030,9 +1036,9 @@ function endCall(){
   if (localPlaceholderEl) { localPlaceholderEl.style.display = ''; document.getElementById('localCamText').textContent = 'Kamera isključena'; }
 }
 
-document.addEventListener('DOMContentLoaded', function(){
-  initLocalCamera();
-});
+// Napomena: initLocalCamera() se više ne pokreće automatski jer je
+// prostor s malim kamericama prije poziva sad sakriven (prazan veliki
+// prostor umjesto njega) - kamera se aktivira tek kad stvarni poziv počne.
 
 (async function(){
   let me = { loggedIn: false };
