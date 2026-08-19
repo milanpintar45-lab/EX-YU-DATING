@@ -501,6 +501,10 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
       <div class="convo-list" id="convoList">
         <!-- Popunjava se dinamički iz stvarnih poruka -->
       </div>
+      <div style="padding:10px 14px;border-top:1px solid rgba(162,60,255,0.25);font-family:'Cormorant Garamond',serif;font-size:15px;color:var(--purple-100);letter-spacing:1px;">Svi korisnici</div>
+      <div class="convo-list" id="allUsersList" style="flex:0 0 auto;max-height:220px;">
+        <div style="padding:14px;text-align:center;color:#b8a4d4;font-size:12px;">Učitavam...</div>
+      </div>
     </div>
 
     <!-- CHAT AREA -->
@@ -512,6 +516,7 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
           <div class="status" id="chatStatus">🟢 Online · Zagreb</div>
         </div>
         <div class="actions">
+          <a href="prosireni-chat.html" title="Prošireni chat">💬</a>
           <a href="video.html" title="Video poziv">📹</a>
           <a href="#" title="Više">⋮</a>
         </div>
@@ -526,7 +531,8 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
         <div id="mentionDropdown" style="display:none;position:absolute;bottom:100%;left:60px;margin-bottom:6px;background:linear-gradient(135deg,#2d0057,#4a0a7a);border:1px solid rgba(162,60,255,0.5);border-radius:10px;max-height:180px;overflow-y:auto;min-width:180px;box-shadow:0 10px 30px rgba(0,0,0,0.5);z-index:50;"></div>
         <div class="icon-btn" title="Emoji">😊</div>
         <div class="icon-btn" title="Priloži">📎</div>
-        <input type="text" placeholder="Napiši poruku… (@ za označavanje)" id="msgInput">
+        <div class="icon-btn" title="Označi nekoga (@)" onclick="insertAtSign()">@</div>
+        <input type="text" placeholder="Napiši poruku…" id="msgInput">
         <button type="button" class="btn" id="sendBtn">Pošalji</button>
       </div>
     </div>
@@ -743,6 +749,48 @@ document.addEventListener('click', function(e){
   if(!e.target.closest('#mentionDropdown') && e.target.id !== 'msgInput') closeMentionDropdown();
 });
 
+function insertAtSign(){
+  var input = document.getElementById('msgInput');
+  var pos = input.selectionStart;
+  var before = input.value.slice(0, pos);
+  var after = input.value.slice(pos);
+  var needsSpace = before.length && !/\s$/.test(before);
+  input.value = before + (needsSpace ? ' ' : '') + '@' + after;
+  input.focus();
+  input.selectionStart = input.selectionEnd = before.length + (needsSpace ? 1 : 0) + 1;
+  updateMentionDropdown();
+}
+
+async function loadAllUsersList(){
+  var list = document.getElementById('allUsersList');
+  if(!list) return;
+  try {
+    var data = await api('GET', '/users');
+    var users = data.users || [];
+    if(!users.length){
+      list.innerHTML = '<div style="padding:14px;text-align:center;color:#b8a4d4;font-size:12px;">Nema drugih korisnika.</div>';
+      return;
+    }
+    list.innerHTML = users.map(function(u){
+      return '<div class="convo-item" data-name="' + escHtml(u.nick) + '">' +
+        '<div class="convo-avatar">👤' + (u.is_online ? '<span class="online-dot"></span>' : '') + '</div>' +
+        '<div class="convo-info"><div class="convo-name">' + escHtml(u.nick) + '</div>' +
+        '<div class="convo-preview">' + escHtml(u.city || '') + '</div></div>' +
+      '</div>';
+    }).join('');
+  } catch(e) {
+    list.innerHTML = '<div style="padding:14px;text-align:center;color:#b8a4d4;font-size:12px;">Greška pri učitavanju.</div>';
+  }
+}
+document.getElementById('allUsersList').addEventListener('click', function(e){
+  const item = e.target.closest('.convo-item');
+  if(!item) return;
+  document.querySelectorAll('.convo-item').forEach(function(i){ i.classList.remove('active'); });
+  item.classList.add('active');
+  activeName = item.dataset.name;
+  renderMessages(activeName);
+});
+
 async function loadMyMiniProfile(){
   try {
     var me = await api('GET', '/profile/me');
@@ -759,6 +807,7 @@ async function loadMyMiniProfile(){
   try { var meAuth = await api('GET', '/auth/me'); window.exyuMeNick = meAuth.nick; } catch(e){}
   await loadMyMiniProfile();
   await buildConvoList();
+  loadAllUsersList();
   renderMessages(activeName || '');
 })();
 </script>
