@@ -87,7 +87,7 @@ router.get('/incoming', requireAuth, async (req, res) => {
   const result = await db.query(
     `SELECT c.id, c.room, c.created_at, u.nick AS from_nick
      FROM calls c JOIN users u ON u.id = c.from_user_id
-     WHERE c.to_user_id = $1 AND c.status = 'ringing' AND c.created_at > now() - interval '35 seconds'
+     WHERE c.to_user_id = $1 AND c.status = 'ringing' AND c.created_at > now() - interval '50 seconds'
      ORDER BY c.created_at DESC LIMIT 1`,
     [req.user.userId]
   );
