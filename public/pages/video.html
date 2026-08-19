@@ -523,6 +523,10 @@ body {
           <div class="live-dot"></div>
           <span>Poziv nije aktivan</span>
         </div>
+        <div class="ctrl-wrap hidden" id="fullscreenWrap">
+          <button type="button" class="ctrl-btn" id="fullscreenBtn" onclick="toggleCallFullscreen()" title="Cijeli ekran">⛶</button>
+          <div class="ctrl-label">Cijeli ekran</div>
+        </div>
         <div class="ctrl-wrap hidden" id="endCallWrap">
           <button type="button" class="ctrl-btn end" id="endBtn" onclick="manualEndCall=true; endCall();" title="Prekini poziv">📞</button>
           <div class="ctrl-label">Prekini</div>
@@ -846,6 +850,21 @@ async function openOneOnOneCall(name, room){
   var status = document.getElementById('callStatus');
   status.innerHTML = '<div class="live-dot"></div><span>🎥 Stvarni video poziv s ' + name + '</span>';
   document.getElementById('endCallWrap').classList.remove('hidden');
+  document.getElementById('fullscreenWrap').classList.remove('hidden');
+}
+
+function toggleCallFullscreen(){
+  var el = document.getElementById('oneOnOneFrameWrap');
+  if (!el) return;
+  var isFull = document.fullscreenElement || document.webkitFullscreenElement;
+  if (!isFull) {
+    if (el.requestFullscreen) { el.requestFullscreen().catch(function(){}); }
+    else if (el.webkitRequestFullscreen) { el.webkitRequestFullscreen(); }
+    else { alert('Cijeli ekran nije podržan u ovom pregledniku.'); }
+  } else {
+    if (document.exitFullscreen) { document.exitFullscreen().catch(function(){}); }
+    else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
+  }
 }
 
 function handleAcceptClick(){
@@ -906,6 +925,7 @@ function endCall(){
   document.getElementById('callOverlay').classList.remove('show');
   document.getElementById('callAcceptBtn').style.display = '';
   document.getElementById('endCallWrap').classList.add('hidden');
+  document.getElementById('fullscreenWrap').classList.add('hidden');
   callActive = false;
   currentContact = null;
   incomingCallId = null;
