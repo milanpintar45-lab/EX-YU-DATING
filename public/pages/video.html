@@ -542,6 +542,33 @@ body {
 
 </div>
 
+<!-- DEBUG KUTIJICA - bilježi što se događa tijekom poziva -->
+<div id="exyuDebugBox" style="position:fixed;left:8px;bottom:8px;z-index:99999;max-width:340px;max-height:200px;overflow-y:auto;background:rgba(0,0,0,0.85);color:#0f0;font-size:11px;font-family:monospace;padding:8px;border-radius:8px;border:1px solid #0f0;display:none;"></div>
+<script>
+function exyuDebugLog(msg){
+  try {
+    var box = document.getElementById('exyuDebugBox');
+    if (!box) return;
+    box.style.display = 'block';
+    var time = new Date().toLocaleTimeString('hr-HR');
+    var line = document.createElement('div');
+    line.textContent = time + ' — ' + msg;
+    box.appendChild(line);
+    box.scrollTop = box.scrollHeight;
+    var log = JSON.parse(localStorage.getItem('exyuCallLog') || '[]');
+    log.push(time + ' — ' + msg);
+    if (log.length > 40) log = log.slice(log.length - 40);
+    localStorage.setItem('exyuCallLog', JSON.stringify(log));
+  } catch(e){}
+}
+exyuDebugLog('Stranica učitana (video.html)');
+document.addEventListener('visibilitychange', function(){
+  exyuDebugLog('Stranica ' + (document.hidden ? 'sakrivena (u pozadini)' : 'opet vidljiva'));
+});
+window.addEventListener('pagehide', function(){ exyuDebugLog('pagehide — stranica se gasi/napušta'); });
+window.addEventListener('beforeunload', function(){ exyuDebugLog('beforeunload — stranica se ponovno učitava/napušta'); });
+</script>
+
 <script>
 const API_BASE = '/api';
 async function api(method, path, body) {
@@ -668,6 +695,33 @@ let currentContact = null;
 let localStream = null;
 let oneOnOneApi = null;
 
+// ===== WAKE LOCK - sprječava gašenje/zaključavanje ekrana tijekom poziva =====
+// Bez ovoga, na mnogim mobitelima (pogotovo iPhone) preglednik u pozadini
+// "ubije" stranicu kad se ekran zaključa, pa se cijeli poziv tiho izgubi
+// i stranica se ponovno učita kad se korisnik vrati - bez ikakve poruke greške.
+let exyuWakeLock = null;
+async function exyuRequestWakeLock(){
+  try {
+    if ('wakeLock' in navigator) {
+      exyuWakeLock = await navigator.wakeLock.request('screen');
+      exyuDebugLog('Wake lock aktiviran (ekran neće ugasnuti)');
+      exyuWakeLock.addEventListener('release', function(){
+        exyuDebugLog('Wake lock je pušten (ekran se opet može ugasiti)');
+      });
+    } else {
+      exyuDebugLog('Wake lock nije podržan na ovom uređaju/pregledniku');
+    }
+  } catch(e){ exyuDebugLog('Wake lock greška: ' + e.message); }
+}
+function exyuReleaseWakeLock(){
+  if (exyuWakeLock) { try { exyuWakeLock.release(); } catch(e){} exyuWakeLock = null; }
+}
+document.addEventListener('visibilitychange', async function(){
+  if (document.visibilityState === 'visible' && callActive && !exyuWakeLock) {
+    await exyuRequestWakeLock();
+  }
+});
+
 // Lokalna kamera - samo za prikaz "sebe" prije nego poziv počne
 function initLocalCamera(){
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -793,6 +847,7 @@ async function openOneOnOneCall(name, room){
   var mediaOk = await ensureMediaPermission();
   if (!mediaOk) { return; }
   callActive = true;
+  exyuRequestWakeLock();
   endGroupCall();
 
   // VAŽNO: ugasi pregled kamere PRIJE otvaranja pravog poziva, da Daily.co
@@ -844,6 +899,7 @@ async function openOneOnOneCall(name, room){
   oneOnOneApi = frame;
   oneOnOneApi.on('left-meeting', function(ev){
     console.log('[EX YU DATE] left-meeting event:', ev);
+    exyuDebugLog('left-meeting event: ' + JSON.stringify(ev));
     if (!manualEndCall) {
       alert('⚠️ Veza u video pozivu je prekinuta (moguće slaba mreža). Pokušajte ponovno, po mogućnosti na WiFi-u.');
     }
@@ -852,6 +908,7 @@ async function openOneOnOneCall(name, room){
   });
   oneOnOneApi.on('error', function(e){
     console.log('[EX YU DATE] Daily error event:', e);
+    exyuDebugLog('error event: ' + (e && e.errorMsg ? e.errorMsg : 'nepoznato'));
     alert('❌ Greška u pozivu: ' + (e && e.errorMsg ? e.errorMsg : 'nepoznata greška'));
     endCall();
   });
@@ -940,6 +997,7 @@ function checkIncomingCalls(){
 setInterval(checkIncomingCalls, 3000);
 
 function endCall(){
+  exyuReleaseWakeLock();
   document.getElementById('callOverlay').classList.remove('show');
   document.getElementById('callAcceptBtn').style.display = '';
   document.getElementById('endCallWrap').classList.add('hidden');
