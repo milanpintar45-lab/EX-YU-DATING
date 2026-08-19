@@ -914,6 +914,7 @@ async function declineIncomingCall(){
 }
 
 function checkIncomingCalls(){
+  if (document.hidden) return;
   if (callActive || incomingCallId) return;
   api('GET', '/calls/incoming').then(function(data){
     if (data.call && !incomingCallId && !callActive) {
