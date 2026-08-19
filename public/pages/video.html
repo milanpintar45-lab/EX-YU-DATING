@@ -464,6 +464,10 @@ body {
     <!-- SIDEBAR -->
     <div class="video-sidebar">
       <div class="video-sidebar-header">Kontakti</div>
+      <div style="padding:10px 12px;display:flex;gap:6px;">
+        <input type="text" id="videoNickSearch" placeholder="Traži po nicku..." style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid rgba(162,60,255,0.4);background:rgba(255,255,255,0.06);color:#fff;font-family:inherit;font-size:13px;">
+        <button type="button" class="ctrl-btn" style="width:auto;padding:8px 12px;border-radius:8px;font-size:12px;" onclick="searchVideoContact()">🔍</button>
+      </div>
       <div class="video-contact-list" id="contactList">
       </div>
     </div>
@@ -613,6 +617,23 @@ async function loadContacts(){
     list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);">Greška pri učitavanju kontakata.</div>';
   }
 }
+
+function searchVideoContact(){
+  var q = document.getElementById('videoNickSearch').value.trim().toLowerCase();
+  var list = document.getElementById('contactList');
+  if (!q) { list.innerHTML = knownUsers.length ? knownUsers.map(contactCard).join('') : '<div style="padding:20px;text-align:center;color:var(--muted);">Nema drugih korisnika.</div>'; return; }
+  var matches = knownUsers.filter(function(u){ return u.nick.toLowerCase().indexOf(q) !== -1; });
+  list.innerHTML = matches.length ? matches.map(contactCard).join('') : '<div style="padding:20px;text-align:center;color:var(--muted);">Korisnik nije pronađen.</div>';
+}
+document.addEventListener('DOMContentLoaded', function(){
+  var searchInput = document.getElementById('videoNickSearch');
+  if (searchInput) {
+    searchInput.addEventListener('keyup', function(e){
+      if (e.key === 'Enter') { searchVideoContact(); }
+      else { searchVideoContact(); }
+    });
+  }
+});
 
 // ======================
 // GRUPNI POZIV (Daily.co)
