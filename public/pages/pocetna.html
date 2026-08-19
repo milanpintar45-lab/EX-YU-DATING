@@ -142,7 +142,13 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
 .status-stats{display:flex;gap:22px;flex-wrap:wrap;}
 .status-stats .stat{display:flex;align-items:center;gap:8px;font-size:13px;}
 .status-stats .stat span:first-child{color:var(--muted);letter-spacing:.5px;}
-.status-stats .stat .count-box{font-weight:600;background:var(--purple-900);border:1px solid rgba(162,60,255,0.4);color:#fff;}
+.status-stats .stat .count-box{
+  font-weight:800;
+  background:linear-gradient(45deg,#ff6b9d,#a23cff);
+  border:none;
+  color:#fff;
+  box-shadow:0 2px 6px rgba(162,60,255,0.5);
+}
 
 .status-menu{display:flex;gap:18px;flex-wrap:wrap;}
 .status-menu a{
