@@ -813,7 +813,7 @@ async function startCall(name){
         acceptBtn.style.display = '';
         if (myActiveCallId) { api('POST', '/calls/' + myActiveCallId + '/cancel', {}).catch(function(){}); }
       }
-    }, 30000);
+    }, 45000);
   } catch(e) {
     overlay.classList.remove('show');
     acceptBtn.style.display = '';
