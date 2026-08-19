@@ -138,22 +138,6 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
   font-family:'Inter',sans-serif;
   color:#fff;
 }
-.search-convo{
-  padding:10px 14px;
-  border-bottom:1px solid rgba(162,60,255,0.25);
-}
-.search-convo input{
-  width:100%;
-  padding:8px 12px;
-  border-radius:8px;
-  border:1px solid rgba(162,60,255,0.35);
-  background:rgba(255,255,255,0.05);
-  color:#fff;
-  font-family:inherit;
-  font-size:13px;
-  outline:none;
-}
-.search-convo input::placeholder{color:var(--muted);}
 .convo-list{
   flex:1;
   overflow-y:auto;
@@ -183,12 +167,6 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
   display:flex;align-items:center;justify-content:center;font-size:18px;
   border:1px solid rgba(255,224,236,0.4);
   position:relative;
-}
-.convo-avatar .online-dot{
-  position:absolute;bottom:2px;right:2px;
-  width:10px;height:10px;border-radius:50%;
-  background:#22c55e;box-shadow:0 0 5px #22c55e;
-  border:2px solid var(--purple-900);
 }
 .convo-info{flex:1;min-width:0;}
 .convo-name{color:#fff;font-weight:600;font-size:14px;display:flex;justify-content:space-between;}
@@ -239,8 +217,6 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
   gap:8px;
 }
 
-/* Poruke prikazane kao velika tablica (redovi preko cijele širine),
-   ne kao uski "oblačići" poravnati sa strane */
 .msg-bubble{
   width:100%;
   max-width:100%;
@@ -405,29 +381,13 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
   .footer-nav{display:none;}
 }
 
-
-/* MALI "TV" VIDEO U PRAZNOM SREDNJEM PROSTORU ZAGLAVLJA */
-.title-wrap-tv{
-  width:100%;
-  max-width:220px;
-  margin:0 auto;
-  aspect-ratio:16/9;
-  border-radius:10px;
-  overflow:hidden;
-  border:2px solid rgba(162,60,255,0.5);
-  box-shadow:0 6px 20px rgba(162,60,255,0.4);
-  background:#000;
-}
-.title-wrap-tv video{width:100%;height:100%;object-fit:cover;display:block;}
-
-/* HERO BANNER - puna širina, video na vrhu stranice */
 .hero-banner{
   position:relative;
   width:100%;
   height:180px;
   background:linear-gradient(135deg, #2d0057, #4a0a7a);
   display:flex;
-  align-items:center;s
+  align-items:center;
   justify-content:center;
   overflow:hidden;
   border-bottom:2px solid rgba(255,255,255,0.15);
@@ -441,7 +401,6 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
 }
 @media(max-width:600px){ .hero-banner{ height:140px; } }
 
-/* DOLAZNI POZIV - overlay za "zvonjenje" na svim stranicama */
 .call-overlay{
   position:fixed;top:0;left:0;right:0;bottom:0;
   background:rgba(0,0,0,0.85);
@@ -558,10 +517,6 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
         </div>
       </div>
       <div class="chat-messages" id="chatMessages">
-        <div class="empty-chat" id="emptyChat" style="display:none;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#b8a4d4;font-style:italic;gap:12px;">
-          <div style="font-size:3em;opacity:.3;">💬</div>
-          <div>Odaberite razgovor ili započnite novi</div>
-        </div>
         <div class="typing-indicator" id="typing" style="display:none">
           <div class="dot-flash"></div><div class="dot-flash"></div><div class="dot-flash"></div>
           <span id="typingName"></span> piše…
@@ -660,15 +615,15 @@ function bubbleHtml(m){
 
 async function renderMessages(name){
   const box = document.getElementById('chatMessages');
-  const empty = document.getElementById('emptyChat');
   if(!name){
+    // Više se ne prikazuje natpis "Odaberite razgovor" - polje za poruke
+    // ostaje jednostavno prazno, a pisanje poruke (sendMessage) samo
+    // automatski odabere prvi razgovor s liste ako postoji.
     if(box) box.innerHTML = '';
-    if(empty) empty.style.display = 'flex';
-    document.getElementById('chatName').textContent = 'Odaberite razgovor';
+    document.getElementById('chatName').textContent = 'Chat';
     document.getElementById('chatStatus').textContent = '';
     return;
   }
-  if(empty) empty.style.display = 'none';
   document.getElementById('chatName').textContent = name;
   document.getElementById('chatStatus').textContent = '';
   var videoLink = document.querySelector('.chat-header .actions a[title="Video poziv"]');
@@ -696,7 +651,6 @@ async function deleteMessage(id){
   } catch(e) { alert('❌ ' + e.message); }
 }
 
-// Switch conversation
 document.getElementById('convoList').addEventListener('click', function(e){
   const item = e.target.closest('.convo-item');
   if(!item) return;
@@ -706,14 +660,11 @@ document.getElementById('convoList').addEventListener('click', function(e){
   renderMessages(activeName);
 });
 
-// Send message
 async function sendMessage(){
   const input = document.getElementById('msgInput');
   const text = input.value.trim();
   if(!text) return;
 
-  // Ako nitko nije odabran s liste, automatski uzmi prvi razgovor s liste
-  // (korisnik može odmah pisati, ne mora prvo ništa označavati)
   if(!activeName){
     var firstItem = document.querySelector('.convo-item');
     if(firstItem){
@@ -721,7 +672,6 @@ async function sendMessage(){
       firstItem.classList.add('active');
       activeName = firstItem.dataset.name;
     } else {
-      // Nema nikoga na listi razgovora - nema kome poslati poruku
       return;
     }
   }
@@ -736,7 +686,6 @@ async function sendMessage(){
 document.getElementById('sendBtn').addEventListener('click', sendMessage);
 document.getElementById('msgInput').addEventListener('keydown', function(e){ if(e.key==='Enter' && !mentionDropdownOpen()) sendMessage(); });
 
-// ===== @MENTION AUTOCOMPLETE =====
 var mentionSearchTimer = null;
 function mentionDropdownOpen(){
   var dd = document.getElementById('mentionDropdown');
@@ -914,9 +863,6 @@ async function declineIncomingCallGlobal(){
   if (window.exyuUpdateFriendReqBadge) window.exyuUpdateFriendReqBadge();
   if (window.exyuUpdatePokesBadge) window.exyuUpdatePokesBadge();
 
-  // Obavijesti preglednika (opt-in) - provjerava nove poruke/bockanja/zahtjeve svakih 20s
-  // i prikazuje pravu obavijest preglednika, ali SAMO ako je korisnik to sam uključio u postavkama
-  // I ako je dao dopuštenje pregledniku.
   (async function(){
     if (!('Notification' in window)) return;
     let notifEnabled = false;
@@ -945,7 +891,7 @@ async function declineIncomingCallGlobal(){
           new Notification('EX YU DATE', { body: 'Imate novi zahtjev za prijateljstvo! 🤝' });
         }
         lastFriendReqCount = freqCount;
-      } catch(e) { /* korisnik se možda odjavio - tiho preskoči */ }
+      } catch(e) { }
     }
     pollNotifications();
     setInterval(pollNotifications, 20000);
@@ -1143,8 +1089,6 @@ async function declineIncomingCallGlobal(){
     } catch(e) { alert('❌ ' + e.message); }
   };
 
-  document.getElementById('exyuFriendReqModal').addEventListener('click', function(e){ if(e.target === this) this.classList.remove('on'); });
-  document.getElementById('exyuGiftsModal').addEventListener('click', function(e){ if(e.target === this) this.classList.remove('on'); });
   document.getElementById('exyuPokesModal2').addEventListener('click', function(e){ if(e.target === this) this.classList.remove('on'); });
 })();
 </script>
