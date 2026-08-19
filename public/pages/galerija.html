@@ -200,14 +200,14 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
 .side-upload:hover{box-shadow:0 0 20px rgba(162,60,255,0.5);}
 .side-grid{
   display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:10px;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
   min-height:120px;
 }
 .side-item{
   position:relative;
   aspect-ratio:1/1;
-  border-radius:10px;
+  border-radius:8px;
   overflow:hidden;
   border:1px solid rgba(162,60,255,0.35);
   background:linear-gradient(135deg,var(--purple-900),var(--purple-700));
@@ -219,8 +219,8 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
 .side-item .side-del{
   position:absolute;top:4px;right:4px;
   background:rgba(0,0,0,0.6);color:#fff;border:none;
-  width:26px;height:26px;border-radius:50%;
-  cursor:pointer;font-size:14px;
+  width:20px;height:20px;border-radius:50%;
+  cursor:pointer;font-size:11px;
   display:flex;align-items:center;justify-content:center;
 }
 .side-empty{
@@ -254,28 +254,62 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
 }
 .gallery-item .thumb-privacy.private{color:var(--pink);}
 
+/* ZVJEZDICE (ocjena) */
+.star-rating{
+  display:flex;gap:2px;justify-content:center;padding:3px 0;
+  background:rgba(0,0,0,0.55);
+}
+.star-rating .star{
+  font-size:13px;cursor:pointer;color:rgba(255,255,255,0.35);transition:color .15s;
+}
+.star-rating .star.filled{color:#ffd700;}
+.star-rating .star:hover, .star-rating .star:hover ~ .star{color:rgba(255,255,255,0.35);}
+
+/* OSOBNA PORUKA UZ SLIKU/VIDEO (jedna poruka, ne lista komentara) */
+.item-msg-box{
+  background:rgba(0,0,0,0.3);border-top:1px solid rgba(162,60,255,0.3);
+  padding:4px;
+}
+.item-msg-current{
+  font-size:10px;color:#ffe27a;padding:2px 4px;font-style:italic;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.item-msg-input-row{display:flex;gap:3px;padding:2px;}
+.item-msg-input-row input{
+  flex:1;min-width:0;padding:4px 6px;border-radius:5px;
+  border:1px solid rgba(162,60,255,0.4);background:rgba(255,255,255,0.06);
+  color:#fff;font-family:inherit;font-size:10px;
+}
+.item-msg-input-row button{
+  padding:4px 6px;border-radius:5px;border:none;background:var(--purple-500);
+  color:#fff;font-size:10px;cursor:pointer;flex-shrink:0;
+}
+
 /* LIGHTBOX */
 .lightbox-overlay{
   position:fixed;top:0;left:0;right:0;bottom:0;
-  background:rgba(0,0,0,0.85);
+  background:rgba(0,0,0,0.95);
   display:none;align-items:center;justify-content:center;
-  z-index:1000;backdrop-filter:blur(8px);
-  padding:20px;
+  z-index:1000;
+  padding:0;
 }
 .lightbox-overlay.show{display:flex;}
 .lightbox-box{
-  max-width:90vw;max-height:90vh;
-  border-radius:14px;overflow:hidden;
-  border:1px solid rgba(162,60,255,0.5);
-  background:linear-gradient(135deg,var(--purple-900),var(--purple-700));
+  width:100vw;height:100vh;max-width:100vw;max-height:100vh;
+  border-radius:0;overflow:hidden;
+  border:none;
+  background:#000;
   display:flex;flex-direction:column;
-  box-shadow:0 20px 60px rgba(0,0,0,0.6);
+  box-shadow:none;
 }
 .lightbox-image{
-  width:100%;height:100%;min-height:300px;
+  width:100%;flex:1;min-height:0;
   display:flex;align-items:center;justify-content:center;
   font-size:120px;opacity:.9;
-  background:linear-gradient(135deg,var(--purple-900),var(--purple-700));
+  background:#000;
+}
+.lightbox-image img, .lightbox-image video{
+  max-width:100%;max-height:100%;object-fit:contain;
 }
 .lightbox-info{
   padding:14px 18px;
@@ -317,7 +351,7 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
 /* RESPONSIVE */
 @media (max-width:900px){
   .dual-gallery{grid-template-columns:1fr;gap:16px;}
-  .side-grid{grid-template-columns:repeat(3,1fr);}
+  .side-grid{grid-template-columns:repeat(4,1fr);}
 }
 @media (max-width:600px){
   body{padding:8px;}
@@ -325,13 +359,13 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
   .gallery-content{padding:14px 12px;}
   .gallery-side{padding:12px;}
   .gallery-side h3{font-size:19px;letter-spacing:1.5px;}
-  .side-grid{grid-template-columns:repeat(2,1fr);gap:8px;}
+  .side-grid{grid-template-columns:repeat(3,1fr);gap:6px;}
   .side-upload{padding:8px 12px;font-size:12px;}
   .nav-bar{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;}
   .nav-bar a{padding:10px 12px;font-size:11px;letter-spacing:1px;white-space:nowrap;flex-shrink:0;}
 }
 @media (max-width:380px){
-  .side-grid{grid-template-columns:1fr 1fr;gap:6px;}
+  .side-grid{grid-template-columns:repeat(3,1fr);gap:5px;}
 }
 
 body{opacity:1;transition:opacity .15s;}
@@ -559,24 +593,76 @@ async function api(method, path, body) {
 let myPhotosG = [];
 let myVideosG = [];
 
-function reactionBar(item, kind){
-  var likeActive = item.owner_reaction === 'like';
-  var passActive = item.owner_reaction === 'pass';
-  return '<div class="reaction-bar" style="position:absolute;bottom:4px;left:4px;right:4px;display:flex;gap:4px;justify-content:center;">' +
-    '<button type="button" onclick="event.stopPropagation();setReaction(\''+kind+'\','+item.id+',\'like\')" title="Sviđa mi se" style="flex:1;padding:4px 0;border-radius:6px;border:none;cursor:pointer;font-size:13px;background:'+(likeActive?'#22c55e':'rgba(0,0,0,0.55)')+';color:#fff;">👍</button>' +
-    '<button type="button" onclick="event.stopPropagation();setReaction(\''+kind+'\','+item.id+',\'pass\')" title="Ne sviđa mi se" style="flex:1;padding:4px 0;border-radius:6px;border:none;cursor:pointer;font-size:13px;background:'+(passActive?'#ef4444':'rgba(0,0,0,0.55)')+';color:#fff;">👎</button>' +
+var PRIVACY_LABELS = { javno: '👁️ Javno', matchevi: '💞 Matchevi', privatno: '🔒 Sakrij' };
+var PRIVACY_BORDER = { javno: '#22c55e', matchevi: '#f59e0b', privatno: '#ef4444' };
+async function cyclePrivacyG(kind, id){
+  try {
+    var path = (kind === 'slike' ? '/profile/photos/' : '/profile/videos/') + id;
+    var res = await api('PATCH', path);
+    var arr = kind === 'slike' ? myPhotosG : myVideosG;
+    var item = arr.find(function(x){ return x.id == id; });
+    if(item) item.privacy = res.privacy;
+    if (kind === 'slike') renderSlike(); else renderVidea();
+  } catch(e) { alert('❌ ' + e.message); }
+}
+function privacyBadge(kind, id, privacy){
+  var p = privacy || 'javno';
+  return '<div onclick="event.stopPropagation();cyclePrivacyG(\'' + kind + '\',' + id + ')" title="Klikni za promjenu vidljivosti" style="position:absolute;top:4px;left:4px;font-size:9px;background:rgba(0,0,0,0.65);border:1px solid ' + PRIVACY_BORDER[p] + ';color:#fff;border-radius:6px;padding:2px 5px;cursor:pointer;">' + PRIVACY_LABELS[p] + '</div>';
+}
+
+// Lokalno spremljene zvjezdice/komentari (dok backend ne podržava - vidi napomenu ispod)
+function getLocalRatings(){
+  try { return JSON.parse(localStorage.getItem('exyuGalleryRatings') || '{}'); } catch(e){ return {}; }
+}
+function saveLocalRatings(obj){
+  try { localStorage.setItem('exyuGalleryRatings', JSON.stringify(obj)); } catch(e){}
+}
+function getLocalItemMessages(){
+  try { return JSON.parse(localStorage.getItem('exyuGalleryItemMsgs') || '{}'); } catch(e){ return {}; }
+}
+function saveLocalItemMessages(obj){
+  try { localStorage.setItem('exyuGalleryItemMsgs', JSON.stringify(obj)); } catch(e){}
+}
+function escM(t){ return String(t).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]); }); }
+function itemMessageBox(kind, id){
+  var msgs = getLocalItemMessages();
+  var key = kind + '_' + id;
+  var current = msgs[key];
+  return '<div class="item-msg-box">' +
+    (current ? '<div class="item-msg-current">💬 ' + escM(current.who) + ': ' + escM(current.text) + '</div>' : '') +
+    '<div class="item-msg-input-row">' +
+      '<input type="text" placeholder="Ostavi osobnu poruku..." id="imsg_' + kind + '_' + id + '" onclick="event.stopPropagation();" onkeydown="if(event.key===\'Enter\'){event.stopPropagation();setItemMessage(\'' + kind + '\',' + id + ')}">' +
+      '<button type="button" onclick="event.stopPropagation();setItemMessage(\'' + kind + '\',' + id + ')">✅</button>' +
+    '</div>' +
   '</div>';
 }
-async function setReaction(kind, id, reaction){
-  var arr = kind === 'slike' ? myPhotosG : myVideosG;
-  var item = arr.find(function(x){ return x.id === id; });
-  var next = (item && item.owner_reaction === reaction) ? null : reaction; // ponovni klik poništava
-  try {
-    var path = (kind === 'slike' ? '/profile/photos/' : '/profile/videos/') + id + '/reaction';
-    var res = await api('PATCH', path, { reaction: next });
-    if(item) item.owner_reaction = res.ownerReaction;
-    if(kind === 'slike') renderSlike(); else renderVidea();
-  } catch(e) { alert('❌ ' + e.message); }
+function setItemMessage(kind, id){
+  var input = document.getElementById('imsg_' + kind + '_' + id);
+  var text = input.value.trim();
+  if (!text) return;
+  var msgs = getLocalItemMessages();
+  var key = kind + '_' + id;
+  msgs[key] = { who: (window.exyuMeNick || 'Ja'), text: text };
+  saveLocalItemMessages(msgs);
+  if (kind === 'slike') renderSlike(); else renderVidea();
+}
+
+function starRow(kind, id){
+  var ratings = getLocalRatings();
+  var key = kind + '_' + id;
+  var current = ratings[key] || 0;
+  var stars = '';
+  for (var i = 1; i <= 5; i++) {
+    stars += '<span class="star' + (i <= current ? ' filled' : '') + '" onclick="event.stopPropagation();setStarRating(\'' + kind + '\',' + id + ',' + i + ')">★</span>';
+  }
+  return '<div class="star-rating">' + stars + '</div>';
+}
+function setStarRating(kind, id, stars){
+  var ratings = getLocalRatings();
+  var key = kind + '_' + id;
+  ratings[key] = (ratings[key] === stars) ? 0 : stars;
+  saveLocalRatings(ratings);
+  if (kind === 'slike') renderSlike(); else renderVidea();
 }
 
 function renderSlike(){
@@ -584,8 +670,10 @@ function renderSlike(){
   if(!myPhotosG.length){ grid.innerHTML = '<div class="side-empty">Nema slika. Klikni "Dodaj sliku".</div>'; return; }
   grid.innerHTML = myPhotosG.map((item, i) =>
     '<div class="side-item">' +
-      '<img src="' + item.data_url + '" alt="slika" onclick="openLightboxImg(' + i + ')">' +
-      reactionBar(item, 'slike') +
+      '<img src="' + item.data_url + '" alt="slika" style="' + (item.privacy==='privatno' ? 'filter:brightness(0.4);' : '') + '" onclick="openLightboxImg(' + i + ')">' +
+      privacyBadge('slike', item.id, item.privacy) +
+      starRow('slike', item.id) +
+      itemMessageBox('slike', item.id) +
       '<button type="button" class="side-del" title="Obriši" onclick="delItem(\'slike\',' + item.id + ')">✕</button>' +
     '</div>'
   ).join('');
@@ -593,10 +681,12 @@ function renderSlike(){
 function renderVidea(){
   const grid = document.getElementById('videaGrid');
   if(!myVideosG.length){ grid.innerHTML = '<div class="side-empty">Nema videa. Klikni "Dodaj video".</div>'; return; }
-  grid.innerHTML = myVideosG.map((item) =>
+  grid.innerHTML = myVideosG.map((item, i) =>
     '<div class="side-item">' +
-      '<video src="' + item.data_url + '" controls muted playsinline></video>' +
-      reactionBar(item, 'videa') +
+      '<video src="' + item.data_url + '" muted playsinline style="' + (item.privacy==='privatno' ? 'filter:brightness(0.4);' : '') + '" onclick="event.stopPropagation();openLightboxVideo(' + i + ')"></video>' +
+      privacyBadge('videa', item.id, item.privacy) +
+      starRow('videa', item.id) +
+      itemMessageBox('videa', item.id) +
       '<button type="button" class="side-del" title="Obriši" onclick="delItem(\'videa\',' + item.id + ')">✕</button>' +
     '</div>'
   ).join('');
@@ -658,12 +748,26 @@ function openLightboxImg(i){
   if(!item) return;
   const lb = document.getElementById('lightboxOverlay');
   const img = document.getElementById('lbImage');
-  img.innerHTML = '<img src="' + item.data_url + '" style="max-width:100%;max-height:80vh;object-fit:contain;">';
+  img.innerHTML = '<img src="' + item.data_url + '">';
   document.getElementById('lbName').textContent = 'Slika ' + (i+1);
   document.getElementById('lbMeta').textContent = '';
   lb.classList.add('show');
 }
-function closeLightbox(){ document.getElementById('lightboxOverlay').classList.remove('show'); }
+function openLightboxVideo(i){
+  const item = myVideosG[i];
+  if(!item) return;
+  const lb = document.getElementById('lightboxOverlay');
+  const img = document.getElementById('lbImage');
+  img.innerHTML = '<video src="' + item.data_url + '" controls autoplay playsinline></video>';
+  document.getElementById('lbName').textContent = 'Video ' + (i+1);
+  document.getElementById('lbMeta').textContent = '';
+  lb.classList.add('show');
+}
+function closeLightbox(){
+  document.getElementById('lightboxOverlay').classList.remove('show');
+  var v = document.querySelector('#lbImage video');
+  if (v) { v.pause(); }
+}
 document.getElementById('lightboxOverlay').addEventListener('click', function(e){ if(e.target === this) closeLightbox(); });
 document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeLightbox(); });
 
@@ -672,6 +776,7 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeLi
     const gal = await api('GET', '/profile/gallery/me');
     myPhotosG = gal.photos || [];
     myVideosG = gal.videos || [];
+    try { var meAuth = await api('GET', '/auth/me'); window.exyuMeNick = meAuth.nick; } catch(e){}
   } catch(e) {
     window.location.href = '../index.html';
     return;
@@ -779,9 +884,6 @@ async function declineIncomingCallGlobal(){
   if (window.exyuUpdateFriendReqBadge) window.exyuUpdateFriendReqBadge();
   if (window.exyuUpdatePokesBadge) window.exyuUpdatePokesBadge();
 
-  // Obavijesti preglednika (opt-in) - provjerava nove poruke/bockanja/zahtjeve svakih 20s
-  // i prikazuje pravu obavijest preglednika, ali SAMO ako je korisnik to sam uključio u postavkama
-  // I ako je dao dopuštenje pregledniku.
   (async function(){
     if (!('Notification' in window)) return;
     let notifEnabled = false;
@@ -810,7 +912,7 @@ async function declineIncomingCallGlobal(){
           new Notification('EX YU DATE', { body: 'Imate novi zahtjev za prijateljstvo! 🤝' });
         }
         lastFriendReqCount = freqCount;
-      } catch(e) { /* korisnik se možda odjavio - tiho preskoči */ }
+      } catch(e) { }
     }
     pollNotifications();
     setInterval(pollNotifications, 20000);
@@ -1016,7 +1118,6 @@ async function declineIncomingCallGlobal(){
 
 <script>
 (function(){
-  /* Hover prefetch — počni učitavati stranicu čim miš prijeđe na link */
   var prefetched = {};
   document.addEventListener('mouseover', function(e){
     var a = e.target.closest('a[href]');
@@ -1032,7 +1133,6 @@ async function declineIncomingCallGlobal(){
     document.head.appendChild(l);
   }, { passive: true });
 
-  /* Fallback za preglednike bez View Transitions API */
   if (!document.startViewTransition) {
     document.addEventListener('click', function(e){
       if (e.defaultPrevented) return;
@@ -1050,8 +1150,6 @@ async function declineIncomingCallGlobal(){
     });
   }
 
-  /* Ako view transitions JEST aktivan, ugasi body animaciju —
-     preglednik već radi crossfade, dupla animacija = trzaj */
   if (document.startViewTransition) {
     var s = document.createElement('style');
     s.textContent = 'body{animation:none!important;}';
