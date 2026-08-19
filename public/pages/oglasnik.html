@@ -26,8 +26,6 @@
   --red:#ef4444;
   --orange:#f59e0b;
   --blue:#3b82f6;
-  --danger:#ff3366;
-  --success:#00ff88;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;}
@@ -250,6 +248,47 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
   color:#fff;border:none;
 }
 
+/* MEDIJ UZ OGLAS (slika/video) */
+.ad-media-wrap{
+  position:relative;
+  width:100%;
+  aspect-ratio:16/9;
+  border-radius:8px;
+  overflow:hidden;
+  margin-bottom:12px;
+  background:linear-gradient(135deg,var(--purple-900),var(--purple-700));
+}
+.ad-media-wrap img, .ad-media-wrap video{
+  width:100%;height:100%;object-fit:cover;display:block;
+}
+.ad-media-badge{
+  position:absolute;top:6px;left:6px;
+  font-size:10px;background:rgba(0,0,0,0.65);
+  border-radius:6px;padding:2px 6px;color:#fff;
+}
+.ad-media-lock-btn{
+  position:absolute;top:6px;right:6px;
+  font-size:12px;background:rgba(0,0,0,0.65);
+  border:1px solid #a23cff;border-radius:6px;padding:2px 6px;color:#fff;
+  cursor:pointer;
+}
+.ad-media-locked{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:6px;height:100%;color:var(--muted);
+  background:rgba(0,0,0,0.4);
+}
+.ad-media-locked span{font-size:28px;}
+.ad-media-code-row{display:flex;gap:4px;padding:0 10px;width:100%;}
+.ad-media-code-row input{
+  flex:1;min-width:0;padding:5px 8px;border-radius:6px;
+  border:1px solid rgba(162,60,255,0.4);background:rgba(255,255,255,0.08);
+  color:#fff;font-family:inherit;font-size:12px;
+}
+.ad-media-code-row button{
+  padding:5px 10px;border-radius:6px;border:none;background:var(--purple-500);
+  color:#fff;font-size:12px;cursor:pointer;
+}
+
 /* NEW AD BUTTON */
 .new-ad-btn{
   display:inline-flex;align-items:center;gap:10px;
@@ -304,6 +343,22 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
 .modal-form-row select:focus, .modal-form-row input:focus, .modal-form-row textarea:focus{
   outline:none;border-color:var(--purple-500);box-shadow:0 0 10px rgba(162,60,255,0.3);
 }
+.modal-media-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 16px;border-radius:8px;border:1px dashed rgba(162,60,255,0.5);
+  background:rgba(255,255,255,0.04);color:var(--purple-300);
+  font-family:inherit;font-size:13px;cursor:pointer;width:100%;justify-content:center;
+}
+.modal-media-btn:hover{background:rgba(162,60,255,0.15);color:#fff;}
+.modal-media-preview{
+  position:relative;margin-top:10px;border-radius:8px;overflow:hidden;
+  max-height:180px;
+}
+.modal-media-preview img, .modal-media-preview video{width:100%;max-height:180px;object-fit:cover;display:block;}
+.modal-media-remove{
+  position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.7);color:#fff;
+  border:none;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:14px;
+}
 .modal-btns{
   display:flex;gap:12px;justify-content:center;margin-top:20px;
 }
@@ -350,14 +405,12 @@ body{opacity:1;transition:opacity .15s;}
    EX YU DATE — ANTI-TRZANJE v3 (FINALNA VERZIJA)
    =================================================== */
 
-/* 1. Pozadina nikad ne nestaje — nema bijelog bljeska */
 html {
   background: linear-gradient(135deg,#1a0033 0%,#2d0057 50%,#4a0a7a 100%);
   background-attachment: fixed;
-  overflow-y: scroll; /* scrollbar uvijek prisutan → nema layout shiftova */
+  overflow-y: scroll;
 }
 
-/* 2. View Transitions API (Chrome 111+) — čista crossfade, bez pokreta */
 @view-transition {
   navigation: auto;
 }
@@ -370,7 +423,6 @@ html {
 @keyframes exyu-out { to   { opacity: 0; } }
 @keyframes exyu-in  { from { opacity: 0; } }
 
-/* 3. Fallback — isti efekt za Firefox/Safari, BEZ pokreta */
 body {
   animation: exyu-body-in 0.22s linear both;
 }
@@ -379,7 +431,6 @@ body {
   to   { opacity: 1; }
 }
 
-/* MALI "TV" VIDEO U PRAZNOM SREDNJEM PROSTORU ZAGLAVLJA */
 .title-wrap-tv{
   width:100%;
   max-width:220px;
@@ -393,7 +444,6 @@ body {
 }
 .title-wrap-tv video{width:100%;height:100%;object-fit:cover;display:block;}
 
-/* HERO BANNER - puna širina, video na vrhu stranice */
 .hero-banner{
   position:relative;
   width:100%;
@@ -413,46 +463,6 @@ body {
   position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.2)); z-index:1;
 }
 @media(max-width:600px){ .hero-banner{ height:140px; } }
-
-/* DOLAZNI POZIV - overlay za "zvonjenje" na svim stranicama */
-.call-overlay{
-  position:fixed;top:0;left:0;right:0;bottom:0;
-  background:rgba(0,0,0,0.85);
-  display:none;flex-direction:column;
-  align-items:center;justify-content:center;
-  z-index:99999;backdrop-filter:blur(6px);
-}
-.call-overlay.show{display:flex;}
-.call-overlay .caller-avatar{
-  font-size:80px;margin-bottom:12px;
-  animation:pulse 2s infinite;
-}
-.call-overlay .caller-name{
-  font-size:22px;color:#fff;font-weight:700;margin-bottom:4px;
-}
-.call-overlay .caller-status{
-  font-size:14px;color:var(--muted);margin-bottom:24px;
-}
-.call-actions{
-  display:flex;gap:16px;
-}
-.call-btn-action{
-  width:64px;height:64px;border-radius:50%;
-  border:none;display:flex;align-items:center;justify-content:center;
-  font-size:28px;cursor:pointer;transition:all .2s;
-}
-.call-btn-action.accept{
-  background:var(--success);color:#000;box-shadow:0 0 20px rgba(0,255,136,0.4);
-}
-.call-btn-action.decline{
-  background:var(--danger);color:#fff;box-shadow:0 0 20px rgba(255,51,102,0.4);
-}
-.call-btn-action:hover{transform:scale(1.1);}
-@keyframes pulse{
-  0%{transform:scale(1);}
-  50%{transform:scale(1.1);}
-  100%{transform:scale(1);}
-}
 </style>
 </head>
 <body>
@@ -573,17 +583,6 @@ body {
   <div class="footer-nav">EX YU DATE — UPOZNAVANJE BEZ GRANICA</div>
 </div>
 
-<!-- DOLAZNI POZIV OVERLAY -->
-<div class="call-overlay" id="callOverlay">
-  <div class="caller-avatar" id="callerAvatar">👤</div>
-  <div class="caller-name" id="callerName"></div>
-  <div class="caller-status" id="callerStatusText">Vas zove…</div>
-  <div class="call-actions">
-    <button type="button" class="call-btn-action decline" onclick="declineIncomingCallGlobal()">📞</button>
-    <button type="button" class="call-btn-action accept" onclick="acceptIncomingCallGlobal()">📹</button>
-  </div>
-</div>
-
 <!-- NEW AD MODAL -->
 <div class="modal-overlay" id="newAdModal">
   <div class="modal-box">
@@ -612,6 +611,12 @@ body {
     <div class="modal-form-row">
       <label>Tekst oglasa</label>
       <textarea id="adText" placeholder="Opišite što tražite, što nudite, vaše interese..."></textarea>
+    </div>
+    <div class="modal-form-row">
+      <label>Slika ili video uz oglas (opcionalno)</label>
+      <button type="button" class="modal-media-btn" onclick="document.getElementById('adMediaInput').click()">📎 Dodaj sliku ili video</button>
+      <input type="file" id="adMediaInput" accept="image/*,video/*" style="display:none">
+      <div id="adMediaPreviewWrap"></div>
     </div>
     <div class="modal-form-row">
       <label>Vaš spol / oblik</label>
@@ -656,6 +661,7 @@ async function api(method, path, body) {
 function escHtml(t){ return String(t).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]); }); }
 
 var myNick = null;
+var pendingAdMedia = null; // { kind: 'image'|'video', dataUrl }
 
 var CATEGORY_LABELS = {
   'on-trazi-nju':'👨 ON TRAŽI NJU', 'on-trazi-njega':'👨 ON TRAŽI NJEGA', 'on-trazi-par':'👨 ON TRAŽI PAR',
@@ -687,10 +693,77 @@ function timeAgo(iso){
   return 'Prije ' + days + ' dan' + (days===1?'':'a');
 }
 
+// ===== MEDIJ UZ OGLAS (slika/video prikaz + zaključavanje šifrom) =====
+function adMediaHtml(ad){
+  if (!ad.imageUrl && !ad.videoUrl && !ad.mediaLocked) return '';
+  var isOwner = !!ad.isOwner;
+  var lockBtn = '';
+  if (isOwner) {
+    if (ad.mediaPrivacy === 'kod') {
+      lockBtn = '<span class="ad-media-lock-btn" onclick="event.stopPropagation();unlockAdMedia(' + ad.id + ')">🔑 Ukloni šifru</span>';
+    } else {
+      lockBtn = '<span class="ad-media-lock-btn" onclick="event.stopPropagation();lockAdMedia(' + ad.id + ')">🔑 Zaključaj</span>';
+    }
+  }
+  if (ad.mediaLocked) {
+    return '<div class="ad-media-wrap" onclick="event.stopPropagation();">' +
+      '<div class="ad-media-locked">' +
+        '<span>🔒</span>' +
+        '<div style="font-size:12px;">Slika/video zaključani šifrom</div>' +
+        '<div class="ad-media-code-row">' +
+          '<input type="text" placeholder="Upiši šifru" id="adcode_' + ad.id + '">' +
+          '<button type="button" onclick="checkAdMediaCode(' + ad.id + ')">Prikaži</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }
+  var mediaTag = ad.videoUrl
+    ? '<video src="' + ad.videoUrl + '" muted playsinline controls></video>'
+    : '<img src="' + ad.imageUrl + '" alt="oglas">';
+  return '<div class="ad-media-wrap" onclick="event.stopPropagation();" id="admedia_' + ad.id + '">' +
+    mediaTag +
+    '<span class="ad-media-badge">' + (ad.videoUrl ? '🎬 Video' : '📷 Slika') + '</span>' +
+    lockBtn +
+  '</div>';
+}
+
+async function lockAdMedia(id){
+  var code = prompt('Upiši šifru koju ćeš podijeliti s osobom kojoj želiš pokazati sliku/video uz ovaj oglas:');
+  if (code === null) return;
+  code = code.trim();
+  if (!code) { alert('Šifra ne smije biti prazna.'); return; }
+  try {
+    await api('POST', '/ads/' + id + '/lock-media', { code: code });
+    alert('🔑 Zaključano! Šifra je: ' + code + '\n\nPošalji tu šifru osobi kojoj želiš pokazati ovo.');
+    loadAds();
+  } catch(e) { alert('❌ ' + e.message); }
+}
+async function unlockAdMedia(id){
+  if (!confirm('Ukloniti šifru i postaviti sliku/video kao javno vidljivo?')) return;
+  try {
+    await api('POST', '/ads/' + id + '/unlock-media');
+    loadAds();
+  } catch(e) { alert('❌ ' + e.message); }
+}
+async function checkAdMediaCode(id){
+  var input = document.getElementById('adcode_' + id);
+  var code = input.value.trim();
+  if (!code) return;
+  try {
+    var res = await api('POST', '/ads/' + id + '/check-media-code', { code: code });
+    var wrap = input.closest('.ad-media-wrap');
+    var mediaTag = res.videoUrl
+      ? '<video src="' + res.videoUrl + '" muted playsinline controls></video>'
+      : '<img src="' + res.imageUrl + '" alt="oglas">';
+    wrap.innerHTML = mediaTag + '<span class="ad-media-badge">' + (res.videoUrl ? '🎬 Video' : '📷 Slika') + '</span>';
+  } catch(e) { alert('❌ ' + e.message); }
+}
+
 function adCard(ad){
   var canDelete = myNick && ad.nick === myNick;
   return '<div class="ad-card" data-gender="' + ad.poster_gender + '" style="position:relative;">' +
     (canDelete ? '<button type="button" onclick="event.stopPropagation();deleteAd(' + ad.id + ')" title="Obriši oglas" style="position:absolute;top:8px;right:8px;background:#dc2626;color:#fff;border:none;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:14px;z-index:2;">✕</button>' : '') +
+    adMediaHtml(ad) +
     '<div class="ad-card-header">' +
       '<div class="ad-avatar">' + (GENDER_ICON[ad.poster_gender]||'👤') + '</div>' +
       '<div class="ad-info"><h4>' + escHtml(ad.nick) + (ad.age_range ? ', ' + ad.age_range : '') + '</h4>' +
@@ -793,6 +866,35 @@ function openNewAdModal(){
 }
 function closeNewAdModal(){
   document.getElementById('newAdModal').classList.remove('active');
+  pendingAdMedia = null;
+  document.getElementById('adMediaPreviewWrap').innerHTML = '';
+}
+
+document.getElementById('adMediaInput').addEventListener('change', function(e){
+  var file = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+  var isImage = file.type.startsWith('image/');
+  var isVideo = file.type.startsWith('video/');
+  if (!isImage && !isVideo) { alert('Molimo odaberite sliku ili video!'); return; }
+  if (isVideo && file.size > 15 * 1024 * 1024) {
+    if (!confirm('Video je velik (' + Math.round(file.size/1024/1024) + ' MB). Učitavanje može potrajati ili ne uspjeti. Nastaviti?')) return;
+  }
+  var reader = new FileReader();
+  reader.onload = function(ev){
+    pendingAdMedia = { kind: isVideo ? 'video' : 'image', dataUrl: ev.target.result };
+    var wrap = document.getElementById('adMediaPreviewWrap');
+    var tag = isVideo
+      ? '<video src="' + ev.target.result + '" muted playsinline controls></video>'
+      : '<img src="' + ev.target.result + '" alt="pregled">';
+    wrap.innerHTML = '<div class="modal-media-preview">' + tag +
+      '<button type="button" class="modal-media-remove" onclick="removeAdMedia()">✕</button></div>';
+  };
+  reader.readAsDataURL(file);
+});
+function removeAdMedia(){
+  pendingAdMedia = null;
+  document.getElementById('adMediaPreviewWrap').innerHTML = '';
 }
 
 async function saveNewAd(){
@@ -803,8 +905,13 @@ async function saveNewAd(){
   var age = document.getElementById('adAge').value;
   var city = document.getElementById('adCity').value.trim();
   if(!title || !text){ alert('Molimo ispunite naslov i tekst oglasa!'); return; }
+  var body = { category: category, title: title, body: text, posterGender: gender, ageRange: age, city: city };
+  if (pendingAdMedia) {
+    if (pendingAdMedia.kind === 'image') body.imageUrl = pendingAdMedia.dataUrl;
+    else body.videoUrl = pendingAdMedia.dataUrl;
+  }
   try {
-    await api('POST', '/ads', { category: category, title: title, body: text, posterGender: gender, ageRange: age, city: city });
+    await api('POST', '/ads', body);
     alert('✅ Oglas je objavljen!');
     closeNewAdModal();
     document.getElementById('adTitle').value = '';
@@ -834,44 +941,6 @@ api('GET', '/auth/me').then(function(me){
 loadCategoryCounts();
 
 </script>
-
-<!-- DOLAZNI POZIV - "zvono" koje radi na ovoj stranici -->
-<script>
-let incomingCallIdGlobal = null;
-function checkIncomingCallsGlobal(){
-  if (incomingCallIdGlobal) return;
-  api('GET', '/calls/incoming').then(function(data){
-    if (data.call && !incomingCallIdGlobal) {
-      incomingCallIdGlobal = data.call.id;
-      window.exyuIncomingCallRoom = data.call.room;
-      window.exyuIncomingCallFrom = data.call.from_nick;
-      document.getElementById('callerAvatar').textContent = '👤';
-      document.getElementById('callerName').textContent = data.call.from_nick;
-      document.getElementById('callOverlay').classList.add('show');
-    }
-  }).catch(function(){});
-}
-setInterval(checkIncomingCallsGlobal, 3000);
-
-async function acceptIncomingCallGlobal(){
-  var callId = incomingCallIdGlobal;
-  document.getElementById('callOverlay').classList.remove('show');
-  try {
-    var data = await api('POST', '/calls/' + callId + '/accept');
-    window.location.href = 'video.html?joinRoom=' + encodeURIComponent(data.room) + '&withUser=' + encodeURIComponent(window.exyuIncomingCallFrom || '');
-  } catch(e) {
-    alert('❌ ' + e.message);
-    incomingCallIdGlobal = null;
-  }
-}
-async function declineIncomingCallGlobal(){
-  var callId = incomingCallIdGlobal;
-  document.getElementById('callOverlay').classList.remove('show');
-  incomingCallIdGlobal = null;
-  try { await api('POST', '/calls/' + callId + '/decline'); } catch(e){}
-}
-</script>
-
 <script>
 api('GET', '/users/friends-count').then(function(fc){
   var cnt = document.getElementById("myFriendsCount");
