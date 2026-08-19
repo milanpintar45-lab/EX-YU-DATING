@@ -593,8 +593,8 @@ async function api(method, path, body) {
 let myPhotosG = [];
 let myVideosG = [];
 
-var PRIVACY_LABELS = { javno: '👁️ Javno', matchevi: '💞 Matchevi', privatno: '🔒 Sakrij' };
-var PRIVACY_BORDER = { javno: '#22c55e', matchevi: '#f59e0b', privatno: '#ef4444' };
+var PRIVACY_LABELS = { javno: '👁️ Javno', matchevi: '💞 Matchevi', privatno: '🔒 Sakrij', kod: '🔑 Šifra' };
+var PRIVACY_BORDER = { javno: '#22c55e', matchevi: '#f59e0b', privatno: '#ef4444', kod: '#a23cff' };
 async function cyclePrivacyG(kind, id){
   try {
     var path = (kind === 'slike' ? '/profile/photos/' : '/profile/videos/') + id;
@@ -605,9 +605,41 @@ async function cyclePrivacyG(kind, id){
     if (kind === 'slike') renderSlike(); else renderVidea();
   } catch(e) { alert('❌ ' + e.message); }
 }
+async function lockWithCode(kind, id){
+  var code = prompt('Upiši šifru koju ćeš podijeliti s osobom kojoj želiš pokazati ovu ' + (kind==='slike'?'sliku':'video') + ':');
+  if (code === null) return;
+  code = code.trim();
+  if (!code) { alert('Šifra ne smije biti prazna.'); return; }
+  try {
+    var path = (kind === 'slike' ? '/profile/photos/' : '/profile/videos/') + id + '/lock';
+    var res = await api('POST', path, { code: code });
+    var arr = kind === 'slike' ? myPhotosG : myVideosG;
+    var item = arr.find(function(x){ return x.id == id; });
+    if(item) item.privacy = res.privacy;
+    if (kind === 'slike') renderSlike(); else renderVidea();
+    alert('🔑 Zaključano! Šifra je: ' + code + '\n\nPošalji tu šifru osobi kojoj želiš pokazati ovo (npr. preko poruke u Chatu).');
+  } catch(e) { alert('❌ ' + e.message); }
+}
+async function unlockCode(kind, id){
+  if(!confirm('Ukloniti šifru i postaviti nazad na Javno?')) return;
+  try {
+    var path = (kind === 'slike' ? '/profile/photos/' : '/profile/videos/') + id + '/unlock';
+    var res = await api('POST', path);
+    var arr = kind === 'slike' ? myPhotosG : myVideosG;
+    var item = arr.find(function(x){ return x.id == id; });
+    if(item) item.privacy = res.privacy;
+    if (kind === 'slike') renderSlike(); else renderVidea();
+  } catch(e) { alert('❌ ' + e.message); }
+}
 function privacyBadge(kind, id, privacy){
   var p = privacy || 'javno';
-  return '<div onclick="event.stopPropagation();cyclePrivacyG(\'' + kind + '\',' + id + ')" title="Klikni za promjenu vidljivosti" style="position:absolute;top:4px;left:4px;font-size:9px;background:rgba(0,0,0,0.65);border:1px solid ' + PRIVACY_BORDER[p] + ';color:#fff;border-radius:6px;padding:2px 5px;cursor:pointer;">' + PRIVACY_LABELS[p] + '</div>';
+  var clickAction = (p === 'kod')
+    ? 'unlockCode(\'' + kind + '\',' + id + ')'
+    : 'cyclePrivacyG(\'' + kind + '\',' + id + ')';
+  return '<div style="position:absolute;top:4px;left:4px;display:flex;gap:3px;">' +
+    '<span onclick="event.stopPropagation();' + clickAction + '" title="' + (p === 'kod' ? 'Klikni da ukloniš šifru' : 'Klikni za promjenu vidljivosti') + '" style="font-size:9px;background:rgba(0,0,0,0.65);border:1px solid ' + PRIVACY_BORDER[p] + ';color:#fff;border-radius:6px;padding:2px 5px;cursor:pointer;">' + PRIVACY_LABELS[p] + '</span>' +
+    (p === 'kod' ? '' : '<span onclick="event.stopPropagation();lockWithCode(\'' + kind + '\',' + id + ')" title="Zaključaj šifrom i dijeli s kim želiš" style="font-size:11px;background:rgba(0,0,0,0.65);border:1px solid #a23cff;color:#fff;border-radius:6px;padding:1px 4px;cursor:pointer;">🔑</span>') +
+  '</div>';
 }
 
 // Lokalno spremljene zvjezdice/komentari (dok backend ne podržava - vidi napomenu ispod)
