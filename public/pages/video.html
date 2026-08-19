@@ -444,7 +444,7 @@ body {
       <a href="#" id="contactAdminLink">✉️ Kontakt admina</a>
       <a href="settings.html">⚙️ Postavke</a>
       <div id="adminQuickButtons" style="display:none;flex-direction:column;gap:6px;margin-top:6px;align-items:flex-end;">
-        <a href="../index.html" style="color:#ffd700;font-weight:700;letter-spacing:1px;text-shadow:0 0 8px rgba(255,215,0,0.6);">📋 Registracija</a>
+        <a href="../index.html" style="color:#ffd700;font-weight:700;letter-spacing:1px;text-shadow:0 0 8px rgba(255,215,0,0.6);">📋 Registracija <span id="adminPendingBadge" style="background:#ffd700;color:#1a0033;font-weight:800;font-size:11px;padding:2px 7px;border-radius:10px;margin-left:4px;display:none;">0</span></a>
         <a href="#" id="firstPageBtn" style="color:#ffd700;font-weight:700;letter-spacing:1px;text-shadow:0 0 8px rgba(255,215,0,0.6);">🔧 Prva stranica</a>
         <a href="admin.html" style="color:#ffd700;font-weight:700;letter-spacing:1px;text-shadow:0 0 8px rgba(255,215,0,0.6);">🛠️ Admin panel</a>
       </div>
@@ -1172,6 +1172,20 @@ api('GET', '/users/friends-count').then(function(fc){
   var adminQuickButtons = document.getElementById('adminQuickButtons');
   if (me.isAdmin && adminQuickButtons) {
     adminQuickButtons.style.display = 'flex';
+      // Žuta značka pored "Registracija" - pokazuje koliko korisnika čeka odobrenje,
+      // da admin ne mora ulaziti u panel da provjeri
+      (async function(){
+        async function updatePendingBadge(){
+          try {
+            var data = await api('GET', '/admin/users');
+            var pending = (data.users || []).filter(function(u){ return u.status === 'pending'; }).length;
+            var badge = document.getElementById('adminPendingBadge');
+            if (badge) { badge.textContent = pending; badge.style.display = pending > 0 ? 'inline-block' : 'none'; }
+          } catch(e) {}
+        }
+        updatePendingBadge();
+        setInterval(updatePendingBadge, 30000);
+      })();
       var naplataNav = document.getElementById('naplataNav');
       if (naplataNav) naplataNav.style.display = 'inline-block';
     document.getElementById('firstPageBtn').addEventListener('click', function(e){
