@@ -774,7 +774,24 @@ function cancelOutgoingCall(){
   document.getElementById('callAcceptBtn').style.display = '';
 }
 
+async function ensureMediaPermission(){
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    alert('⚠️ Ovaj preglednik ne podržava video pozive. Molimo koristite noviju verziju Chrome-a.');
+    return false;
+  }
+  try {
+    var testStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    testStream.getTracks().forEach(function(t){ t.stop(); });
+    return true;
+  } catch(err) {
+    alert('⚠️ Za video poziv morate dozvoliti pristup kameri i mikrofonu.\n\nDodirnite ikonicu (🔒 ili ⓘ) pored adrese stranice u pregledniku, otvorite "Dozvole" i omogućite Kameru i Mikrofon za ovu stranicu, zatim pokušajte ponovno.');
+    return false;
+  }
+}
+
 async function openOneOnOneCall(name, room){
+  var mediaOk = await ensureMediaPermission();
+  if (!mediaOk) { return; }
   callActive = true;
   endGroupCall();
 
