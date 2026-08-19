@@ -1262,7 +1262,7 @@ async function renderProfilesTable(){
   var users = _cachedAdminUsers.length ? _cachedAdminUsers : (await api('GET', '/admin/users')).users || [];
   var rows = users.map(function(u){
     var status = u.suspended ? '<span style="color:var(--red);">Suspendiran</span>' : '<span style="color:var(--green);">Aktivan</span>';
-    return '<tr><td>'+u.nick+'</td><td>'+(u.gender==='m'?'Muškarac':u.gender==='z'?'Žena':'Par')+'</td><td>'+(u.country||'—')+'</td><td>'+(u.city||'—')+'</td><td>'+(u.email||'—')+'</td><td>'+status+'</td><td><button type="button" class="btn btn-sm btn-outline" onclick="window.open(\'profil.html?user='+u.nick+'\');">Pogledaj</button></td></tr>';
+    return '<tr><td style="cursor:pointer;text-decoration:underline;color:#fff;" onclick="window.location.href=\'profil.html?user=\'+encodeURIComponent(\''+u.nick+'\')" title="Klikni za otvaranje profila">'+u.nick+'</td><td>'+(u.gender==='m'?'Muškarac':u.gender==='z'?'Žena':'Par')+'</td><td>'+(u.country||'—')+'</td><td>'+(u.city||'—')+'</td><td>'+(u.email||'—')+'</td><td>'+status+'</td><td><button type="button" class="btn btn-sm btn-outline" onclick="window.location.href=\'profil.html?user='+u.nick+'\'">Pogledaj</button></td></tr>';
   });
   tbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px;">Nema profila za prikaz.</td></tr>';
 }
