@@ -198,11 +198,34 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
   display:inline-flex;align-items:center;gap:8px;justify-content:center;
 }
 .side-upload:hover{box-shadow:0 0 20px rgba(162,60,255,0.5);}
+.side-columns{
+  display:flex;
+  gap:14px;
+  align-items:flex-start;
+}
 .side-grid{
   display:grid;
   grid-template-columns:repeat(4,1fr);
   gap:8px;
   min-height:120px;
+  flex:0 0 auto;
+  width:60%;
+}
+.side-messages{
+  flex:1;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.side-msg-row{
+  background:rgba(0,0,0,0.25);
+  border:1px solid rgba(162,60,255,0.3);
+  border-radius:8px;
+  padding:6px 8px;
+}
+.side-msg-row .side-msg-label{
+  font-size:10px;color:var(--purple-300);font-weight:700;margin-bottom:3px;
 }
 .side-item{
   position:relative;
@@ -256,8 +279,9 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
 
 /* ZVJEZDICE (ocjena) */
 .star-rating{
-  display:flex;gap:2px;justify-content:center;padding:3px 0;
+  display:flex;gap:2px;justify-content:center;padding:2px 0;
   background:rgba(0,0,0,0.55);
+  position:absolute;bottom:0;left:0;right:0;
 }
 .star-rating .star{
   font-size:13px;cursor:pointer;color:rgba(255,255,255,0.35);transition:color .15s;
@@ -267,14 +291,15 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
 
 /* OSOBNA PORUKA UZ SLIKU/VIDEO (jedna poruka, ne lista komentara) */
 .item-msg-box{
-  background:rgba(0,0,0,0.3);border-top:1px solid rgba(162,60,255,0.3);
-  padding:4px;
+  background:transparent;border-top:none;
+  padding:0;
 }
 .item-msg-current{
-  font-size:10px;color:#ffe27a;padding:2px 4px;font-style:italic;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font-size:11px;color:#ffe27a;padding:0;font-style:italic;
+  overflow:hidden;text-overflow:ellipsis;white-space:normal;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
 }
-.item-msg-input-row{display:flex;gap:3px;padding:2px;}
+.item-msg-input-row{display:flex;gap:3px;padding:0;}
 .item-msg-input-row input{
   flex:1;min-width:0;padding:4px 6px;border-radius:5px;
   border:1px solid rgba(162,60,255,0.4);background:rgba(255,255,255,0.06);
@@ -351,7 +376,8 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
 /* RESPONSIVE */
 @media (max-width:900px){
   .dual-gallery{grid-template-columns:1fr;gap:16px;}
-  .side-grid{grid-template-columns:repeat(4,1fr);}
+  .side-columns{flex-direction:column;}
+  .side-grid{width:100%;}
 }
 @media (max-width:600px){
   body{padding:8px;}
@@ -363,9 +389,6 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
   .side-upload{padding:8px 12px;font-size:12px;}
   .nav-bar{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;}
   .nav-bar a{padding:10px 12px;font-size:11px;letter-spacing:1px;white-space:nowrap;flex-shrink:0;}
-}
-@media (max-width:380px){
-  .side-grid{grid-template-columns:repeat(3,1fr);gap:5px;}
 }
 
 body{opacity:1;transition:opacity .15s;}
@@ -535,7 +558,10 @@ body {
         <h3>SLIKE</h3>
         <button type="button" class="side-upload" onclick="document.getElementById('slikeInput').click()">📷 Dodaj sliku</button>
         <input type="file" id="slikeInput" accept="image/*" multiple style="display:none">
-        <div class="side-grid" id="slikeGrid"></div>
+        <div class="side-columns">
+          <div class="side-grid" id="slikeGrid"></div>
+          <div class="side-messages" id="slikeMsgPanel"></div>
+        </div>
       </div>
 
       <!-- VIDEA (desno) -->
@@ -543,7 +569,10 @@ body {
         <h3>VIDEA</h3>
         <button type="button" class="side-upload" onclick="document.getElementById('videaInput').click()">🎬 Dodaj video</button>
         <input type="file" id="videaInput" accept="video/*" multiple style="display:none">
-        <div class="side-grid" id="videaGrid"></div>
+        <div class="side-columns">
+          <div class="side-grid" id="videaGrid"></div>
+          <div class="side-messages" id="videaMsgPanel"></div>
+        </div>
       </div>
 
     </div>
@@ -699,27 +728,47 @@ function setStarRating(kind, id, stars){
 
 function renderSlike(){
   const grid = document.getElementById('slikeGrid');
-  if(!myPhotosG.length){ grid.innerHTML = '<div class="side-empty">Nema slika. Klikni "Dodaj sliku".</div>'; return; }
+  const msgPanel = document.getElementById('slikeMsgPanel');
+  if(!myPhotosG.length){
+    grid.innerHTML = '<div class="side-empty">Nema slika. Klikni "Dodaj sliku".</div>';
+    msgPanel.innerHTML = '';
+    return;
+  }
   grid.innerHTML = myPhotosG.map((item, i) =>
-    '<div class="side-item">' +
-      '<img src="' + item.data_url + '" alt="slika" style="' + (item.privacy==='privatno' ? 'filter:brightness(0.4);' : '') + '" onclick="openLightboxImg(' + i + ')">' +
+    '<div class="side-item" onclick="openLightboxImg(' + i + ')">' +
+      '<img src="' + item.data_url + '" alt="slika" style="' + (item.privacy==='privatno' ? 'filter:brightness(0.4);' : '') + '">' +
       privacyBadge('slike', item.id, item.privacy) +
       starRow('slike', item.id) +
+      '<button type="button" class="side-del" title="Obriši" onclick="event.stopPropagation();delItem(\'slike\',' + item.id + ')">✕</button>' +
+    '</div>'
+  ).join('');
+  msgPanel.innerHTML = myPhotosG.map((item, i) =>
+    '<div class="side-msg-row">' +
+      '<div class="side-msg-label">Slika ' + (i+1) + '</div>' +
       itemMessageBox('slike', item.id) +
-      '<button type="button" class="side-del" title="Obriši" onclick="delItem(\'slike\',' + item.id + ')">✕</button>' +
     '</div>'
   ).join('');
 }
 function renderVidea(){
   const grid = document.getElementById('videaGrid');
-  if(!myVideosG.length){ grid.innerHTML = '<div class="side-empty">Nema videa. Klikni "Dodaj video".</div>'; return; }
+  const msgPanel = document.getElementById('videaMsgPanel');
+  if(!myVideosG.length){
+    grid.innerHTML = '<div class="side-empty">Nema videa. Klikni "Dodaj video".</div>';
+    msgPanel.innerHTML = '';
+    return;
+  }
   grid.innerHTML = myVideosG.map((item, i) =>
-    '<div class="side-item">' +
-      '<video src="' + item.data_url + '" muted playsinline style="' + (item.privacy==='privatno' ? 'filter:brightness(0.4);' : '') + '" onclick="event.stopPropagation();openLightboxVideo(' + i + ')"></video>' +
+    '<div class="side-item" onclick="openLightboxVideo(' + i + ')">' +
+      '<video src="' + item.data_url + '" muted playsinline style="' + (item.privacy==='privatno' ? 'filter:brightness(0.4);' : '') + '"></video>' +
       privacyBadge('videa', item.id, item.privacy) +
       starRow('videa', item.id) +
+      '<button type="button" class="side-del" title="Obriši" onclick="event.stopPropagation();delItem(\'videa\',' + item.id + ')">✕</button>' +
+    '</div>'
+  ).join('');
+  msgPanel.innerHTML = myVideosG.map((item, i) =>
+    '<div class="side-msg-row">' +
+      '<div class="side-msg-label">Video ' + (i+1) + '</div>' +
       itemMessageBox('videa', item.id) +
-      '<button type="button" class="side-del" title="Obriši" onclick="delItem(\'videa\',' + item.id + ')">✕</button>' +
     '</div>'
   ).join('');
 }
