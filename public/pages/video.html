@@ -524,7 +524,7 @@ body {
           <span>Poziv nije aktivan</span>
         </div>
         <div class="ctrl-wrap hidden" id="endCallWrap">
-          <button type="button" class="ctrl-btn end" id="endBtn" onclick="endCall()" title="Prekini poziv">📞</button>
+          <button type="button" class="ctrl-btn end" id="endBtn" onclick="manualEndCall=true; endCall();" title="Prekini poziv">📞</button>
           <div class="ctrl-label">Prekini</div>
         </div>
       </div>
@@ -659,6 +659,7 @@ function endGroupCall(){
 })();
 
 let callActive = false;
+let manualEndCall = false;
 let currentContact = null;
 let localStream = null;
 let oneOnOneApi = null;
@@ -820,8 +821,19 @@ async function openOneOnOneCall(name, room){
     return;
   }
   oneOnOneApi = frame;
-  oneOnOneApi.on('left-meeting', function(){ endCall(); });
-  oneOnOneApi.on('error', function(e){ alert('❌ Greška u pozivu: ' + (e && e.errorMsg ? e.errorMsg : 'nepoznata greška')); endCall(); });
+  oneOnOneApi.on('left-meeting', function(ev){
+    console.log('[EX YU DATE] left-meeting event:', ev);
+    if (!manualEndCall) {
+      alert('⚠️ Veza u video pozivu je prekinuta (moguće slaba mreža). Pokušajte ponovno, po mogućnosti na WiFi-u.');
+    }
+    manualEndCall = false;
+    endCall();
+  });
+  oneOnOneApi.on('error', function(e){
+    console.log('[EX YU DATE] Daily error event:', e);
+    alert('❌ Greška u pozivu: ' + (e && e.errorMsg ? e.errorMsg : 'nepoznata greška'));
+    endCall();
+  });
 
   try {
     await oneOnOneApi.join({ url: room, userName: exyuSelfNickForCall() });
