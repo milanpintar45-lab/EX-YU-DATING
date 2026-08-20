@@ -142,13 +142,7 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
 .status-stats{display:flex;gap:22px;flex-wrap:wrap;}
 .status-stats .stat{display:flex;align-items:center;gap:8px;font-size:13px;}
 .status-stats .stat span:first-child{color:var(--muted);letter-spacing:.5px;}
-.status-stats .stat .count-box{
-  font-weight:800;
-  background:linear-gradient(45deg,#ff6b9d,#a23cff);
-  border:none;
-  color:#fff;
-  box-shadow:0 2px 6px rgba(162,60,255,0.5);
-}
+.status-stats .stat .count-box{font-weight:800;background:var(--purple-500);border:1px solid rgba(162,60,255,0.4);color:#fff;}
 
 .status-menu{display:flex;gap:18px;flex-wrap:wrap;}
 .status-menu a{
@@ -308,7 +302,7 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
   .chat-card{padding:10px 12px; font-size:14px;}
   .empty{padding:22px 8px; font-size:13px;}
   .footer-nav{padding:10px 14px; font-size:11px;}
-  .count-box{padding:3px 8px; font-size:11px;}
+  .count-box{padding:6px 11px; font-size:15px;}
 }
 
 /* ===================================================
@@ -405,7 +399,7 @@ body {
       <a href="#" id="contactAdminLink">✉️ Kontakt admina</a>
       <a href="settings.html">⚙️ Postavke</a>
       <div id="adminQuickButtons" style="display:none;flex-direction:column;gap:6px;margin-top:6px;align-items:flex-end;">
-        <a href="../index.html" style="color:#ffd700;font-weight:700;letter-spacing:1px;text-shadow:0 0 8px rgba(255,215,0,0.6);">📋 Registracija <span id="adminPendingBadge" style="background:#ffd700;color:#1a0033;font-weight:800;font-size:11px;padding:2px 7px;border-radius:10px;margin-left:4px;display:none;">0</span></a>
+        <a href="../index.html" style="color:#ffd700;font-weight:700;letter-spacing:1px;text-shadow:0 0 8px rgba(255,215,0,0.6);">📋 Registracija</a>
         <a href="#" id="firstPageBtn" style="color:#ffd700;font-weight:700;letter-spacing:1px;text-shadow:0 0 8px rgba(255,215,0,0.6);">🔧 Prva stranica</a>
         <a href="admin.html" style="color:#ffd700;font-weight:700;letter-spacing:1px;text-shadow:0 0 8px rgba(255,215,0,0.6);">🛠️ Admin panel</a>
       </div>
@@ -482,20 +476,16 @@ body {
         <a href="chat.html">Chat</a>
         <a href="chat.html" class="open">otvori sve →</a>
       </div>
-      <div class="col-body" id="homeChatCol">
-        <div class="empty">Učitavam...</div>
-      </div>
-      <div class="chat-input-wrap" style="margin-top:8px;display:flex;gap:6px;">
-        <input type="text" id="homeChatInput" placeholder="Napiši poruku…" style="flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(162,60,255,0.4);border-radius:8px;padding:8px 10px;color:#fff;font-family:inherit;font-size:13px;outline:none;">
-        <button type="button" id="homeChatSendBtn" style="background:linear-gradient(180deg,var(--purple-500),var(--purple-600));color:#fff;border:none;border-radius:8px;padding:8px 14px;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:inherit;font-size:13px;">POŠALJI</button>
+      <div class="col-body">
+        <div class="empty">Nema poruka za prikaz.</div>
       </div>
     </div>
 
     <!-- COLUMN 4: NA MREŽI -->
     <div class="col">
       <div class="col-header">NA MREŽI</div>
-      <div class="col-body" id="homeOnlineCol">
-        <div class="empty">Učitavam...</div>
+      <div class="col-body">
+        <div class="empty">Nema korisnika online.</div>
       </div>
     </div>
 
@@ -529,72 +519,6 @@ body {
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error || 'Greška.');
     return data;
-  }
-
-  function escHome(t){ return String(t).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]); }); }
-
-  function homeProfileCard(p){
-    var giMap={m:'👨',z:'👩',p:'💑'};
-    var genderIcon = giMap[p.gender] || '👤';
-    var metaText = p.city ? (p.city.charAt(0).toUpperCase()+p.city.slice(1)) : '';
-    var countryLabel = {hr:'HR', ba:'BiH', rs:'RS'}[p.country] || '';
-    if (countryLabel) metaText = metaText ? (metaText + ' · ' + countryLabel) : countryLabel;
-    return '<div class="profile-card" style="cursor:pointer;" onclick="window.location.href=\'profil.html?user=' + encodeURIComponent(p.nick) + '\'">' +
-      '<div class="avatar">' + genderIcon + '</div>' +
-      '<div class="info"><div class="name">' + escHome(p.nick) + (p.age ? ', '+p.age : '') + '</div>' +
-      '<div class="meta">' + escHome(metaText) + '</div></div>' +
-      '<div class="dot-online" title="online"></div>' +
-    '</div>';
-  }
-
-  async function loadHomeOnlineUsers(){
-    var col = document.getElementById('homeOnlineCol');
-    if (!col) return;
-    var countries = ['hr','ba','rs'];
-    var all = [];
-    for (var i = 0; i < countries.length; i++) {
-      try {
-        var data = await api('GET', '/users?' + new URLSearchParams({ country: countries[i], onlineOnly: 'true' }));
-        all = all.concat(data.users || []);
-      } catch (e) { /* preskoči tu državu ako ne uspije, ostale se svejedno prikažu */ }
-    }
-    if (all.length === 0) {
-      col.innerHTML = '<div class="empty">Nema korisnika online.</div>';
-      return;
-    }
-    col.innerHTML = all.slice(0, 12).map(homeProfileCard).join('');
-  }
-
-  // ===== CHAT NA POČETNOJ - piše u chat matične države korisnika =====
-  var homeChatCountry = null;
-
-  function homeChatCard(c){
-    return '<div class="chat-card"><div class="who">' + escHome(c.who) +
-      '<span style="color:var(--muted);font-weight:400"> · ' + escHome(c.city||'') + '</span></div>' +
-      '<div class="msg">' + escHome(c.body) + '</div></div>';
-  }
-
-  async function loadHomeChat(){
-    var col = document.getElementById('homeChatCol');
-    if (!col || !homeChatCountry) return;
-    try {
-      var data = await api('GET', '/country-chat?country=' + homeChatCountry + '&limit=8');
-      var list = data.messages || [];
-      col.innerHTML = list.length ? list.map(homeChatCard).join('') : '<div class="empty">Nema poruka za prikaz.</div>';
-    } catch(e) {
-      col.innerHTML = '<div class="empty">Greška pri učitavanju chata.</div>';
-    }
-  }
-
-  async function sendHomeChat(){
-    var input = document.getElementById('homeChatInput');
-    var text = input.value.trim();
-    if (!text || !homeChatCountry) return;
-    try {
-      await api('POST', '/country-chat', { country: homeChatCountry, county: 'SVI', body: text });
-      input.value = '';
-      loadHomeChat();
-    } catch(e) { alert('❌ ' + e.message); }
   }
 
   (async function(){
@@ -726,40 +650,10 @@ if (searchBtn) searchBtn.addEventListener('click', runNickSearch);  searchInput.
       }
     } catch(e) {}
 
-    // NA MREŽI - stvarni online korisnici iz sve tri države
-    loadHomeOnlineUsers();
-    setInterval(loadHomeOnlineUsers, 30000);
-
-    // CHAT - dohvati matičnu državu korisnika pa učitaj/omogući pisanje u njen chat
-    try {
-      var myProfile = await api('GET', '/profile/me');
-      homeChatCountry = myProfile.country;
-      loadHomeChat();
-      setInterval(loadHomeChat, 10000);
-    } catch(e) {
-      document.getElementById('homeChatCol').innerHTML = '<div class="empty">Greška pri učitavanju chata.</div>';
-    }
-    document.getElementById('homeChatSendBtn').addEventListener('click', sendHomeChat);
-    document.getElementById('homeChatInput').addEventListener('keydown', function(e){ if(e.key==='Enter') sendHomeChat(); });
-
     // 3 admin gumba (registracija/prva stranica/admin panel) - vidljivo SAMO stvarnom adminu
     var adminQuickButtons = document.getElementById('adminQuickButtons');
     if (isAdmin && adminQuickButtons) {
       adminQuickButtons.style.display = 'flex';
-      // Žuta značka pored "Registracija" - pokazuje koliko korisnika čeka odobrenje,
-      // da admin ne mora ulaziti u panel da provjeri
-      (function(){
-        async function updatePendingBadge(){
-          try {
-            var data = await api('GET', '/admin/users');
-            var pending = (data.users || []).filter(function(u){ return u.status === 'pending'; }).length;
-            var badge = document.getElementById('adminPendingBadge');
-            if (badge) { badge.textContent = pending; badge.style.display = pending > 0 ? 'inline-block' : 'none'; }
-          } catch(e) {}
-        }
-        updatePendingBadge();
-        setInterval(updatePendingBadge, 30000);
-      })();
       var naplataNav = document.getElementById('naplataNav');
       if (naplataNav) naplataNav.style.display = 'inline-block';
       document.getElementById('firstPageBtn').addEventListener('click', function(e){
