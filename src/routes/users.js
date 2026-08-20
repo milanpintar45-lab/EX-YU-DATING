@@ -1,1001 +1,146 @@
-<!DOCTYPE html>
-<html lang="hr">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>EX YU DATE — Početna</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
-<style>
-:root{
-  --bg:#1a0033;
-  --purple-900:#2d0057;
-  --purple-800:#4a0a7a;
-  --purple-700:#6b1a9e;
-  --purple-600:#7b2cbf;
-  --purple-500:#a23cff;
-  --purple-300:#c57dff;
-  --purple-100:#e9c6ff;
-  --pink:#ff6b9d;
-  --text:#e9c6ff;
-  --muted:#b8a4d4;
-  --line:rgba(162,60,255,0.45);
-  --panel:rgba(45,0,87,0.4);
-  --danger:#ff3366;
-  --success:#00ff88;
-}
-*{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;}
-body{
-  font-family:'Inter',sans-serif;
-  background:linear-gradient(135deg,#1a0033 0%,#2d0057 50%,#4a0a7a 100%);
-  color:var(--text);
-  min-height:100vh;
-  padding:18px;
-}
-a{color:inherit;text-decoration:none;cursor:pointer;}
+const express = require('express');
+const db = require('../db');
+const { requireAuth, requireAdmin } = require('../middleware/auth');
+const { getRegion } = require('../utils/geo');
 
-.app{
-  min-height:calc(100vh - 36px);
-  border:1px solid rgba(162,60,255,0.25);
-  border-radius:14px;
-  overflow:hidden;
-  background:rgba(0,0,0,0.15);
-  display:flex;
-  flex-direction:column;
-}
+const router = express.Router();
+const ALLOWED_COUNTRIES = ['hr', 'ba', 'rs'];
 
-/* TOP HEADER */
-.top{
-  display:grid;
-  grid-template-columns: 160px 1fr 220px;
-  padding:18px 22px;
-  gap:16px;
-  align-items:start;
-}
-.corner-links{display:flex;flex-direction:column;gap:6px;font-size:13px;}
-.corner-links a{color:var(--purple-300);font-size:15px;}
-.corner-links a:hover{color:#fff;}
+// Korisnik se smatra "online" ako je pingao u zadnjih 5 minuta
+const ONLINE_WINDOW_MINUTES = 5;
 
-.title-wrap{text-align:center;}
-.title{
-  font-family:'Cormorant Garamond',serif;
-  font-size:60px;
-  font-weight:700;
-  font-style:italic;
-  letter-spacing:3px;
-  background:linear-gradient(180deg,#fff 0%,var(--purple-100) 60%,var(--purple-300) 100%);
-  -webkit-background-clip:text;background-clip:text;color:transparent;
-  filter:drop-shadow(0 0 18px rgba(162,60,255,0.55));
-  cursor:pointer;
-}
-.title-sub{font-size:13px;color:var(--muted);letter-spacing:4px;margin-top:4px;}
+// Polja koja je SIGURNO vratiti drugim korisnicima (nikad email/telefon/password_hash)
+const PUBLIC_FIELDS = `
+  nick, nick2, gender, seek_gender, country, city,
+  date_part('year', age(birth_date))::int AS age,
+  (show_online_status AND last_seen_at > now() - interval '${ONLINE_WINDOW_MINUTES} minutes') AS is_online
+`;
 
-.right-of-title{display:flex;flex-direction:column;gap:8px;align-items:flex-end;font-size:13px;}
-.right-of-title a{color:var(--purple-300);font-size:15px;}
-.right-of-title .with-count{display:flex;align-items:center;gap:6px;}
-.count-box{
-  min-width:32px;padding:2px 8px;text-align:center;
-  background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.6);border-radius:10px;font-size:13px;color:#ff5c5c;font-weight:700;
-}
+// ============================================
+// POST /api/users/presence-ping
+// Klijent zove periodički (npr. svakih 60s) dok je stranica otvorena
+// ============================================
+router.post('/presence-ping', requireAuth, async (req, res) => {
+  await db.query('UPDATE users SET last_seen_at = now() WHERE id = $1', [req.user.userId]);
+  res.json({ ok: true });
+});
 
-.middle-row{
-  display:grid;
-  grid-template-columns: 1fr 1fr;
-  padding:6px 22px 14px;
-  gap:24px;
-}
-.messages a{color:var(--purple-300);font-weight:500;}
-.messages{display:flex;align-items:center;gap:8px;}
-.search-row{display:flex;align-items:center;gap:8px;}
-.search-row label{color:var(--purple-300);white-space:nowrap;}
-.search-row input{
-  flex:0 1 200px;max-width:200px;background:rgba(255,255,255,0.06);
-  border:1px solid rgba(162,60,255,0.4);border-radius:8px;
-  padding:6px 10px;color:#fff;font-family:inherit;font-size:13px;
-}
-.search-row input::placeholder{color:var(--muted);}
+// ============================================
+// GET /api/users?country=hr&county=&onlineOnly=true&search=nick
+// Lista odobrenih profila (bez admina, bez trenutnog korisnika) - za chat/na-mreži/svi-korisnici
+// ============================================
+router.get('/', requireAuth, async (req, res) => {
+  const { country, onlineOnly, search, gender, ageMin, ageMax, sort, region } = req.query;
+  const conditions = [
+    'status = $1', 'is_admin = false', 'id != $2', 'suspended = false', 'paused = false',
+    'id NOT IN (SELECT blocked_id FROM blocks WHERE blocker_id = $2)',
+    'id NOT IN (SELECT blocker_id FROM blocks WHERE blocked_id = $2)',
+  ];
+  const params = ['approved', req.user.userId];
 
-/* NAV BAR */
-.nav-bar{
-  display:flex;
-  align-items:stretch;
-  border-bottom:2px solid rgba(255,45,149,0.5);
-}
-.nav-bar a{
-  display:inline-block;
-  padding:14px 22px;
-  font-weight:700;
-  letter-spacing:1.5px;
-  color:var(--muted);
-  border-right:1px solid rgba(255,45,149,0.35);
-  transition:all .2s;
-  text-transform:uppercase;
-  font-size:14px;
-  cursor:pointer;
-}
-.nav-bar a:hover{color:#fff;background:rgba(255,45,149,0.16);}
-.nav-bar a.flag-hr{color:#4da6ff;}
-.nav-bar a.flag-ba{color:#4dd980;}
-.nav-bar a.flag-rs{color:#ff5c5c;}
-.nav-bar a.active{color:#fff !important;}
-.nav-bar a.active{
-  color:#fff;
-  background:linear-gradient(180deg,#ff2d78,#c4145a);
-  box-shadow:inset 0 -3px 0 #ffb3d9;
-  text-shadow:0 0 12px rgba(255,92,173,0.85);
-}
-.nav-bar .spacer{flex:1;}
-
-/* STATUS BAR */
-.status-bar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  flex-wrap:wrap;
-  gap:18px;
-  padding:12px 22px;
-  border-bottom:2px solid var(--line);
-  background:rgba(0,0,0,0.18);
-}
-.status-stats{display:flex;gap:22px;flex-wrap:wrap;}
-.status-stats .stat{display:flex;align-items:center;gap:8px;font-size:13px;}
-.status-stats .stat span:first-child{color:var(--muted);letter-spacing:.5px;}
-.status-stats .stat .count-box{font-weight:800;background:var(--purple-500);border:1px solid rgba(162,60,255,0.4);color:#fff;}
-
-.status-menu{display:flex;gap:18px;flex-wrap:wrap;}
-.status-menu a{
-  color:var(--purple-300);font-weight:500;font-size:14px;letter-spacing:.5px;
-  transition:color .2s;
-}
-.status-menu a:hover{color:#fff;}
-
-/* 4 COLUMNS */
-.columns{
-  display:grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  flex:1;
-  min-height:480px;
-}
-.col{
-  padding:14px 14px 18px;
-  border-right:1px solid rgba(162,60,255,0.35);
-  display:flex;flex-direction:column;
-  min-height:100%;
-}
-.col:last-child{border-right:none;}
-.col-header{
-  font-family:'Cormorant Garamond',serif;
-  font-size:20px;
-  color:var(--purple-100);
-  font-weight:700;
-  text-align:center;
-  letter-spacing:2px;
-  padding-bottom:10px;
-  margin-bottom:12px;
-  border-bottom:1px solid rgba(162,60,255,0.35);
-  display:flex;justify-content:space-between;align-items:center;
-}
-.col-header a{color:var(--purple-100);}
-.col-header a:hover{color:#fff;}
-.col-header .open{font-size:11px;color:var(--purple-300);font-family:'Inter',sans-serif;letter-spacing:0;}
-.col-body{flex:1;display:flex;flex-direction:column;gap:6px;font-size:13px;}
-
-/* Profile cards */
-.profile-card{
-  background:rgba(255,255,255,0.04);
-  border:1px solid rgba(162,60,255,0.35);
-  border-radius:8px;
-  padding:8px 10px;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-size:13px;
-}
-.profile-card .avatar{
-  width:36px;height:36px;border-radius:50%;
-  background:linear-gradient(135deg,var(--purple-500),var(--purple-300));
-  flex-shrink:0;
-  border:1px solid rgba(255,224,236,0.4);
-  display:flex;align-items:center;justify-content:center;font-size:16px;
-}
-.profile-card .info{flex:1;min-width:0;}
-.profile-card .info .name{color:#ffe27a;font-weight:700;font-size:15px;text-shadow:0 0 6px rgba(255,226,122,0.5);}
-.profile-card .info .meta{color:var(--muted);font-size:11px;}
-.dot-online{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 6px #22c55e;}
-
-/* Ad item */
-.ad-item{
-  background:rgba(255,255,255,0.04);
-  border:1px solid rgba(162,60,255,0.35);
-  border-radius:8px;padding:8px 10px;
-}
-
-/* Gallery */
-.gallery-grid{
-  display:grid;grid-template-columns:1fr 1fr;gap:6px;
-}
-.thumb{
-  aspect-ratio:1/1;
-  max-height:120px;
-  background:linear-gradient(135deg,var(--purple-700),var(--purple-500));
-  border-radius:6px;
-  border:1px solid rgba(162,60,255,0.3);
-}
-
-/* Chat */
-.chat-card{
-  background:rgba(255,255,255,0.04);
-  border:1px solid rgba(162,60,255,0.35);
-  border-radius:8px;
-  padding:8px 10px;
-  font-size:13px;
-}
-.chat-card .who{color:#ffe27a;font-weight:700;font-size:14px;text-shadow:0 0 6px rgba(255,226,122,0.5);}
-.chat-card .msg{color:var(--text);margin-top:2px;}
-
-.empty{
-  text-align:center;color:var(--muted);font-style:italic;
-  padding:18px 8px;font-size:12px;
-}
-
-/* Footer */
-.footer-nav{
-  padding:14px 22px;
-  border-top:1px solid rgba(162,60,255,0.35);
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  background:rgba(0,0,0,0.22);
-  color:var(--muted);
-  font-size:12px;
-  letter-spacing:2px;
-}
-
-@media (max-width: 1100px){
-  .columns{grid-template-columns:1fr 1fr;}
-  .col{border-bottom:1px solid rgba(162,60,255,0.35);}
-}
-@media (max-width: 900px){
-  .top{grid-template-columns:1fr 1fr; gap:10px; padding:14px 18px;}
-  .title{font-size:40px; letter-spacing:2px;}
-  .title-sub{font-size:11px;}
-  .corner-links{font-size:12px;}
-  .right-of-title{font-size:12px;}
-  .nav-bar a{padding:12px 16px; font-size:12px; letter-spacing:1px;}
-  .status-bar{padding:10px 18px;}
-  .middle-row{padding:6px 18px 12px;}
-}
-@media (max-width: 600px){
-  body{padding:8px;}
-  .app{min-height:calc(100vh - 16px); border-radius:10px;}
-  .top{grid-template-columns:1fr; text-align:center; gap:8px; padding:12px 14px;}
-  .corner-links{flex-direction:row; justify-content:center; gap:10px; flex-wrap:wrap;}
-  .right-of-title{align-items:center; gap:6px;}
-  .title{font-size:30px; letter-spacing:1.5px;}
-  .title-sub{font-size:10px; letter-spacing:2px;}
-  .middle-row{grid-template-columns:1fr; gap:10px; padding:6px 14px 10px;}
-  .messages{justify-content:center;}
-  .search-row{flex-direction:column; align-items:stretch; gap:6px;}
-  .search-row label{align-self:flex-start; font-size:12px;}
-  .search-row input{padding:8px 10px; font-size:14px;}
-  .nav-bar{flex-wrap:nowrap; overflow-x:auto; gap:0; -webkit-overflow-scrolling:touch;}
-  .nav-bar::-webkit-scrollbar{height:3px;}
-  .nav-bar::-webkit-scrollbar-thumb{background:rgba(162,60,255,0.5); border-radius:4px;}
-  .nav-bar a{padding:10px 12px; font-size:11px; letter-spacing:1px; border-right:none; border-bottom:1px solid rgba(162,60,255,0.2); white-space:nowrap; flex-shrink:0;}
-  .status-bar{flex-direction:column; align-items:flex-start; gap:10px; padding:10px 14px;}
-  .status-stats{gap:12px;}
-  .status-stats .stat{font-size:12px;}
-  .status-menu{gap:12px;}
-  .status-menu a{font-size:13px;}
-  .columns{grid-template-columns:1fr; gap:0;}
-  .col{padding:10px 14px 14px; border-right:none; border-bottom:1px solid rgba(162,60,255,0.35);}
-  .col:last-child{border-bottom:none;}
-  .col-header{font-size:17px; padding-bottom:8px; margin-bottom:10px;}
-  .col-body{gap:8px;}
-  .profile-card{padding:10px 12px; gap:10px; font-size:14px;}
-  .profile-card .avatar{width:40px;height:40px; font-size:18px;}
-  .profile-card .info .meta{font-size:12px;}
-  .gallery-grid{grid-template-columns:1fr 1fr; gap:8px;}
-  .thumb{max-height:110px;}
-  .chat-card{padding:10px 12px; font-size:14px;}
-  .empty{padding:22px 8px; font-size:13px;}
-  .footer-nav{padding:10px 14px; font-size:11px;}
-  .count-box{padding:6px 11px; font-size:15px;}
-}
-
-/* ===================================================
-   EX YU DATE — ANTI-TRZANJE v3 (FINALNA VERZIJA)
-   =================================================== */
-
-/* 1. Pozadina nikad ne nestaje — nema bijelog bljeska */
-html {
-  background: linear-gradient(135deg,#1a0033 0%,#2d0057 50%,#4a0a7a 100%);
-  background-attachment: fixed;
-  overflow-y: scroll; /* scrollbar uvijek prisutan → nema layout shiftova */
-}
-
-/* 2. View Transitions API (Chrome 111+) — čista crossfade, bez pokreta */
-@view-transition {
-  navigation: auto;
-}
-::view-transition-old(root) {
-  animation: 180ms linear forwards exyu-out;
-}
-::view-transition-new(root) {
-  animation: 220ms linear forwards exyu-in;
-}
-@keyframes exyu-out { to   { opacity: 0; } }
-@keyframes exyu-in  { from { opacity: 0; } }
-
-/* 3. Fallback — isti efekt za Firefox/Safari, BEZ pokreta */
-body {
-  animation: exyu-body-in 0.22s linear both;
-}
-@keyframes exyu-body-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-/* DOLAZNI POZIV - overlay za "zvonjenje" na svim stranicama */
-.call-overlay{
-  position:fixed;top:0;left:0;right:0;bottom:0;
-  background:rgba(0,0,0,0.85);
-  display:none;flex-direction:column;
-  align-items:center;justify-content:center;
-  z-index:99999;backdrop-filter:blur(6px);
-}
-.call-overlay.show{display:flex;}
-.call-overlay .caller-avatar{
-  font-size:80px;margin-bottom:12px;
-  animation:pulse 2s infinite;
-}
-.call-overlay .caller-name{
-  font-size:22px;color:#fff;font-weight:700;margin-bottom:4px;
-}
-.call-overlay .caller-status{
-  font-size:14px;color:var(--muted);margin-bottom:24px;
-}
-.call-actions{
-  display:flex;gap:16px;
-}
-.call-btn-action{
-  width:64px;height:64px;border-radius:50%;
-  border:none;display:flex;align-items:center;justify-content:center;
-  font-size:28px;cursor:pointer;transition:all .2s;
-}
-.call-btn-action.accept{
-  background:var(--success);color:#000;box-shadow:0 0 20px rgba(0,255,136,0.4);
-}
-.call-btn-action.decline{
-  background:var(--danger);color:#fff;box-shadow:0 0 20px rgba(255,51,102,0.4);
-}
-.call-btn-action:hover{transform:scale(1.1);}
-@keyframes pulse{
-  0%{transform:scale(1);}
-  50%{transform:scale(1.1);}
-  100%{transform:scale(1);}
-}
-</style>
-</head>
-<body>
-<div class="app">
-
-  <!-- TOP HEADER -->
-  <div class="top">
-    <div class="corner-links">
-      <a href="#" id="logoutL">Odjava</a>
-      <a href="chat.html">Poruke <span class="count-box" id="headerPorukeBadge">0</span></a>
-      <a href="#" id="friendReqLink">Zahtjevi za prijateljstvo <span class="count-box" id="friendReqBadge">0</span></a>
-      <a href="#" id="giftsLink">🎁 Pokloni</a>
-      <a href="#" id="pokesLink">👉 Bockanja <span class="count-box" id="pokesBadge">0</span></a>
-    </div>
-    <div class="title-wrap">
-      <a href="pocetna.html"><div class="title">EX YU DATE</div></a>
-      <div class="title-sub">UPOZNAVANJE BEZ GRANICA</div>
-    </div>
-    <div class="right-of-title">
-      <a href="#" id="contactAdminLink">✉️ Kontakt admina</a>
-      <a href="settings.html">⚙️ Postavke</a>
-      <div id="adminQuickButtons" style="display:none;flex-direction:column;gap:6px;margin-top:6px;align-items:flex-end;">
-        <a href="../index.html" style="color:#ffd700;font-weight:700;letter-spacing:1px;text-shadow:0 0 8px rgba(255,215,0,0.6);">📋 Registracija</a>
-        <a href="#" id="firstPageBtn" style="color:#ffd700;font-weight:700;letter-spacing:1px;text-shadow:0 0 8px rgba(255,215,0,0.6);">🔧 Prva stranica</a>
-        <a href="admin.html" style="color:#ffd700;font-weight:700;letter-spacing:1px;text-shadow:0 0 8px rgba(255,215,0,0.6);">🛠️ Admin panel</a>
-      </div>
-    </div>
-  </div>
-
-  <!-- NAV BAR -->
-  <nav class="nav-bar">
-    <a href="pocetna.html" class="active">Početna</a>
-    <a href="hrvatska.html" class="flag-hr">🇭🇷 Hrvatska</a>
-    <a href="bosna.html" class="flag-ba">🇧🇦 Bosna i Hercegovina</a>
-    <a href="srbija.html" class="flag-rs">🇷🇸 Srbija</a>
-    <a href="chat.html">Chat</a>
-    <a href="video.html">Video pozivi</a>
-    <a href="galerija.html">Galerija</a>
-    <a href="oglasnik.html">Oglasnik</a>
-    <a href="profil.html">Profil</a>
-    <a href="#" id="myFriendsNav">Moji prijatelji (<span id="myFriendsCount">0</span>)</a>
-    <a href="naplata.html" id="naplataNav" style="display:none;color:#ffd700;">💰 NAPLATA</a>
-    <div class="spacer"></div>
-  </nav>
-
-  <!-- STATUS BAR -->
-  <div class="status-bar">
-    <div class="status-stats">
-      <div class="stat"><span>online</span><span class="count-box">0</span></div>
-      <div class="stat"><span>žene</span><span class="count-box">0</span></div>
-      <div class="stat"><span>parovi</span><span class="count-box">0</span></div>
-      <div class="stat"><span>muškarci</span><span class="count-box">0</span></div>
-    </div>
-  </div>
-
- <div class="middle-row">
-    <div class="search-row" style="position:relative;display:flex;align-items:center;gap:8px;padding:8px 0;">
-      <input type="text" id="nickSearchHome" placeholder="Traži po nicku..." autocomplete="off" style="flex:1;min-width:0;padding:10px 12px;border-radius:8px;border:1px solid rgba(162,60,255,0.4);background:rgba(255,255,255,0.06);color:#fff;font-size:14px;">
-      <button type="button" id="nickSearchBtn" style="padding:10px 16px;border-radius:8px;border:none;background:#a23cff;color:#fff;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;">Potraži</button>
-      <div id="nickSearchResults" style="display:none;position:absolute;top:100%;left:0;right:0;margin-top:4px;background:linear-gradient(135deg,#2d0057,#4a0a7a);border:1px solid rgba(162,60,255,0.5);border-radius:10px;max-height:220px;overflow-y:auto;z-index:50;box-shadow:0 10px 30px rgba(0,0,0,0.5);"></div>
-    </div>
-  </div> 
-
-  <!-- 4 COLUMNS -->
-  <div class="columns">
-
-    <!-- COLUMN 1: OGLASNIK -->
-    <div class="col">
-     <div class="col-header">
-        <a href="prosireni-oglasnik.html">Oglasnik</a>
-        <a href="prosireni-oglasnik.html" class="open">otvori sve →</a>
-      </div> 
-      <div class="col-body">
-        <div class="empty">Nema oglasa za prikaz.</div>
-      </div>
-    </div>
-
-    <!-- COLUMN 2: GALERIJA -->
-    <div class="col">
-      <div class="col-header">
-        <a href="galerija.html">Galerija</a>
-        <a href="galerija.html" class="open">otvori sve →</a>
-      </div>
-      <div class="col-body">
-        <div class="gallery-grid">
-          <div class="thumb"></div>
-          <div class="thumb"></div>
-          <div class="thumb"></div>
-          <div class="thumb"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- COLUMN 3: CHAT -->
-    <div class="col">
-      <div class="col-header">
-        <a href="chat.html">Chat</a>
-        <a href="chat.html" class="open">otvori sve →</a>
-      </div>
-      <div class="col-body">
-        <div class="empty">Nema poruka za prikaz.</div>
-      </div>
-    </div>
-
-    <!-- COLUMN 4: NA MREŽI -->
-    <div class="col">
-      <div class="col-header">NA MREŽI</div>
-      <div class="col-body">
-        <div id="onlineNowList"><div class="empty">Učitavam...</div></div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- FOOTER -->
-  <div class="footer-nav">
-    EX YU DATE — UPOZNAVANJE BEZ GRANICA
-  </div>
-
-</div>
-
-<!-- DOLAZNI POZIV OVERLAY -->
-<div class="call-overlay" id="callOverlay">
-  <div class="caller-avatar" id="callerAvatar">👤</div>
-  <div class="caller-name" id="callerName"></div>
-  <div class="caller-status" id="callerStatusText">Vas zove…</div>
-  <div class="call-actions">
-    <button type="button" class="call-btn-action decline" onclick="declineIncomingCallGlobal()">📞</button>
-    <button type="button" class="call-btn-action accept" onclick="acceptIncomingCallGlobal()">📹</button>
-  </div>
-</div>
-
-  <script>
-  // Zajednički API helper (isti princip kao u index.html)
-  const API_BASE = '/api';
-  async function api(method, path, body) {
-    const opts = { method, headers: {}, credentials: 'include' };
-    if (body) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
-    const res = await fetch(API_BASE + path, opts);
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data.error || 'Greška.');
-    return data;
+  if (country && ALLOWED_COUNTRIES.includes(country)) {
+    params.push(country);
+    conditions.push(`country = $${params.length}`);
+  }
+  if (gender && ['m', 'z', 'p'].includes(gender)) {
+    params.push(gender);
+    conditions.push(`gender = $${params.length}`);
+  }
+  if (search) {
+    params.push(`%${String(search).trim()}%`);
+    conditions.push(`nick ILIKE $${params.length}`);
+  }
+  if (onlineOnly === 'true') {
+    conditions.push(`last_seen_at > now() - interval '${ONLINE_WINDOW_MINUTES} minutes'`);
+  }
+  if (ageMin && !isNaN(parseInt(ageMin, 10))) {
+    params.push(parseInt(ageMin, 10));
+    conditions.push(`date_part('year', age(birth_date)) >= $${params.length}`);
+  }
+  if (ageMax && !isNaN(parseInt(ageMax, 10))) {
+    params.push(parseInt(ageMax, 10));
+    conditions.push(`date_part('year', age(birth_date)) <= $${params.length}`);
   }
 
-  (async function(){
-    let me = { loggedIn: false };
-    try { me = await api('GET', '/auth/me'); } catch (e) { /* nastavi kao gost */ }
-    var userNick = me.loggedIn ? me.nick : null;
-    var isAdmin = me.loggedIn ? !!me.isAdmin : false;
+  const orderBy = sort === 'ime' ? 'nick ASC' : 'last_seen_at DESC NULLS LAST';
 
-    if (!me.loggedIn) {
-      // Nitko nije prijavljen - vrati na registraciju/login
-      window.location.href = '../index.html';
-      return;
-    }
+  const result = await db.query(
+    `SELECT ${PUBLIC_FIELDS} FROM users WHERE ${conditions.join(' AND ')} ORDER BY ${orderBy} LIMIT 200`,
+    params
+  );
 
-    // Presence ping - javlja serveru da je korisnik aktivan (za "online" status)
-    api('POST', '/users/presence-ping').catch(()=>{});
-    setInterval(function(){ api('POST', '/users/presence-ping').catch(()=>{}); }, 60000);
-
-    document.getElementById('logoutL').addEventListener('click', async function(e) {
-      e.preventDefault();
-      try { await api('POST', '/auth/logout'); } catch(e){}
-      window.location.href = '../index.html';
-    });
-
-    document.getElementById('contactAdminLink').addEventListener('click', function(e){
-      e.preventDefault();
-      if (window.exyuOpenAdmin) window.exyuOpenAdmin();
-    });
-    document.getElementById('friendReqLink').addEventListener('click', function(e){
-      e.preventDefault();
-      if (window.exyuOpenFriendRequests) window.exyuOpenFriendRequests();
-    });
-    document.getElementById('giftsLink').addEventListener('click', function(e){
-      e.preventDefault();
-      if (window.exyuOpenGifts) window.exyuOpenGifts();
-    });
-    document.getElementById('pokesLink').addEventListener('click', function(e){
-      e.preventDefault();
-      if (window.exyuOpenPokes) window.exyuOpenPokes();
-    });
-    if (window.exyuUpdateFriendReqBadge) window.exyuUpdateFriendReqBadge();
-    if (window.exyuUpdatePokesBadge) window.exyuUpdatePokesBadge();
-
-    (async function(){
-      try {
-        var od = await api('GET', '/users?onlineOnly=true&sort=ime');
-        var list = document.getElementById('onlineNowList');
-        var users = od.users || [];
-        if (!users.length) { list.innerHTML = '<div class="empty">Nema korisnika online.</div>'; return; }
-        list.innerHTML = users.slice(0, 12).map(function(u){
-          return '<a href="profil.html?user=' + encodeURIComponent(u.nick) + '" class="profile-card">' +
-            '<div class="avatar">👤</div>' +
-            '<div class="info"><div class="name">' + u.nick + '</div>' +
-            '<div class="meta">🟢 Online' + (u.city ? ' · ' + u.city : '') + '</div></div>' +
-            '</a>';
-        }).join('');
-      } catch(e) {}
-    })();
-
-  // Obavijesti preglednika (opt-in) - provjerava nove poruke/bockanja/zahtjeve svakih 20s
-  // i prikazuje pravu obavijest preglednika, ali SAMO ako je korisnik to sam uključio u postavkama
-  // I ako je dao dopuštenje pregledniku.
-  (async function(){
-    if (!('Notification' in window)) return;
-    let notifEnabled = false;
-    try { notifEnabled = (await api('GET', '/settings')).browserNotifications; } catch(e){}
-    if (!notifEnabled || Notification.permission !== 'granted') return;
-
-    let lastMsgCount = null, lastPokeCount = null, lastFriendReqCount = null;
-    async function pollNotifications(){
-      try {
-        var msgData = await api('GET', '/messages/unread-count');
-        if (lastMsgCount !== null && msgData.count > lastMsgCount) {
-          new Notification('EX YU DATE', { body: 'Imate novu poruku!' });
-        }
-        lastMsgCount = msgData.count;
-
-        var notifData = await api('GET', '/moderation/notifications');
-        var pokeCount = (notifData.notifications || []).filter(function(n){ return n.type === 'poke' && !n.read_at; }).length;
-        if (lastPokeCount !== null && pokeCount > lastPokeCount) {
-          new Notification('EX YU DATE', { body: 'Netko vas je bocnuo! 👉' });
-        }
-        lastPokeCount = pokeCount;
-
-        var freqData = await api('GET', '/friends/requests');
-        var freqCount = (freqData.requests || []).length;
-        if (lastFriendReqCount !== null && freqCount > lastFriendReqCount) {
-          new Notification('EX YU DATE', { body: 'Imate novi zahtjev za prijateljstvo! 🤝' });
-        }
-        lastFriendReqCount = freqCount;
-      } catch(e) { /* korisnik se možda odjavio - tiho preskoči */ }
-    }
-    pollNotifications();
-    setInterval(pollNotifications, 20000);
-  })();
-
-    // Pretraga po nicku - traži stvarne korisnike preko API-ja
-    var searchTimer = null;
-    var searchInput = document.getElementById('nickSearchHome');
-    var searchResults = document.getElementById('nickSearchResults');
-    function escName(t){ return String(t).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]); }); }
-   
- var searchBtn = document.getElementById('nickSearchBtn');
-function runNickSearch(){
-  searchInput.dispatchEvent(new Event('input'));
-}
-if (searchBtn) searchBtn.addEventListener('click', runNickSearch);  searchInput.addEventListener('input', function(){
-      var q = searchInput.value.trim();
-      clearTimeout(searchTimer);
-      if (!q) { searchResults.style.display = 'none'; return; }
-      searchTimer = setTimeout(async function(){
-        try {
-          var data = await api('GET', '/users?' + new URLSearchParams({ search: q }));
-          var users = (data.users || []).slice(0, 8);
-          if (!users.length) { searchResults.innerHTML = '<div style="padding:10px;color:#b8a4d4;font-size:13px;">Nema rezultata.</div>'; }
-          else {
-            searchResults.innerHTML = users.map(function(u){
-              return '<a href="profil.html?user=' + encodeURIComponent(u.nick) + '" style="display:block;padding:10px 12px;color:#fff;font-size:13px;border-bottom:1px solid rgba(162,60,255,0.15);">' + escName(u.nick) + (u.city ? ' <span style="color:#b8a4d4;font-size:11px;">· ' + escName(u.city) + '</span>' : '') + '</a>';
-            }).join('');
-          }
-          searchResults.style.display = 'block';
-        } catch(e) { searchResults.style.display = 'none'; }
-      }, 200);
-    });
-    document.addEventListener('click', function(e){
-      if (!e.target.closest('.search-row')) searchResults.style.display = 'none';
-    });
-
-    // Stvaran broj prijatelja (prihvaćeni zahtjevi) - preko API-ja
-    try {
-      var fc = await api('GET', '/users/friends-count');
-      var cnt = document.getElementById('myFriendsCount');
-      if (cnt) cnt.textContent = fc.count;
-    } catch(e) {}
-
-    // Status traka - stvarni brojevi (online/žene/muškarci/parovi)
-    try {
-      var stats = await api('GET', '/users/stats');
-      var statBoxes = document.querySelectorAll('.status-stats .count-box');
-      if (statBoxes.length >= 4) {
-        statBoxes[0].textContent = stats.online;
-        statBoxes[1].textContent = stats.women;
-        statBoxes[2].textContent = stats.pairs;
-        statBoxes[3].textContent = stats.men;
-      }
-    } catch(e) {}
-
-    // 3 admin gumba (registracija/prva stranica/admin panel) - vidljivo SAMO stvarnom adminu
-    var adminQuickButtons = document.getElementById('adminQuickButtons');
-    if (isAdmin && adminQuickButtons) {
-      adminQuickButtons.style.display = 'flex';
-      var naplataNav = document.getElementById('naplataNav');
-      if (naplataNav) naplataNav.style.display = 'inline-block';
-      document.getElementById('firstPageBtn').addEventListener('click', function(e){
-        e.preventDefault();
-        localStorage.removeItem('exyu_welcome_accepted');
-        window.location.href = '../index.html';
-      });
-    }
-  })();
-  </script>
-
-  <!-- DOLAZNI POZIV - "zvono" koje radi na ovoj stranici -->
-  <script>
-  let incomingCallIdGlobal = null;
-  function checkIncomingCallsGlobal(){
-    if (incomingCallIdGlobal) return;
-    api('GET', '/calls/incoming').then(function(data){
-      if (data.call && !incomingCallIdGlobal) {
-        incomingCallIdGlobal = data.call.id;
-        window.exyuIncomingCallRoom = data.call.room;
-        window.exyuIncomingCallFrom = data.call.from_nick;
-        document.getElementById('callerAvatar').textContent = '👤';
-        document.getElementById('callerName').textContent = data.call.from_nick;
-        document.getElementById('callOverlay').classList.add('show');
-      }
-    }).catch(function(){});
-  }
-  setInterval(checkIncomingCallsGlobal, 3000);
-
-  async function acceptIncomingCallGlobal(){
-    var callId = incomingCallIdGlobal;
-    document.getElementById('callOverlay').classList.remove('show');
-    try {
-      var data = await api('POST', '/calls/' + callId + '/accept');
-      window.location.href = 'video.html?joinRoom=' + encodeURIComponent(data.room) + '&withUser=' + encodeURIComponent(window.exyuIncomingCallFrom || '');
-    } catch(e) {
-      alert('❌ ' + e.message);
-      incomingCallIdGlobal = null;
-    }
-  }
-  async function declineIncomingCallGlobal(){
-    var callId = incomingCallIdGlobal;
-    document.getElementById('callOverlay').classList.remove('show');
-    incomingCallIdGlobal = null;
-    try { await api('POST', '/calls/' + callId + '/decline'); } catch(e){}
-  }
-  </script>
-
-  <!-- ZAHTJEVI ZA PRIJATELJSTVO + POKLONI -->
-  <div class="exyu-modal" id="exyuFriendReqModal">
-    <div class="exyu-modal-box">
-      <h3>🤝 Zahtjevi za prijateljstvo</h3>
-      <div id="exyuFriendReqList" style="max-height:400px;overflow-y:auto;"></div>
-      <div class="exyu-modal-actions" style="margin-top:14px;">
-        <button type="button" class="exyu-btn-cancel" onclick="document.getElementById('exyuFriendReqModal').classList.remove('on')" style="flex:1;">Zatvori</button>
-      </div>
-    </div>
-  </div>
-  <div class="exyu-modal" id="exyuGiftsModal">
-    <div class="exyu-modal-box">
-      <h3>🎁 Pokloni</h3>
-      <p style="margin-bottom:10px;font-size:13px;color:#b8a4d4;">Pošalji poklon</p>
-      <div style="display:flex;gap:8px;margin-bottom:10px;">
-        <input type="text" id="giftToNick" placeholder="Nick primatelja" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(162,60,255,0.4);background:rgba(255,255,255,0.08);color:#fff;">
-        <select id="giftType" style="padding:10px;border-radius:8px;border:1px solid rgba(162,60,255,0.4);background:rgba(255,255,255,0.08);color:#fff;">
-          <option value="ruza">🌹 Ruža</option>
-          <option value="srce">❤️ Srce</option>
-          <option value="dijamant">💎 Dijamant</option>
-          <option value="medvjedic">🧸 Medvjedić</option>
-          <option value="sampanjac">🍾 Šampanjac</option>
-        </select>
-      </div>
-      <textarea id="giftMessage" placeholder="Poruka uz poklon (opcionalno)..." style="width:100%;min-height:60px;padding:10px;border-radius:8px;border:1px solid rgba(162,60,255,0.4);background:rgba(255,255,255,0.08);color:#fff;font-family:inherit;margin-bottom:10px;"></textarea>
-      <button type="button" class="exyu-btn-send" onclick="exyuSendGift()" style="width:100%;margin-bottom:14px;">Pošalji poklon</button>
-      <div style="font-weight:700;color:#c57dff;font-size:13px;margin-bottom:8px;">Primljeni pokloni</div>
-      <div id="exyuGiftsList" style="max-height:250px;overflow-y:auto;"></div>
-      <div class="exyu-modal-actions" style="margin-top:14px;">
-        <button type="button" class="exyu-btn-cancel" onclick="document.getElementById('exyuGiftsModal').classList.remove('on')" style="flex:1;">Zatvori</button>
-      </div>
-    </div>
-  </div>
-  <script>
-  (function(){
-    function esc(t){ return String(t).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]); }); }
-    var GIFT_ICONS = { ruza:'🌹', srce:'❤️', dijamant:'💎', medvjedic:'🧸', sampanjac:'🍾' };
-    var GIFT_LABELS = { ruza:'Ruža', srce:'Srce', dijamant:'Dijamant', medvjedic:'Medvjedić', sampanjac:'Šampanjac' };
-
-    window.exyuUpdateFriendReqBadge = async function(){
-      try {
-        var data = await api('GET', '/friends/requests');
-        var b = document.getElementById('friendReqBadge');
-        if (b) b.textContent = (data.requests || []).length;
-      } catch(e){}
-    };
-
-    window.exyuOpenFriendRequests = async function(){
-      var list = document.getElementById('exyuFriendReqList');
-      list.innerHTML = 'Učitavam...';
-      document.getElementById('exyuFriendReqModal').classList.add('on');
-      try {
-        var data = await api('GET', '/friends/requests');
-        var reqs = data.requests || [];
-        list.innerHTML = reqs.length ? reqs.map(function(r){
-          return '<div class="exyu-msg-item"><div class="from">' + esc(r.from_nick) + '</div>' +
-            '<div class="exyu-modal-actions" style="margin-top:8px;">' +
-              '<button type="button" class="exyu-btn-send" style="padding:8px 14px;font-size:13px;" onclick="exyuAcceptFriendReq(' + r.id + ')">✅ Prihvati</button>' +
-              '<button type="button" class="exyu-btn-cancel" style="padding:8px 14px;font-size:13px;" onclick="exyuDeclineFriendReq(' + r.id + ')">✖ Odbij</button>' +
-            '</div></div>';
-        }).join('') : '<div class="exyu-empty">Nema zahtjeva na čekanju.</div>';
-      } catch(e) {
-        list.innerHTML = '<div class="exyu-empty">Greška pri učitavanju.</div>';
-      }
-    };
-    window.exyuAcceptFriendReq = async function(id){
-      try { await api('POST', '/friends/requests/' + id + '/accept'); window.exyuOpenFriendRequests(); window.exyuUpdateFriendReqBadge(); }
-      catch(e){ alert('❌ ' + e.message); }
-    };
-    window.exyuDeclineFriendReq = async function(id){
-      try { await api('POST', '/friends/requests/' + id + '/decline'); window.exyuOpenFriendRequests(); window.exyuUpdateFriendReqBadge(); }
-      catch(e){ alert('❌ ' + e.message); }
-    };
-
-    window.exyuOpenGifts = async function(){
-      document.getElementById('exyuGiftsModal').classList.add('on');
-      var list = document.getElementById('exyuGiftsList');
-      list.innerHTML = 'Učitavam...';
-      try {
-        var data = await api('GET', '/gifts/received');
-        var gifts = data.gifts || [];
-        list.innerHTML = gifts.length ? gifts.map(function(g){
-          return '<div class="exyu-msg-item"><div class="from">' + (GIFT_ICONS[g.gift_type]||'🎁') + ' ' + GIFT_LABELS[g.gift_type] + ' od ' + esc(g.from_nick) + '</div>' +
-            (g.message ? '<div class="txt">' + esc(g.message) + '</div>' : '') +
-            '<div class="time">' + new Date(g.created_at).toLocaleString('hr-HR') + '</div></div>';
-        }).join('') : '<div class="exyu-empty">Nema primljenih poklona.</div>';
-      } catch(e) {
-        list.innerHTML = '<div class="exyu-empty">Greška pri učitavanju.</div>';
-      }
-    };
-    window.exyuSendGift = async function(){
-      var toNick = document.getElementById('giftToNick').value.trim();
-      var giftType = document.getElementById('giftType').value;
-      var message = document.getElementById('giftMessage').value.trim();
-      if(!toNick){ alert('Upišite nick primatelja!'); return; }
-      try {
-        await api('POST', '/gifts', { toNick: toNick, giftType: giftType, message: message });
-        alert('🎁 Poklon poslan!');
-        document.getElementById('giftToNick').value = '';
-        document.getElementById('giftMessage').value = '';
-      } catch(e) { alert('❌ ' + e.message); }
-    };
-
-    document.getElementById('exyuFriendReqModal').addEventListener('click', function(e){ if(e.target === this) this.classList.remove('on'); });
-    document.getElementById('exyuGiftsModal').addEventListener('click', function(e){ if(e.target === this) this.classList.remove('on'); });
-  })();
-  </script>
-
-  <!-- BOCKANJA -->
-  <div class="exyu-modal" id="exyuPokesModal2">
-    <div class="exyu-modal-box">
-      <h3>👉 Bockanja</h3>
-      <div style="display:flex;gap:8px;margin-bottom:14px;">
-        <input type="text" id="pokeToNick" placeholder="Nick korisnika za bockanje" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(162,60,255,0.4);background:rgba(255,255,255,0.08);color:#fff;">
-        <button type="button" class="exyu-btn-send" onclick="exyuSendPoke()" style="width:auto;padding:10px 18px;">Bocni</button>
-      </div>
-      <div id="exyuPokesList2" style="max-height:350px;overflow-y:auto;"></div>
-      <div class="exyu-modal-actions" style="margin-top:14px;">
-        <button type="button" class="exyu-btn-cancel" onclick="document.getElementById('exyuPokesModal2').classList.remove('on')" style="flex:1;">Zatvori</button>
-      </div>
-    </div>
-  </div>
-  <script>
-  (function(){
-    function esc(t){ return String(t).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]); }); }
-
-    window.exyuUpdatePokesBadge = async function(){
-      try {
-        var data = await api('GET', '/moderation/notifications');
-        var n = (data.notifications || []).filter(function(x){ return x.type === 'poke' && !x.read_at; }).length;
-        var b = document.getElementById('pokesBadge');
-        if (b) b.textContent = n;
-      } catch(e){}
-    };
-
-    window.exyuOpenPokes = async function(){
-      document.getElementById('exyuPokesModal2').classList.add('on');
-      var list = document.getElementById('exyuPokesList2');
-      list.innerHTML = 'Učitavam...';
-      try {
-        var data = await api('GET', '/moderation/pokes');
-        var received = data.received || [], sent = data.sent || [];
-        var html = '<div style="font-weight:700;color:#c57dff;font-size:13px;margin-bottom:8px;">Primljena bockanja (' + received.length + ')</div>';
-        html += received.length ? received.map(function(p){
-          return '<div class="exyu-msg-item"><div class="from">' + esc(p.from_nick) + '</div><div class="time">' + new Date(p.created_at).toLocaleString('hr-HR') + '</div></div>';
-        }).join('') : '<div class="exyu-empty" style="padding:12px;">Nema primljenih bockanja.</div>';
-        html += '<div style="font-weight:700;color:#c57dff;font-size:13px;margin:14px 0 8px;">Poslana bockanja (' + sent.length + ')</div>';
-        html += sent.length ? sent.map(function(p){
-          return '<div class="exyu-msg-item"><div class="from">' + esc(p.to_nick) + '</div><div class="time">' + new Date(p.created_at).toLocaleString('hr-HR') + '</div></div>';
-        }).join('') : '<div class="exyu-empty" style="padding:12px;">Niste nikoga bocnuli.</div>';
-        list.innerHTML = html;
-        await api('POST', '/moderation/notifications/mark-read');
-        window.exyuUpdatePokesBadge();
-      } catch(e) {
-        list.innerHTML = '<div class="exyu-empty">Greška pri učitavanju.</div>';
-      }
-    };
-    window.exyuSendPoke = async function(){
-      var nick = document.getElementById('pokeToNick').value.trim();
-      if(!nick){ alert('Upišite nick!'); return; }
-      try {
-        await api('POST', '/moderation/poke', { toNick: nick });
-        alert('👉 Bocnuo/la si korisnika "' + nick + '"!');
-        document.getElementById('pokeToNick').value = '';
-        window.exyuOpenPokes();
-      } catch(e) { alert('❌ ' + e.message); }
-    };
-
-    document.getElementById('exyuPokesModal2').addEventListener('click', function(e){ if(e.target === this) this.classList.remove('on'); });
-  })();
-  </script>
-
-<!-- OBRATI SE ADMINU + PORUKE WIDGET -->
-<style>
-.exyu-fab-wrap{position:fixed;right:16px;bottom:16px;z-index:9998;display:flex;flex-direction:column;gap:10px;align-items:flex-end;}
-.exyu-fab{background:linear-gradient(45deg,#a23cff,#c57dff);color:#fff;border:none;padding:12px 18px;border-radius:30px;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 8px 25px rgba(162,60,255,0.5);font-family:inherit;letter-spacing:.5px;}
-.exyu-fab:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(162,60,255,0.7);}
-.exyu-fab.msg{background:linear-gradient(45deg,#ff6b9d,#a23cff);}
-.exyu-fab .badge{background:#fff;color:#a23cff;border-radius:12px;padding:2px 8px;margin-left:6px;font-size:11px;font-weight:800;}
-.exyu-modal{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px);}
-.exyu-modal.on{display:flex;}
-.exyu-modal-box{background:linear-gradient(135deg,#2d0057,#4a0a7a);border:2px solid rgba(162,60,255,0.5);border-radius:20px;padding:30px;max-width:480px;width:100%;color:#e9c6ff;box-shadow:0 25px 70px rgba(0,0,0,0.7);}
-.exyu-modal-box h3{font-family:'Cormorant Garamond',serif;font-size:1.8em;color:#fff;margin-bottom:14px;letter-spacing:1px;}
-.exyu-modal-box textarea{width:100%;min-height:120px;padding:12px;border-radius:12px;border:2px solid rgba(162,60,255,0.4);background:rgba(255,255,255,0.08);color:#fff;font-family:inherit;font-size:15px;margin-bottom:14px;resize:vertical;}
-.exyu-modal-box textarea:focus{outline:none;border-color:#c57dff;}
-.exyu-modal-actions{display:flex;gap:10px;}
-.exyu-btn-send{flex:1;background:linear-gradient(45deg,#a23cff,#c57dff);color:#fff;border:none;padding:14px;border-radius:12px;font-weight:700;cursor:pointer;font-family:inherit;font-size:15px;}
-.exyu-btn-cancel{flex:1;background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(162,60,255,0.4);padding:14px;border-radius:12px;font-weight:700;cursor:pointer;font-family:inherit;font-size:15px;}
-.exyu-msg-item{background:rgba(0,0,0,0.3);border-left:3px solid #a23cff;padding:12px;border-radius:8px;margin-bottom:10px;}
-.exyu-msg-item .from{color:#c57dff;font-weight:700;font-size:13px;}
-.exyu-msg-item .txt{margin-top:6px;font-size:14px;color:#e9c6ff;}
-.exyu-msg-item .time{font-size:11px;color:#b8a4d4;margin-top:4px;}
-.exyu-empty{text-align:center;color:#b8a4d4;padding:30px;font-style:italic;}
-@media(max-width:600px){.exyu-fab{padding:10px 14px;font-size:13px;}}
-</style>
-<div class="exyu-modal" id="exyuAdminModal">
-  <div class="exyu-modal-box">
-    <h3>✉️ Poruka adminu</h3>
-    <p style="margin-bottom:12px;font-size:14px;color:#b8a4d4;">Napišite pitanje ili prijavu — admin će je vidjeti u svojim porukama.</p>
-    <textarea id="exyuAdminText" placeholder="Vaša poruka..."></textarea>
-    <div class="exyu-modal-actions">
-      <button type="button" class="exyu-btn-cancel" onclick="exyuCloseAdmin()">Odustani</button>
-      <button type="button" class="exyu-btn-send" onclick="exyuSendAdmin()">Pošalji</button>
-    </div>
-  </div>
-</div>
-<script>
-(function(){
-  window.exyuOpenAdmin = function(){ document.getElementById('exyuAdminModal').classList.add('on'); };
-  window.exyuCloseAdmin = function(){ document.getElementById('exyuAdminModal').classList.remove('on'); document.getElementById('exyuAdminText').value=''; };
-  window.exyuSendAdmin = async function(){
-    var t = document.getElementById('exyuAdminText').value.trim();
-    if(!t){ alert('Napišite poruku!'); return; }
-    try {
-      await api('POST', '/messages', { toNick: 'admin', body: t });
-      exyuCloseAdmin();
-      alert('✅ Poruka poslana adminu!');
-      updateBadge();
-    } catch (err) {
-      alert('❌ ' + err.message);
-    }
-  };
-  async function updateBadge(){
-    try {
-      var data = await api('GET', '/messages/unread-count');
-      var b = document.getElementById('headerPorukeBadge');
-      if(b) b.textContent = data.count;
-    } catch (e) { /* korisnik možda nije prijavljen - badge ostaje na 0 */ }
-  }
-  updateBadge();
-  setInterval(updateBadge, 15000);
-})();
-</script>
-
-<script>
-(function(){
-  /* Hover prefetch — počni učitavati stranicu čim miš prijeđe na link */
-  var prefetched = {};
-  document.addEventListener('mouseover', function(e){
-    var a = e.target.closest('a[href]');
-    if (!a) return;
-    var href = a.getAttribute('href');
-    if (!href || href[0] === '#') return;
-    if (/^(javascript|mailto|tel):/.test(href)) return;
-    if (a.target === '_blank') return;
-    if (prefetched[href]) return;
-    prefetched[href] = true;
-    var l = document.createElement('link');
-    l.rel = 'prefetch'; l.href = href;
-    document.head.appendChild(l);
-  }, { passive: true });
-
-  /* Fallback za preglednike bez View Transitions API */
-  if (!document.startViewTransition) {
-    document.addEventListener('click', function(e){
-      if (e.defaultPrevented) return;
-      var a = e.target.closest('a[href]');
-      if (!a) return;
-      var href = a.getAttribute('href');
-      if (!href || href[0] === '#') return;
-      if (/^(javascript|mailto|tel):/.test(href)) return;
-      if (a.target === '_blank') return;
-      if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
-      e.preventDefault();
-      document.body.style.transition = 'opacity 0.15s linear';
-      document.body.style.opacity   = '0';
-      setTimeout(function(){ window.location.href = href; }, 155);
-    });
+  // Regija/županija se izračunava iz grada (mapiranje), ne sprema se posebno u bazu -
+  // grad ostaje jedini "izvor istine", regija je samo prikazni derivat.
+  let users = result.rows.map((u) => ({ ...u, region: getRegion(u.country, u.city) }));
+  if (region) {
+    const wanted = String(region).trim().toLowerCase();
+    users = users.filter((u) => u.region && u.region.toLowerCase() === wanted);
   }
 
-  /* Ako view transitions JEST aktivan, ugasi body animaciju —
-     preglednik već radi crossfade, dupla animacija = trzaj */
-  if (document.startViewTransition) {
-    var s = document.createElement('style');
-    s.textContent = 'body{animation:none!important;}';
-    document.head.appendChild(s);
+  res.json({ users });
+});
+
+// ============================================
+// GET /api/users/stats?country=hr
+// Brojevi za status traku (online/žene/muškarci/parovi)
+// ============================================
+router.get('/stats', requireAuth, async (req, res) => {
+  const { country } = req.query;
+  const conditions = ['status = $1', 'is_admin = false'];
+  const params = ['approved'];
+
+  if (country && ALLOWED_COUNTRIES.includes(country)) {
+    params.push(country);
+    conditions.push(`country = $${params.length}`);
   }
-})();
-</script>
-</body>
-</html>
+
+  const result = await db.query(
+    `SELECT
+      count(*) FILTER (WHERE last_seen_at > now() - interval '${ONLINE_WINDOW_MINUTES} minutes') AS online,
+      count(*) FILTER (WHERE gender = 'z') AS women,
+      count(*) FILTER (WHERE gender = 'm') AS men,
+      count(*) FILTER (WHERE gender = 'p') AS pairs
+     FROM users WHERE ${conditions.join(' AND ')}`,
+    params
+  );
+  const row = result.rows[0];
+  res.json({
+    online: Number(row.online), women: Number(row.women),
+    men: Number(row.men), pairs: Number(row.pairs),
+  });
+});
+
+// ============================================
+// GET /api/users/friends-count
+// Stvaran broj prihvaćenih prijateljstava (vidi /api/friends za sustav zahtjeva)
+// ============================================
+router.get('/friends-count', requireAuth, async (req, res) => {
+  const result = await db.query(
+    `SELECT count(*) FROM friend_requests WHERE (from_user_id = $1 OR to_user_id = $1) AND status = 'accepted'`,
+    [req.user.userId]
+  );
+  res.json({ count: Number(result.rows[0].count) });
+});
+
+// ============================================
+// DELETE /api/users/:nick  - SAMO ADMIN, trajno brisanje korisnika
+// ============================================
+router.delete('/:nick', requireAuth, requireAdmin, async (req, res) => {
+  const target = await db.query('SELECT id FROM users WHERE nick = $1 AND is_admin = false', [req.params.nick]);
+  if (target.rows.length === 0) {
+    return res.status(404).json({ error: 'Korisnik ne postoji ili je admin (admin se ne može obrisati ovim putem).' });
+  }
+  const targetId = target.rows[0].id;
+
+  // Označi sve prijave protiv ovog korisnika kao "sankcionirano - izbačen" PRIJE brisanja -
+  // snapshot nickova u reports tablici ostaje čitljiv i nakon što račun nestane.
+  await db.query(
+    `UPDATE reports SET status = 'reviewed', sanction = 'kicked' WHERE to_user_id = $1`,
+    [targetId]
+  );
+
+  await db.query('DELETE FROM users WHERE id = $1', [targetId]);
+  res.json({ ok: true });
+});
+
+module.exports = router;
