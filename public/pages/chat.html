@@ -484,6 +484,33 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
   50%{transform:scale(1.1);}
   100%{transform:scale(1);}
 }
+
+/* ===== MOBILNI PRIKAZ CHATA - PUNI EKRAN ZA PORUKE ===== */
+@media (max-width:600px){
+  .sidebar{ display:none; }
+  .sidebar.mobile-show{
+    display:flex;
+    position:fixed;
+    inset:0;
+    z-index:70;
+    background:linear-gradient(135deg,#1a0033,#2d0057);
+    max-height:100vh;
+  }
+  .chat-wrap{ grid-template-columns:1fr; }
+  .mobile-back-btn{ display:inline-flex !important; }
+}
+.mobile-back-btn{
+  display:none;
+  width:34px;height:34px;border-radius:50%;
+  align-items:center;justify-content:center;
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(162,60,255,0.4);
+  color:var(--purple-300);
+  font-size:18px;
+  cursor:pointer;
+  margin-right:6px;
+  flex-shrink:0;
+}
 </style>
 </head>
 <body>
@@ -534,7 +561,7 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
   <!-- CHAT WRAP -->
   <div class="chat-wrap">
     <!-- SIDEBAR -->
-    <div class="sidebar">
+    <div class="sidebar" id="sidebarPanel">
       <div class="sidebar-header">Razgovori <span class="badge" id="convoCount">6</span></div>
       <div class="my-mini-profile" id="myMiniProfile" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid rgba(162,60,255,0.25);cursor:pointer;" onclick="window.location.href='profil.html'">
         <div id="myMiniAvatar" style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#a23cff,#c57dff);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;overflow:hidden;">👤</div>
@@ -551,6 +578,7 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
     <!-- CHAT AREA -->
     <div class="chat-area">
       <div class="chat-header">
+        <div class="mobile-back-btn" id="mobileBackBtn">←</div>
         <div class="avatar">👩</div>
         <div class="info">
           <div class="name" id="chatName">Ana</div>
@@ -707,6 +735,12 @@ document.getElementById('convoList').addEventListener('click', function(e){
   item.classList.add('active');
   activeName = item.dataset.name;
   renderMessages(activeName);
+  document.getElementById('sidebarPanel').classList.remove('mobile-show');
+});
+
+// Mobilni "natrag" gumb - vraća na listu razgovora
+document.getElementById('mobileBackBtn').addEventListener('click', function(){
+  document.getElementById('sidebarPanel').classList.add('mobile-show');
 });
 
 // Send message
@@ -813,6 +847,7 @@ async function loadMyMiniProfile(){
   await loadMyMiniProfile();
   await buildConvoList();
   renderMessages(activeName || '');
+  if(!activeName) document.getElementById('sidebarPanel').classList.add('mobile-show');
 })();
 </script>
 
