@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="hr">
 <head>
@@ -569,8 +570,9 @@ body {
         var users = od.users || [];
         if (!users.length) { list.innerHTML = '<div class="empty">Nema korisnika online.</div>'; return; }
         list.innerHTML = users.slice(0, 12).map(function(u){
+          var avatarHtml = u.avatar_url ? '<img src="' + u.avatar_url + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">' : '👤';
           return '<a href="profil.html?user=' + encodeURIComponent(u.nick) + '" class="profile-card">' +
-            '<div class="avatar">👤</div>' +
+            '<div class="avatar" style="overflow:hidden;">' + avatarHtml + '</div>' +
             '<div class="info"><div class="name">' + u.nick + '</div>' +
             '<div class="meta">🟢 Online' + (u.city ? ' · ' + u.city : '') + '</div></div>' +
             '</a>';
