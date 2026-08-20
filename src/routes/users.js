@@ -11,7 +11,7 @@ const ONLINE_WINDOW_MINUTES = 5;
 
 // Polja koja je SIGURNO vratiti drugim korisnicima (nikad email/telefon/password_hash)
 const PUBLIC_FIELDS = `
-  nick, nick2, gender, seek_gender, country, city,
+  nick, nick2, gender, seek_gender, country, city, avatar_url,
   date_part('year', age(birth_date))::int AS age,
   (show_online_status AND last_seen_at > now() - interval '${ONLINE_WINDOW_MINUTES} minutes') AS is_online
 `;
