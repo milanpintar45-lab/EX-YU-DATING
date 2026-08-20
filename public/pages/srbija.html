@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="hr">
 <head>
@@ -520,8 +521,7 @@ body {
   <div class="middle-row">
     <div class="search-row">
       <label>Traži po nicku</label>
-     <input type="text" id="nickSearch" placeholder="Upiši nick..." style="width:120px;flex:0 0 auto;">
-     <button type="button" id="nickSearchBtn" style="padding:6px 14px;border-radius:8px;border:none;background:#a23cff;color:#fff;font-size:13px;font-weight:600;cursor:pointer;">Potraži</button>
+      <input type="text" id="nickSearch" placeholder="Upiši nick…">
     </div>
   </div>
 
@@ -689,10 +689,13 @@ function escHtml(t){ return String(t).replace(/[&<>"']/g, function(c){ return ({
 function profileCard(p){
   const giMap={m:'👨',z:'👩',p:'💑'};
   const genderIcon = giMap[p.gender] || '👤';
+  const avatarInner = p.avatar_url
+    ? `<img src="${escHtml(p.avatar_url)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+    : genderIcon;
   var metaText = p.city ? (p.city.charAt(0).toUpperCase()+p.city.slice(1)) : '';
   if (p.region && p.region.toLowerCase() !== metaText.toLowerCase()) metaText += ' · ' + p.region;
   return `<div class="profile-card" data-name="${escHtml(p.nick)}">
-    <div class="avatar" style="position:relative;">${genderIcon}
+    <div class="avatar" style="position:relative;overflow:hidden;">${avatarInner}
       <button type="button" class="act-btn act-msg" data-act="msg" style="position:absolute;bottom:-6px;right:-6px;width:20px;height:20px;font-size:11px;background:#a23cff;border:2px solid var(--bg);" title="Pošalji poruku">💬</button>
     </div>
     <div class="info" data-view-profile style="cursor:pointer;">
@@ -806,8 +809,6 @@ document.querySelectorAll('#countyList a[data-county]:not(.svi)').forEach(functi
   var el = document.getElementById(id);
   if(el) el.addEventListener('input', function(){ render(activeCountyTop()); });
 });
-var nickSearchBtn = document.getElementById('nickSearchBtn');
-if (nickSearchBtn) nickSearchBtn.addEventListener('click', function(){ render(activeCountyTop()); });
 ['genderFilter','ageFilter','onlineFilter','sortFilter'].forEach(function(id){
   var el = document.getElementById(id);
   if(el) el.addEventListener('change', function(){ render(activeCountyTop()); });
