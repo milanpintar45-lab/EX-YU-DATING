@@ -1,9 +1,5 @@
 User-agent: *
 Disallow: /pages/admin.html
-Disallow: /pages/bosna.html
-Disallow: /pages/hrvatska.html
-Disallow: /pages/srbija.html
-Disallow: /pages/pocetna.html
 Disallow: /pages/chat.html
 Disallow: /pages/video.html
 Disallow: /pages/galerija.html
