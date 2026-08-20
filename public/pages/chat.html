@@ -22,8 +22,8 @@
   --muted:#b8a4d4;
   --line:rgba(162,60,255,0.45);
   --panel:rgba(45,0,87,0.4);
-  --msg-own:rgba(162,60,255,0.15);
-  --msg-other:rgba(255,255,255,0.05);
+  --msg-own:rgba(162,60,255,0.25);
+  --msg-other:rgba(255,255,255,0.06);
   --danger:#ff3366;
   --success:#00ff88;
 }
@@ -138,6 +138,22 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
   font-family:'Inter',sans-serif;
   color:#fff;
 }
+.search-convo{
+  padding:10px 14px;
+  border-bottom:1px solid rgba(162,60,255,0.25);
+}
+.search-convo input{
+  width:100%;
+  padding:8px 12px;
+  border-radius:8px;
+  border:1px solid rgba(162,60,255,0.35);
+  background:rgba(255,255,255,0.05);
+  color:#fff;
+  font-family:inherit;
+  font-size:13px;
+  outline:none;
+}
+.search-convo input::placeholder{color:var(--muted);}
 .convo-list{
   flex:1;
   overflow-y:auto;
@@ -167,6 +183,12 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
   display:flex;align-items:center;justify-content:center;font-size:18px;
   border:1px solid rgba(255,224,236,0.4);
   position:relative;
+}
+.convo-avatar .online-dot{
+  position:absolute;bottom:2px;right:2px;
+  width:10px;height:10px;border-radius:50%;
+  background:#22c55e;box-shadow:0 0 5px #22c55e;
+  border:2px solid var(--purple-900);
 }
 .convo-info{flex:1;min-width:0;}
 .convo-name{color:#fff;font-weight:600;font-size:14px;display:flex;justify-content:space-between;}
@@ -214,32 +236,34 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
   padding:18px 22px;
   display:flex;
   flex-direction:column;
-  gap:8px;
+  gap:14px;
 }
-
 .msg-bubble{
-  width:100%;
-  max-width:100%;
+  max-width:72%;
   padding:10px 14px;
-  border-radius:8px;
+  border-radius:12px;
   font-size:14px;
   line-height:1.5;
   position:relative;
   word-break:break-word;
-  background:var(--msg-other);
-  border:1px solid rgba(162,60,255,0.3);
-  border-left:3px solid var(--purple-500);
 }
 .msg-bubble.own{
+  align-self:flex-end;
   background:var(--msg-own);
-  border-left:3px solid var(--pink);
+  border:1px solid rgba(162,60,255,0.5);
+  border-bottom-right-radius:3px;
+}
+.msg-bubble.other{
+  align-self:flex-start;
+  background:var(--msg-other);
+  border:1px solid rgba(162,60,255,0.35);
+  border-bottom-left-radius:3px;
 }
 .msg-bubble .sender{
-  font-size:13px;
-  color:#ffe27a;
-  font-weight:700;
-  margin-bottom:4px;
-  text-shadow:0 0 6px rgba(255,226,122,0.5);
+  font-size:11px;
+  color:var(--purple-300);
+  font-weight:600;
+  margin-bottom:3px;
 }
 .msg-bubble .time{
   font-size:10px;
@@ -249,8 +273,7 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
 }
 .msg-bubble .msg-delete{
   position:absolute;
-  top:8px;
-  right:10px;
+  top:-8px;
   width:20px;
   height:20px;
   border-radius:50%;
@@ -268,6 +291,8 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
 }
 .msg-bubble:hover .msg-delete{ opacity:1; }
 .msg-bubble .msg-delete:hover{ transform:scale(1.15); background:#ff2d55; }
+.msg-bubble.own .msg-delete{ right:-8px; }
+.msg-bubble.other .msg-delete{ left:-8px; }
 .typing-indicator{
   display:flex;
   align-items:center;
@@ -349,11 +374,12 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
   .right-of-title{align-items:center;}
   .nav-bar{flex-wrap:wrap;}
   .chat-wrap{grid-template-columns:1fr;}
-  .sidebar{display:none;}
+  .sidebar{display:flex;max-height:160px;}
 }
 @media (max-width:600px){
   .chat-header{padding:10px 14px;}
   .chat-messages{padding:12px 14px;}
+  .msg-bubble{max-width:85%;}
   html,body{height:100%;}
   body{padding:0;}
   .app{height:100vh;min-height:100vh;border-radius:0;}
@@ -381,13 +407,29 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
   .footer-nav{display:none;}
 }
 
+
+/* MALI "TV" VIDEO U PRAZNOM SREDNJEM PROSTORU ZAGLAVLJA */
+.title-wrap-tv{
+  width:100%;
+  max-width:220px;
+  margin:0 auto;
+  aspect-ratio:16/9;
+  border-radius:10px;
+  overflow:hidden;
+  border:2px solid rgba(162,60,255,0.5);
+  box-shadow:0 6px 20px rgba(162,60,255,0.4);
+  background:#000;
+}
+.title-wrap-tv video{width:100%;height:100%;object-fit:cover;display:block;}
+
+/* HERO BANNER - puna širina, video na vrhu stranice */
 .hero-banner{
   position:relative;
   width:100%;
   height:180px;
   background:linear-gradient(135deg, #2d0057, #4a0a7a);
   display:flex;
-  align-items:center;
+  align-items:center;s
   justify-content:center;
   overflow:hidden;
   border-bottom:2px solid rgba(255,255,255,0.15);
@@ -401,6 +443,7 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
 }
 @media(max-width:600px){ .hero-banner{ height:140px; } }
 
+/* DOLAZNI POZIV - overlay za "zvonjenje" na svim stranicama */
 .call-overlay{
   position:fixed;top:0;left:0;right:0;bottom:0;
   background:rgba(0,0,0,0.85);
@@ -501,10 +544,6 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
       <div class="convo-list" id="convoList">
         <!-- Popunjava se dinamički iz stvarnih poruka -->
       </div>
-      <div style="padding:10px 14px;border-top:1px solid rgba(162,60,255,0.25);font-family:'Cormorant Garamond',serif;font-size:15px;color:var(--purple-100);letter-spacing:1px;">Svi korisnici</div>
-      <div class="convo-list" id="allUsersList" style="flex:0 0 auto;max-height:220px;">
-        <div style="padding:14px;text-align:center;color:#b8a4d4;font-size:12px;">Učitavam...</div>
-      </div>
     </div>
 
     <!-- CHAT AREA -->
@@ -516,12 +555,15 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
           <div class="status" id="chatStatus">🟢 Online · Zagreb</div>
         </div>
         <div class="actions">
-          <a href="prosireni-chat.html" title="Prošireni chat">💬</a>
           <a href="video.html" title="Video poziv">📹</a>
           <a href="#" title="Više">⋮</a>
         </div>
       </div>
       <div class="chat-messages" id="chatMessages">
+        <div class="empty-chat" id="emptyChat" style="display:none;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#b8a4d4;font-style:italic;gap:12px;">
+          <div style="font-size:3em;opacity:.3;">💬</div>
+          <div>Odaberite razgovor ili započnite novi</div>
+        </div>
         <div class="typing-indicator" id="typing" style="display:none">
           <div class="dot-flash"></div><div class="dot-flash"></div><div class="dot-flash"></div>
           <span id="typingName"></span> piše…
@@ -531,8 +573,7 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
         <div id="mentionDropdown" style="display:none;position:absolute;bottom:100%;left:60px;margin-bottom:6px;background:linear-gradient(135deg,#2d0057,#4a0a7a);border:1px solid rgba(162,60,255,0.5);border-radius:10px;max-height:180px;overflow-y:auto;min-width:180px;box-shadow:0 10px 30px rgba(0,0,0,0.5);z-index:50;"></div>
         <div class="icon-btn" title="Emoji">😊</div>
         <div class="icon-btn" title="Priloži">📎</div>
-        <div class="icon-btn" title="Označi nekoga (@)" onclick="insertAtSign()">@</div>
-        <input type="text" placeholder="Napiši poruku…" id="msgInput">
+        <input type="text" placeholder="Napiši poruku… (@ za označavanje)" id="msgInput">
         <button type="button" class="btn" id="sendBtn">Pošalji</button>
       </div>
     </div>
@@ -610,10 +651,9 @@ function renderWithMentions(text){
 }
 
 function bubbleHtml(m){
-  var senderName = m.own ? (window.exyuMeNick || 'Ja') : activeName;
   return '<div class="msg-bubble ' + (m.own?'own':'other') + '" data-msg-id="' + m.id + '">' +
     (m.own ? '<span class="msg-delete" title="Izbriši poruku" onclick="deleteMessage(\'' + m.id + '\')">✕</span>' : '') +
-    '<div class="sender">'+escHtml(senderName)+'</div>' +
+    (!m.own?'<div class="sender">'+escHtml(activeName)+'</div>':'') +
     renderWithMentions(m.body) +
     '<div class="time">'+fmtTime(m.created_at)+'</div>' +
     '</div>';
@@ -621,15 +661,15 @@ function bubbleHtml(m){
 
 async function renderMessages(name){
   const box = document.getElementById('chatMessages');
+  const empty = document.getElementById('emptyChat');
   if(!name){
-    // Više se ne prikazuje natpis "Odaberite razgovor" - polje za poruke
-    // ostaje jednostavno prazno, a pisanje poruke (sendMessage) samo
-    // automatski odabere prvi razgovor s liste ako postoji.
     if(box) box.innerHTML = '';
-    document.getElementById('chatName').textContent = 'Chat';
+    if(empty) empty.style.display = 'flex';
+    document.getElementById('chatName').textContent = 'Odaberite razgovor';
     document.getElementById('chatStatus').textContent = '';
     return;
   }
+  if(empty) empty.style.display = 'none';
   document.getElementById('chatName').textContent = name;
   document.getElementById('chatStatus').textContent = '';
   var videoLink = document.querySelector('.chat-header .actions a[title="Video poziv"]');
@@ -657,6 +697,7 @@ async function deleteMessage(id){
   } catch(e) { alert('❌ ' + e.message); }
 }
 
+// Switch conversation
 document.getElementById('convoList').addEventListener('click', function(e){
   const item = e.target.closest('.convo-item');
   if(!item) return;
@@ -666,11 +707,14 @@ document.getElementById('convoList').addEventListener('click', function(e){
   renderMessages(activeName);
 });
 
+// Send message
 async function sendMessage(){
   const input = document.getElementById('msgInput');
   const text = input.value.trim();
   if(!text) return;
 
+  // Ako nitko nije odabran s liste, automatski uzmi prvi razgovor s liste
+  // (korisnik može odmah pisati, ne mora prvo ništa označavati)
   if(!activeName){
     var firstItem = document.querySelector('.convo-item');
     if(firstItem){
@@ -678,6 +722,7 @@ async function sendMessage(){
       firstItem.classList.add('active');
       activeName = firstItem.dataset.name;
     } else {
+      // Nema nikoga na listi razgovora - nema kome poslati poruku
       return;
     }
   }
@@ -692,6 +737,7 @@ async function sendMessage(){
 document.getElementById('sendBtn').addEventListener('click', sendMessage);
 document.getElementById('msgInput').addEventListener('keydown', function(e){ if(e.key==='Enter' && !mentionDropdownOpen()) sendMessage(); });
 
+// ===== @MENTION AUTOCOMPLETE =====
 var mentionSearchTimer = null;
 function mentionDropdownOpen(){
   var dd = document.getElementById('mentionDropdown');
@@ -749,48 +795,6 @@ document.addEventListener('click', function(e){
   if(!e.target.closest('#mentionDropdown') && e.target.id !== 'msgInput') closeMentionDropdown();
 });
 
-function insertAtSign(){
-  var input = document.getElementById('msgInput');
-  var pos = input.selectionStart;
-  var before = input.value.slice(0, pos);
-  var after = input.value.slice(pos);
-  var needsSpace = before.length && !/\s$/.test(before);
-  input.value = before + (needsSpace ? ' ' : '') + '@' + after;
-  input.focus();
-  input.selectionStart = input.selectionEnd = before.length + (needsSpace ? 1 : 0) + 1;
-  updateMentionDropdown();
-}
-
-async function loadAllUsersList(){
-  var list = document.getElementById('allUsersList');
-  if(!list) return;
-  try {
-    var data = await api('GET', '/users');
-    var users = data.users || [];
-    if(!users.length){
-      list.innerHTML = '<div style="padding:14px;text-align:center;color:#b8a4d4;font-size:12px;">Nema drugih korisnika.</div>';
-      return;
-    }
-    list.innerHTML = users.map(function(u){
-      return '<div class="convo-item" data-name="' + escHtml(u.nick) + '">' +
-        '<div class="convo-avatar">👤' + (u.is_online ? '<span class="online-dot"></span>' : '') + '</div>' +
-        '<div class="convo-info"><div class="convo-name">' + escHtml(u.nick) + '</div>' +
-        '<div class="convo-preview">' + escHtml(u.city || '') + '</div></div>' +
-      '</div>';
-    }).join('');
-  } catch(e) {
-    list.innerHTML = '<div style="padding:14px;text-align:center;color:#b8a4d4;font-size:12px;">Greška pri učitavanju.</div>';
-  }
-}
-document.getElementById('allUsersList').addEventListener('click', function(e){
-  const item = e.target.closest('.convo-item');
-  if(!item) return;
-  document.querySelectorAll('.convo-item').forEach(function(i){ i.classList.remove('active'); });
-  item.classList.add('active');
-  activeName = item.dataset.name;
-  renderMessages(activeName);
-});
-
 async function loadMyMiniProfile(){
   try {
     var me = await api('GET', '/profile/me');
@@ -804,10 +808,8 @@ async function loadMyMiniProfile(){
   var params = new URLSearchParams(window.location.search);
   var target = params.get('user');
   if(target) activeName = target;
-  try { var meAuth = await api('GET', '/auth/me'); window.exyuMeNick = meAuth.nick; } catch(e){}
   await loadMyMiniProfile();
   await buildConvoList();
-  loadAllUsersList();
   renderMessages(activeName || '');
 })();
 </script>
@@ -912,6 +914,9 @@ async function declineIncomingCallGlobal(){
   if (window.exyuUpdateFriendReqBadge) window.exyuUpdateFriendReqBadge();
   if (window.exyuUpdatePokesBadge) window.exyuUpdatePokesBadge();
 
+  // Obavijesti preglednika (opt-in) - provjerava nove poruke/bockanja/zahtjeve svakih 20s
+  // i prikazuje pravu obavijest preglednika, ali SAMO ako je korisnik to sam uključio u postavkama
+  // I ako je dao dopuštenje pregledniku.
   (async function(){
     if (!('Notification' in window)) return;
     let notifEnabled = false;
@@ -940,7 +945,7 @@ async function declineIncomingCallGlobal(){
           new Notification('EX YU DATE', { body: 'Imate novi zahtjev za prijateljstvo! 🤝' });
         }
         lastFriendReqCount = freqCount;
-      } catch(e) { }
+      } catch(e) { /* korisnik se možda odjavio - tiho preskoči */ }
     }
     pollNotifications();
     setInterval(pollNotifications, 20000);
@@ -1138,6 +1143,8 @@ async function declineIncomingCallGlobal(){
     } catch(e) { alert('❌ ' + e.message); }
   };
 
+  document.getElementById('exyuFriendReqModal').addEventListener('click', function(e){ if(e.target === this) this.classList.remove('on'); });
+  document.getElementById('exyuGiftsModal').addEventListener('click', function(e){ if(e.target === this) this.classList.remove('on'); });
   document.getElementById('exyuPokesModal2').addEventListener('click', function(e){ if(e.target === this) this.classList.remove('on'); });
 })();
 </script>
