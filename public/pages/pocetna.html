@@ -417,7 +417,7 @@ body {
     <a href="galerija.html">Galerija</a>
     <a href="oglasnik.html">Oglasnik</a>
     <a href="profil.html">Profil</a>
-    <a href="#" id="myFriendsNav">Moji prijatelji (<span id="myFriendsCount">0</span>)</a>
+    <a href="#" id="myFriendsNav">Moji prijatelji (<span id="myFriendsCount">0</span>) <span class="count-box" id="friendsNewBadge" style="display:none;">0</span></a>
     <a href="naplata.html" id="naplataNav" style="display:none;color:#ffd700;">💰 NAPLATA</a>
     <div class="spacer"></div>
   </nav>
@@ -485,7 +485,7 @@ body {
     <div class="col">
       <div class="col-header">NA MREŽI</div>
       <div class="col-body">
-        <div class="empty">Nema korisnika online.</div>
+        <div id="onlineNowList"><div class="empty">Učitavam...</div></div>
       </div>
     </div>
 
@@ -562,6 +562,22 @@ body {
     if (window.exyuUpdateFriendReqBadge) window.exyuUpdateFriendReqBadge();
     if (window.exyuUpdatePokesBadge) window.exyuUpdatePokesBadge();
 
+    (async function(){
+      try {
+        var od = await api('GET', '/users?onlineOnly=true&sort=ime');
+        var list = document.getElementById('onlineNowList');
+        var users = od.users || [];
+        if (!users.length) { list.innerHTML = '<div class="empty">Nema korisnika online.</div>'; return; }
+        list.innerHTML = users.slice(0, 12).map(function(u){
+          return '<a href="profil.html?user=' + encodeURIComponent(u.nick) + '" class="profile-card">' +
+            '<div class="avatar">👤</div>' +
+            '<div class="info"><div class="name">' + u.nick + '</div>' +
+            '<div class="meta">🟢 Online' + (u.city ? ' · ' + u.city : '') + '</div></div>' +
+            '</a>';
+        }).join('');
+      } catch(e) {}
+    })();
+
   // Obavijesti preglednika (opt-in) - provjerava nove poruke/bockanja/zahtjeve svakih 20s
   // i prikazuje pravu obavijest preglednika, ali SAMO ako je korisnik to sam uključio u postavkama
   // I ako je dao dopuštenje pregledniku.
@@ -637,6 +653,23 @@ if (searchBtn) searchBtn.addEventListener('click', runNickSearch);  searchInput.
       var cnt = document.getElementById('myFriendsCount');
       if (cnt) cnt.textContent = fc.count;
     } catch(e) {}
+
+    // Broj NOVIH zahtjeva za prijateljstvo (crveni broj pored "Moji prijatelji")
+    try {
+      var frq = await api('GET', '/friends/requests');
+      var nb = document.getElementById('friendsNewBadge');
+      var n = (frq.requests || []).length;
+      if (nb) { nb.textContent = n; nb.style.display = n > 0 ? 'inline-block' : 'none'; }
+    } catch(e) {}
+
+    // Klik na "Moji prijatelji" - otvori popis svih prijatelja
+    var myFriendsNav = document.getElementById('myFriendsNav');
+    if (myFriendsNav) {
+      myFriendsNav.addEventListener('click', async function(e){
+        e.preventDefault();
+        if (window.exyuOpenMyFriends) window.exyuOpenMyFriends();
+      });
+    }
 
     // Status traka - stvarni brojevi (online/žene/muškarci/parovi)
     try {
@@ -979,6 +1012,36 @@ if (searchBtn) searchBtn.addEventListener('click', runNickSearch);  searchInput.
     s.textContent = 'body{animation:none!important;}';
     document.head.appendChild(s);
   }
+})();
+</script>
+
+<div class="exyu-modal" id="exyuMyFriendsModal">
+  <div class="exyu-modal-box">
+    <h3>👥 Moji prijatelji</h3>
+    <div id="exyuMyFriendsList" style="max-height:400px;overflow-y:auto;"></div>
+    <div class="exyu-modal-actions" style="margin-top:14px;">
+      <button type="button" class="exyu-btn-cancel" onclick="document.getElementById('exyuMyFriendsModal').classList.remove('on')" style="flex:1;">Zatvori</button>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  function escFN(t){ return String(t).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]); }); }
+  window.exyuOpenMyFriends = async function(){
+    document.getElementById('exyuMyFriendsModal').classList.add('on');
+    var list = document.getElementById('exyuMyFriendsList');
+    list.innerHTML = 'Učitavam...';
+    try {
+      var data = await api('GET', '/friends');
+      var friends = data.friends || [];
+      list.innerHTML = friends.length ? friends.map(function(nick){
+        return '<a href="profil.html?user=' + encodeURIComponent(nick) + '" class="exyu-msg-item" style="display:block;"><div class="from">👤 ' + escFN(nick) + '</div></a>';
+      }).join('') : '<div class="exyu-empty">Još nemate prijatelja.</div>';
+    } catch(e) {
+      list.innerHTML = '<div class="exyu-empty">Greška pri učitavanju.</div>';
+    }
+  };
+  document.getElementById('exyuMyFriendsModal').addEventListener('click', function(e){ if(e.target === this) this.classList.remove('on'); });
 })();
 </script>
 </body>
