@@ -291,6 +291,37 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
   padding-bottom:10px;
 }
 
+/* ============ NOVO: čist prikaz podataka za TUĐI profil ============ */
+.view-info-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+.view-info-item{
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(162,60,255,0.25);
+  border-radius:10px;
+  padding:12px 16px;
+}
+.view-info-item .vi-label{
+  font-size:11px;
+  letter-spacing:1px;
+  color:var(--purple-300);
+  font-weight:700;
+  text-transform:uppercase;
+  margin-bottom:4px;
+}
+.view-info-item .vi-value{
+  font-size:15px;
+  color:#fff;
+  line-height:1.4;
+}
+.view-info-item.full-width{grid-column:1 / -1;}
+.view-info-item.full-width .vi-value{white-space:pre-wrap;line-height:1.6;}
+@media(max-width:700px){
+  .view-info-grid{grid-template-columns:1fr;}
+}
+
 .form-row{
   display:grid;
   grid-template-columns: 200px 1fr;
@@ -634,7 +665,13 @@ body {
         </div>
       </div>
 
-      <div class="section-box">
+      <!-- ============ NOVO: čist prikaz podataka za TUĐI profil (sakriveno za vlastiti profil) ============ -->
+      <div class="section-box" id="profileViewCard" style="display:none;">
+        <div class="section-title">📋 O KORISNIKU</div>
+        <div class="view-info-grid" id="viewInfoGrid"></div>
+      </div>
+
+      <div class="section-box" id="profileFormSection">
         <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
           <button type="button" id="stepPrevBtn" onclick="profileStep(-1)" title="Prethodno" style="background:rgba(162,60,255,0.2);border:1px solid rgba(162,60,255,0.5);color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;flex-shrink:0;">◀</button>
           <span id="stepTitle">👤 IME I KONTAKT</span>
@@ -824,13 +861,13 @@ body {
         </div>
       </div>
 
-      <div class="section-box">
+      <div class="section-box" id="bioSection">
         <div class="section-title">📝 KRATKI OPIS</div>
         <textarea class="textarea-box" id="kratkiOpis" placeholder="Jedna kratka rečenica o sebi..." style="min-height:60px;display:block;"></textarea>
         <button type="button" class="edit-btn" id="kratkiOpisDoneBtn" onclick="saveOneField('bio', 'kratkiOpis', 'kratkiOpisDoneBtn')" style="display:block;margin-top:14px;">✅ Gotovo</button>
       </div>
 
-      <div class="section-box">
+      <div class="section-box" id="personalMsgSection">
         <div class="section-title">📢 OSOBNA PORUKA — PORUKA SVIM KORISNICIMA</div>
         <textarea class="textarea-box personal-msg" id="osobnaPoruka" placeholder="Poruka koju će svi korisnici vidjeti na vašem profilu..." style="display:block;"></textarea>
         <button type="button" class="edit-btn" id="osobnaPorukaDoneBtn" onclick="saveOneField('personalMessage', 'osobnaPoruka', 'osobnaPorukaDoneBtn')" style="display:block;margin-top:14px;">✅ Gotovo</button>
@@ -1201,6 +1238,45 @@ async function loadProfile(){
   updateHeaderDisplay();
 }
 
+/* ============ NOVO: labele za čist prikaz tuđeg profila ============ */
+var TRAZIM_LABELS = {z:'Ženu', m:'Muškarca', par:'Par', svi:'Sve / Bez razlike'};
+var HAIR_LABELS = {plava:'Plava', smeda:'Smeđa', crna:'Crna', crvena:'Crvena', siva:'Siva / Sijeda', riza:'Riđa / Osvijetljena', nema:'Bez kose / Ćelav', drugo:'Drugo'};
+var EYE_LABELS = {plave:'Plave', zelene:'Zelene', smede:'Smeđe', sive:'Sive', ljubicaste:'Ljubičaste', crne:'Crne', drugo:'Drugo'};
+var ORIENT_LABELS = {hetero:'Heteroseksualna', homo:'Homoseksualna', biseksualna:'Biseksualna', bicurious:'Bi-curious', pan:'Panseksualna', asexual:'Aseksualna', drugo:'Drugo / Ne želim reći'};
+var STATUS_LABELS = {slobodan:'Slobodan / Slobodna', 'u-vezi':'U vezi', brak:'U braku', razveden:'Razveden / Razvedena', udovac:'Udovac / Udovica', komplikovano:'Komplikovano'};
+
+function escHtmlLocal(t){
+  return String(t).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]); });
+}
+
+function renderProfileViewCard(data){
+  var rows = [];
+  if(data.city) rows.push(['Grad', escHtmlLocal(data.city.charAt(0).toUpperCase()+data.city.slice(1))]);
+  if(data.region) rows.push(['Županija / Kanton / Okrug', escHtmlLocal(data.region)]);
+  if(data.seeking) rows.push(['Traži', TRAZIM_LABELS[data.seeking] || escHtmlLocal(data.seeking)]);
+  if(data.heightRange) rows.push(['Visina', escHtmlLocal(data.heightRange) + ' cm']);
+  if(data.weightRange) rows.push(['Težina', escHtmlLocal(data.weightRange) + ' kg']);
+  if(data.hairColor) rows.push(['Boja kose', HAIR_LABELS[data.hairColor] || escHtmlLocal(data.hairColor)]);
+  if(data.eyeColor) rows.push(['Boja očiju', EYE_LABELS[data.eyeColor] || escHtmlLocal(data.eyeColor)]);
+  if(data.orientation) rows.push(['Seksualna orijentacija', ORIENT_LABELS[data.orientation] || escHtmlLocal(data.orientation)]);
+  if(data.relationshipStatus) rows.push(['Status', STATUS_LABELS[data.relationshipStatus] || escHtmlLocal(data.relationshipStatus)]);
+
+  var grid = document.getElementById('viewInfoGrid');
+  var html = rows.map(function(r){
+    return '<div class="view-info-item"><div class="vi-label">'+r[0]+'</div><div class="vi-value">'+r[1]+'</div></div>';
+  }).join('');
+
+  if(data.bio){
+    html += '<div class="view-info-item full-width"><div class="vi-label">Kratki opis</div><div class="vi-value">'+escHtmlLocal(data.bio)+'</div></div>';
+  }
+  if(data.personalMessage){
+    html += '<div class="view-info-item full-width"><div class="vi-label">Osobna poruka</div><div class="vi-value">'+escHtmlLocal(data.personalMessage)+'</div></div>';
+  }
+
+  grid.innerHTML = html || '<div style="color:var(--muted);font-size:13px;">Korisnik još nije popunio dodatne podatke.</div>';
+  document.getElementById('profileViewCard').style.display = 'block';
+}
+
 async function loadOtherProfile(nick){
   document.getElementById('profileNick').textContent = nick;
   document.getElementById('profileAvatar').textContent = nick.charAt(0).toUpperCase();
@@ -1218,36 +1294,18 @@ async function loadOtherProfile(nick){
 
   if (data.avatarUrl) setProfileAvatar(data.avatarUrl);
   var spolValue = data.profileGender || data.gender;
-  document.getElementById('spol').value = spolValue;
   document.getElementById('profileGender').textContent = gmap[spolValue] || 'Korisnik';
-  document.getElementById('godine').value = data.age;
   document.getElementById('profileAge').textContent = data.age;
-  if (data.seeking) document.getElementById('trazim').value = data.seeking;
-  if (data.heightRange) document.getElementById('visina').value = data.heightRange;
-  if (data.weightRange) document.getElementById('tezina').value = data.weightRange;
-  if (data.hairColor) document.getElementById('bojaKose').value = data.hairColor;
-  if (data.eyeColor) document.getElementById('bojaOciju').value = data.eyeColor;
-  if (data.orientation) document.getElementById('seksOrijentacija').value = data.orientation;
-  if (data.relationshipStatus) document.getElementById('status').value = data.relationshipStatus;
-  if (data.bio) document.getElementById('kratkiOpis').value = data.bio;
-  if (data.personalMessage) document.getElementById('osobnaPoruka').value = data.personalMessage;
 
-  document.querySelectorAll('.form-select, .form-input, .textarea-box').forEach(function(el){
-    el.disabled = true;
-    el.style.pointerEvents = 'none';
-    el.style.background = 'transparent';
-    el.style.border = 'none';
-    el.style.color = '#fff';
-    el.style.opacity = '1';
-  });
+  /* NOVO: sakrij forme s poljima za uređivanje, prikaži čist popis podataka */
+  document.getElementById('profileFormSection').style.display = 'none';
+  document.getElementById('bioSection').style.display = 'none';
+  document.getElementById('personalMsgSection').style.display = 'none';
+  renderProfileViewCard(data);
+
   ['menuBlock','menuPoke','menuSettings'].forEach(function(id){
     var el = document.getElementById(id);
     if(el) el.style.display = 'none';
-  });
-
-  ['kratkiOpisDoneBtn','osobnaPorukaDoneBtn'].forEach(function(id){
-    var btn = document.getElementById(id);
-    if(btn) btn.style.display = 'none';
   });
 
   applyContactRestrictions(data);
@@ -1409,7 +1467,6 @@ function renderVideos(){
       var ov = avatarEl.querySelector('div');
       if (ov) ov.style.display = 'none';
     }
-    showStep(2);
   }
 })();
 
