@@ -402,7 +402,7 @@ body {
 @media (max-width: 900px){ .title-wrap{display:none;} }
 @media (max-width: 600px){ .top{position:static;} }
 </style>
-<script src="https://unpkg.com/@daily-co/daily-js"></script>
+<script src="https://unpkg.com/@daily-co/daily-js@0.92.2"></script>
 </head>
 <body>
 <script>
@@ -635,6 +635,19 @@ document.addEventListener('DOMContentLoaded', function(){
 // GRUPNI POZIV (Daily.co)
 // ======================
 let groupCallApi = null;
+// Pricekaj da se dio za video ucita (do 8 sekundi) prije otvaranja poziva
+async function exyuWaitDaily(){
+  for (var i = 0; i < 80 && !window.DailyIframe; i++) { await new Promise(function(r){ setTimeout(r, 100); }); }
+  if (!window.DailyIframe) throw new Error('Video dio stranice se nije ucitao. Provjerite internet vezu i osvjezite stranicu.');
+}
+// Kad poziv stigne dok stranica nije u prvom planu: naslov kartice i obavijest
+var exyuOrigTitle = document.title;
+function exyuRingNotice(nick){
+  if (!document.hidden) return;
+  document.title = '\uD83D\uDCDE ' + nick + ' vas zove';
+  try { if (window.Notification && Notification.permission === 'granted') new Notification('EX YU DATE', { body: nick + ' vas zove na video poziv' }); } catch(e){}
+}
+function exyuRingClear(){ document.title = exyuOrigTitle; }
 
 async function startGroupCall() {
   if(callActive){ endCall(); }
@@ -647,6 +660,7 @@ async function startGroupCall() {
     const frameWrap = document.getElementById('groupCallFrameWrap');
     frameWrap.classList.remove('hidden');
 
+    await exyuWaitDaily();
     var gFrame = null, gLastErr = null;
     for (var gAttempt = 1; gAttempt <= 4 && !gFrame; gAttempt++) {
       try {
@@ -679,13 +693,30 @@ async function joinGroupCallFromLink(url){
   document.getElementById('groupCallInviteRow').classList.remove('hidden');
   const frameWrap = document.getElementById('groupCallFrameWrap');
   frameWrap.classList.remove('hidden');
-  frameWrap.innerHTML = '';
-  groupCallApi = DailyIframe.createFrame(frameWrap, {
-    showLeaveButton: true,
-    iframeStyle: { width: '100%', height: '480px', border: '0' }
-  });
-  await groupCallApi.join({ url: url, userName: exyuSelfNickForCall() });
-  document.getElementById('endCallWrap').classList.remove('hidden');
+  try {
+    await exyuWaitDaily();
+    var jFrame = null, jLastErr = null;
+    for (var jAttempt = 1; jAttempt <= 4 && !jFrame; jAttempt++) {
+      try {
+        var existingJ = DailyIframe.getCallInstance && DailyIframe.getCallInstance();
+        if (existingJ) { try { existingJ.destroy(); } catch(eDestroyJ){} }
+      } catch(eCheckJ){}
+      if (jAttempt > 1) { await new Promise(function(r){ setTimeout(r, 600); }); }
+      frameWrap.innerHTML = '';
+      try {
+        jFrame = DailyIframe.createFrame(frameWrap, {
+          showLeaveButton: true,
+          iframeStyle: { width: '100%', height: '480px', border: '0' }
+        });
+      } catch(e) { jLastErr = e; jFrame = null; }
+    }
+    if (!jFrame) { throw (jLastErr || new Error('Nije uspjelo spajanje na grupni poziv.')); }
+    groupCallApi = jFrame;
+    await groupCallApi.join({ url: url, userName: exyuSelfNickForCall() });
+    document.getElementById('endCallWrap').classList.remove('hidden');
+  } catch(e) {
+    alert('\u274C ' + e.message);
+  }
 }
 function copyGroupCallLink(){
   var input = document.getElementById('groupCallLink');
@@ -894,6 +925,7 @@ async function openOneOnOneCall(name, room){
   // solves it, seems quite random"). Umjesto da tražimo od korisnika da
   // ručno osvježi stranicu, kod ovdje AUTOMATSKI pokuša ponovno u pozadini,
   // do 4 puta, prije nego što stvarno odustane.
+  try { await exyuWaitDaily(); } catch(eWait) { alert('\u274C ' + eWait.message); endCall(); return; }
   var frame = null;
   var lastErr = null;
   for (var attempt = 1; attempt <= 4 && !frame; attempt++) {
@@ -996,7 +1028,6 @@ async function declineIncomingCall(){
 }
 
 function checkIncomingCalls(){
-  if (document.hidden) return;
   if (callActive || incomingCallId) return;
   api('GET', '/calls/incoming').then(function(data){
     if (data.call && !incomingCallId && !callActive) {
@@ -1016,12 +1047,15 @@ function checkIncomingCalls(){
       statusText.textContent = 'Vas zove…';
       acceptBtn.style.display = '';
       overlay.classList.add('show');
+      exyuRingNotice(data.call.from_nick);
     }
   }).catch(function(){});
 }
 setInterval(checkIncomingCalls, 3000);
+document.addEventListener('visibilitychange', function(){ if (!document.hidden) { exyuRingClear(); checkIncomingCalls(); } });
 
 function endCall(){
+  exyuRingClear();
   exyuReleaseWakeLock();
   document.getElementById('callOverlay').classList.remove('show');
   document.getElementById('callAcceptBtn').style.display = '';
@@ -1470,5 +1504,6 @@ api('GET', '/users/friends-count').then(function(fc){
   });
 })();
 </script>
+<script src="strelice.js" defer></script>
 </body>
 </html>
