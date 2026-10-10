@@ -73,8 +73,9 @@ router.get('/', requireAuth, async (req, res) => {
   // grad ostaje jedini "izvor istine", regija je samo prikazni derivat.
   let users = result.rows.map((u) => ({ ...u, region: getRegion(u.country, u.city) }));
   if (region) {
-    const wanted = String(region).trim().toLowerCase();
-    users = users.filter((u) => u.region && u.region.toLowerCase() === wanted);
+    // jedna ili vise regija odvojenih zarezom (npr. "Istarska,Zadarska")
+    const wanted = String(region).split(',').map((r) => r.trim().toLowerCase()).filter(Boolean);
+    if (wanted.length) users = users.filter((u) => u.region && wanted.includes(u.region.toLowerCase()));
   }
 
   res.json({ users });

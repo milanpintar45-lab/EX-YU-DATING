@@ -775,14 +775,14 @@ const nameQ = (document.getElementById('nickSearch') && document.getElementById(
     list.length ? list.map(profileCard).join('') : '<div class="empty">Nema korisnika za odabrane filtere</div>';
 
   document.getElementById('currentFilter').textContent =
-    filter === "SVI" ? "SVI — cijela Srbija" : filter;
+    filter === "SVI" ? "SVI — cijela Srbija" : (filter.indexOf(',') < 0 ? filter : filter.split(',').join(', '));
 
   var expandLink = document.getElementById('chatExpandLink');
-  if (expandLink) expandLink.href = 'prosireni-chat.html?country=rs' + (filter !== 'SVI' ? '&county=' + encodeURIComponent(filter) : '');
+  if (expandLink) expandLink.href = 'prosireni-chat.html?country=rs' + (filter !== 'SVI' && filter.indexOf(',') < 0 ? '&county=' + encodeURIComponent(filter) : '');
 
   try {
     const chatData = await api('GET', '/country-chat?country=' + COUNTRY_CODE + '&limit=8');
-    const chatList = filter === 'SVI' ? chatData.messages : chatData.messages.filter(c => c.saved_county === filter);
+    const chatList = filter === 'SVI' ? chatData.messages : chatData.messages.filter(c => filter.split(',').indexOf(c.saved_county) >= 0);
     document.getElementById('chatCol').innerHTML =
       chatList.length ? chatList.map(chatCard).join('') : '<div class="empty">Nema poruka</div>';
   } catch (e) {
@@ -794,9 +794,16 @@ const nameQ = (document.getElementById('nickSearch') && document.getElementById(
 document.querySelectorAll('#countyList a').forEach(a=>{
   a.addEventListener('click', e=>{
     e.preventDefault();
-    document.querySelectorAll('#countyList a').forEach(x=>x.classList.remove('active'));
-    a.classList.add('active');
-    render(a.dataset.county);
+    if (a.classList.contains('svi')) {
+      document.querySelectorAll('#countyList a').forEach(x=>x.classList.remove('active'));
+      a.classList.add('active');
+    } else {
+      // vise zupanija odjednom: klik ukljuci/iskljuci
+      document.querySelector('#countyList a.svi').classList.remove('active');
+      a.classList.toggle('active');
+      if (!document.querySelector('#countyList a.active:not(.svi)')) document.querySelector('#countyList a.svi').classList.add('active');
+    }
+    render(activeCountyTop());
   });
 });
 // Dodaj expand linkove svakom okrugu
@@ -825,8 +832,8 @@ document.querySelectorAll('#countyList a[data-county]:not(.svi)').forEach(functi
   if(el) el.addEventListener('change', function(){ render(activeCountyTop()); });
 });
 function activeCountyTop(){
-  var a = document.querySelector('#countyList a.active');
-  return a ? a.dataset.county : 'SVI';
+  var sel = Array.from(document.querySelectorAll('#countyList a.active:not(.svi)')).map(function(a){ return a.dataset.county; });
+  return sel.length ? sel.join(',') : 'SVI';
 }
 
 // Initial render
@@ -839,6 +846,7 @@ render("SVI");
     const text = inp.value.trim();
     if(!text) return;
     try {
+      if (activeCountyTop().indexOf(',') >= 0) { alert('Za pisanje u chat odaberite samo jedan okrug.'); return; }
       await api('POST', '/country-chat', { country: COUNTRY_CODE, county: activeCountyTop(), body: text });
       inp.value = '';
       render(activeCountyTop());
