@@ -498,6 +498,23 @@ body {
 #countyList > a[data-county]:not(.svi){font-size:13.5px;line-height:1.3;padding:7px 8px;font-weight:400;text-shadow:0 0 5px rgba(0,229,255,0.3);border-radius:0;border:0;border-bottom:1px solid rgba(162,60,255,0.35);white-space:normal;}
 #countyList > a[data-county]:not(.svi).active{background:rgba(162,60,255,0.35);}
 #countyList > a.svi{grid-column:1 / -1;margin-bottom:6px;}
+/* Na mrezi, Chat, Svi korisnici: svjetlija podloga, kartice jedna ispod druge, tanja imena, veca slika */
+.columns > .col:nth-child(n+2){background:#cfc4e3;}
+.columns > .col:nth-child(n+2) .col-header{color:#fff;font-weight:800;background:linear-gradient(180deg,#4a1a8a,#2f0d5c);border-radius:10px;padding:10px 8px;border-bottom:0;box-shadow:0 2px 8px rgba(40,10,80,0.35);}
+.columns > .col:nth-child(n+2) .col-header a{color:#ffd84d !important;}
+.columns > .col:nth-child(n+2) .col-body{gap:5px;}
+.columns > .col:nth-child(n+2) .profile-card{background:#ffffff;border:1px solid #bfb0da;flex-wrap:nowrap;padding:6px 8px;gap:10px;box-shadow:0 1px 3px rgba(45,0,87,0.10);}
+.columns > .col:nth-child(n+2) .profile-card .avatar{width:54px;height:54px;font-size:24px;border:1px solid #bfb0da;}
+.columns > .col:nth-child(n+2) .profile-card .info .name{color:#34155c;font-weight:500;font-size:15px;text-shadow:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.columns > .col:nth-child(n+2) .profile-card .info .meta{color:#5a4a75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.columns > .col:nth-child(n+2) .card-actions{width:auto;margin-top:0;gap:4px;flex-shrink:0;}
+.columns > .col:nth-child(n+2) .card-actions .act-btn{width:26px;height:26px;font-size:12px;background:#f1ecfa;border:1px solid #bfb0da;}
+.columns > .col:nth-child(n+2) .chat-card{background:#ffffff;border:1px solid #bfb0da;box-shadow:0 1px 3px rgba(45,0,87,0.10);}
+.columns > .col:nth-child(n+2) .chat-card .who{color:#34155c;font-weight:500;text-shadow:none;}
+.columns > .col:nth-child(n+2) .chat-card .who span{color:#5a4a75 !important;}
+.columns > .col:nth-child(n+2) .chat-card .msg{color:#2f2145;}
+.columns > .col:nth-child(n+2) .empty{color:#5a4a75;}
+.columns > .col:nth-child(n+2) #chatInput{background:#ffffff !important;color:#2f2145 !important;border:1px solid #9c86c4 !important;}
 </style>
 </head>
 <body>
