@@ -469,6 +469,17 @@ body {
 @media (max-width: 900px){ .title-wrap{display:none;} }
 @media (max-width: 600px){ .top{position:static;} }
 </style>
+<style>
+/* Mobitel: linkovi u zaglavlju jedan ispod drugoga, lijevo i desno, kao na laptopu */
+@media (max-width: 600px){
+  .top{grid-template-columns:1fr 1fr !important;text-align:left !important;align-items:start !important;gap:10px !important;}
+  .top .title-wrap{display:none !important;}
+  .corner-links{flex-direction:column !important;flex-wrap:nowrap !important;justify-content:flex-start !important;align-items:flex-start !important;gap:7px !important;}
+  .corner-links a{font-size:15px !important;}
+  .right-of-title{align-items:flex-end !important;text-align:right !important;gap:7px !important;}
+  .right-of-title a{font-size:15px !important;}
+}
+</style>
 </head>
 <body>
 
