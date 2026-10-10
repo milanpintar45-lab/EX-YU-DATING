@@ -1,0 +1,9 @@
+# Lozinke i kljucevi - nikad ne slati na GitHub
+.env
+.env.*
+!.env.example
+/env
+*.pem
+
+# Instalirani paketi - Render ih sam instalira
+node_modules/
