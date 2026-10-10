@@ -50,6 +50,20 @@ app.use('/api', globalApiLimiter);
 // iznova provjeriti sa serverom prije prikaza - bez ovoga preglednik sam "nagađa"
 // i zna satima/danima prikazivati staru spremljenu verziju bez ikakvog pitanja
 // serveru, čak i kad je na serveru već postavljena nova verzija koda.
+// Mobitel prikazuje stranicu kao na laptopu (sirina 1200), pa se priblizava prstima.
+const fs = require('fs');
+const PUBLIC_DIR = path.join(__dirname, '..', 'public');
+app.get(/^\/$|\.html$/, (req, res, next) => {
+  let rel;
+  try { rel = req.path === '/' ? 'index.html' : decodeURIComponent(req.path).replace(/^\/+/, ''); } catch (e) { return next(); }
+  const file = path.normalize(path.join(PUBLIC_DIR, rel));
+  if (!file.startsWith(PUBLIC_DIR + path.sep)) return next();
+  fs.readFile(file, 'utf8', (err, html) => {
+    if (err) return next();
+    res.setHeader('Cache-Control', 'no-cache');
+    res.type('html').send(html.replace(/<meta\s+name="viewport"[^>]*>/i, '<meta name="viewport" content="width=1200">'));
+  });
+});
 app.use(express.static(path.join(__dirname, '..', 'public'), {
   setHeaders: (res, filePath) => {
     if (filePath.endsWith('.html') || filePath.endsWith('sw.js')) {
