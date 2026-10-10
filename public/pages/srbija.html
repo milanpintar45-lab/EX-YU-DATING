@@ -493,10 +493,11 @@ body {
 @media (max-width: 900px){ .title-wrap{display:none;} }
 @media (max-width: 600px){ .top{position:static;} }
 /* Zupanije: tanja slova, jedna ispod druge, bez razmaka */
-#countyList{gap:0;}
+#countyList{display:grid;grid-template-columns:1fr auto;gap:0;}
+#countyList > a:not([data-county]){display:flex;align-items:center;padding:0 8px;border:0;border-bottom:1px solid rgba(162,60,255,0.35);border-radius:0;}
 #countyList > a[data-county]:not(.svi){font-size:13.5px;line-height:1.3;padding:7px 8px;font-weight:400;text-shadow:0 0 5px rgba(0,229,255,0.3);border-radius:0;border:0;border-bottom:1px solid rgba(162,60,255,0.35);white-space:normal;}
 #countyList > a[data-county]:not(.svi).active{background:rgba(162,60,255,0.35);}
-#countyList > a.svi{margin-bottom:6px;}
+#countyList > a.svi{grid-column:1 / -1;margin-bottom:6px;}
 </style>
 </head>
 <body>
