@@ -473,9 +473,6 @@ body {
   </nav>
 
   <!-- VIDEO WRAP -->
-  <div style="margin:0 22px 14px;padding:12px 18px;background:linear-gradient(45deg,#ffd700,#ffb347);border:2px solid #ff9500;border-radius:12px;color:#2d0057;font-size:14px;font-weight:600;line-height:1.5;box-shadow:0 4px 14px rgba(255,180,0,0.4);">
-    📌 <strong>Napomena:</strong> Nakon što druga osoba primi vaš poziv, pričekajte nekoliko sekundi prije javljanja kako biste izbjegli eventualnu grešku pri spajanju. Ako se poziv ne uspije spojiti, slobodno pokušajte ponovno. Hvala na razumijevanju — stranica je još u fazi dorade i unaprjeđenja.
-  </div>
   <div class="video-wrap">
     <!-- SIDEBAR -->
     <div class="video-sidebar">
@@ -638,7 +635,7 @@ let groupCallApi = null;
 // Pricekaj da se dio za video ucita (do 8 sekundi) prije otvaranja poziva
 async function exyuWaitDaily(){
   for (var i = 0; i < 80 && !window.DailyIframe; i++) { await new Promise(function(r){ setTimeout(r, 100); }); }
-  if (!window.DailyIframe) throw new Error('Video dio stranice se nije ucitao. Provjerite internet vezu i osvjezite stranicu.');
+  if (!window.DailyIframe) throw new Error('Video dio stranice se nije učitao. Provjerite internet vezu i osvježite stranicu.');
 }
 // Kad poziv stigne dok stranica nije u prvom planu: naslov kartice i obavijest
 var exyuOrigTitle = document.title;
