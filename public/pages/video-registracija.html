@@ -21,6 +21,12 @@
     height:100vh;
     object-fit:cover;
   }
+  /* zamagljena kopija iza videa - vidi se samo na uspravnom ekranu (mobitel) */
+  #bgVideo{ display:none; }
+  @media (max-aspect-ratio: 1/1){
+    #welcomeVideo{ object-fit:contain; z-index:1; }
+    #bgVideo{ display:block; object-fit:cover; filter:blur(18px) brightness(0.55); transform:scale(1.15); z-index:0; }
+  }
   .skip{
     display:block;
     position:fixed;
@@ -39,12 +45,20 @@
 </style>
 </head>
 <body>
+<video id="bgVideo" autoplay muted playsinline preload="auto" src="media/registracija-video.mp4" aria-hidden="true"></video>
 <video id="welcomeVideo" autoplay playsinline preload="auto" src="media/registracija-video.mp4"></video>
 <button type="button" class="skip" id="skipBtn">Preskoči</button>
 <script>
 document.getElementById('skipBtn').onclick = function(){
   window.location.href = 'upute.html';
 };
+// zamagljena pozadina prati glavni video
+(function(){
+  var v = document.getElementById('welcomeVideo'), b = document.getElementById('bgVideo');
+  v.addEventListener('play', function(){ try{ b.currentTime = v.currentTime; b.play(); }catch(e){} });
+  v.addEventListener('pause', function(){ b.pause(); });
+  setInterval(function(){ if (Math.abs(b.currentTime - v.currentTime) > 0.3) { try{ b.currentTime = v.currentTime; }catch(e){} } }, 1000);
+})();
 document.getElementById('welcomeVideo').addEventListener('ended', function(){
   window.location.href = 'upute.html';
 });
