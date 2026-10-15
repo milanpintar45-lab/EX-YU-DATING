@@ -251,7 +251,7 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
   word-break:break-word;
 }
 .msg-bubble.own{
-  align-self:flex-end;
+  align-self:flex-start;
   background:var(--msg-own);
   border:1px solid rgba(162,60,255,0.5);
   border-bottom-right-radius:3px;
@@ -295,6 +295,7 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
 .msg-bubble:hover .msg-delete{ opacity:1; }
 .msg-bubble .msg-delete:hover{ transform:scale(1.15); background:#ff2d55; }
 .msg-bubble.own .msg-delete{ right:-8px; }
+.msg-bubble{ width:fit-content; }
 .msg-bubble.other .msg-delete{ left:-8px; }
 .typing-indicator{
   display:flex;
@@ -699,7 +700,7 @@ function renderWithMentions(text){
 function bubbleHtml(m){
   return '<div class="msg-bubble ' + (m.own?'own':'other') + '" data-msg-id="' + m.id + '">' +
     (m.own ? '<span class="msg-delete" title="Izbriši poruku" onclick="deleteMessage(\'' + m.id + '\')">✕</span>' : '') +
-    (!m.own?'<div class="sender">'+escHtml(activeName)+'</div>':'') +
+    '<div class="sender">'+escHtml(m.own ? (window.exyuMyNick||'Ja') : activeName)+'</div>' +
     renderWithMentions(m.body) +
     '<div class="time">'+fmtTime(m.created_at)+'</div>' +
     '</div>';
@@ -853,6 +854,7 @@ async function loadMyMiniProfile(){
     var av = document.getElementById('myMiniAvatar');
     if (me.avatarUrl) { av.innerHTML = '<img src="'+me.avatarUrl+'" style="width:100%;height:100%;object-fit:cover;">'; }
     document.getElementById('myMiniName').textContent = me.nick;
+    window.exyuMyNick = me.nick;
   } catch(e) {}
 }
 
