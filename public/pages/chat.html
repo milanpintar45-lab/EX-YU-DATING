@@ -598,7 +598,7 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
         <div class="mobile-back-btn" id="mobileBackBtn">←</div>
         <div class="avatar">👩</div>
         <div class="info">
-          <div class="name" id="chatName">Ana</div>
+          <div class="name" id="chatName" style="cursor:pointer" title="Otvori profil" onclick="if(activeName)location.href='profil.html?user='+encodeURIComponent(activeName)">Ana</div>
           <div class="status" id="chatStatus">🟢 Online · Zagreb</div>
         </div>
         <div class="actions">
@@ -700,7 +700,7 @@ function renderWithMentions(text){
 function bubbleHtml(m){
   return '<div class="msg-bubble ' + (m.own?'own':'other') + '" data-msg-id="' + m.id + '">' +
     (m.own ? '<span class="msg-delete" title="Izbriši poruku" onclick="deleteMessage(\'' + m.id + '\')">✕</span>' : '') +
-    '<div class="sender">'+escHtml(m.own ? (window.exyuMyNick||'Ja') : activeName)+'</div>' +
+    (function(){var n=m.own?(window.exyuMyNick||''):activeName;return '<a class="sender" href="profil.html'+(n&&!m.own?'?user='+encodeURIComponent(n):'')+'" style="display:block;color:inherit;text-decoration:none;cursor:pointer" title="Otvori profil">'+escHtml(n||'Ja')+'</a>'})() +
     renderWithMentions(m.body) +
     '<div class="time">'+fmtTime(m.created_at)+'</div>' +
     '</div>';
