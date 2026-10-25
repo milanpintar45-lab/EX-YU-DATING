@@ -511,6 +511,13 @@ body {
       <div class="col-body">
         <div class="empty">Nema poruka za prikaz.</div>
       </div>
+      <div class="chat-input-wrap" id="homeChatWrap" style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+        <select id="homeChatCountry" title="Gdje šaljete poruku" style="background:#ffffff;color:#2f2145;border:1px solid #9c86c4;border-radius:8px;padding:8px 6px;font-family:inherit;font-size:13px;">
+          <option value="hr">🇭🇷 HR</option><option value="ba">🇧🇦 BiH</option><option value="rs">🇷🇸 SRB</option>
+        </select>
+        <input type="text" id="homeChatInput" placeholder="Napiši poruku…" maxlength="1000" style="flex:1;min-width:90px;background:#ffffff;color:#2f2145;border:1px solid #9c86c4;border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13px;outline:none;">
+        <button type="button" id="homeChatSend" style="background:linear-gradient(180deg,var(--purple-500),var(--purple-600));color:#fff;border:none;border-radius:8px;padding:8px 14px;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:inherit;font-size:13px;">POŠALJI</button>
+      </div>
     </div>
 
     <!-- COLUMN 4: NA MREŽI -->
@@ -1151,14 +1158,31 @@ if (searchBtn) searchBtn.addEventListener('click', runNickSearch);  searchInput.
       return '<a class="thumb" href="galerija.html" style="display:block;background:#d6cbe9 url('+esc(x.data_url)+') center/cover no-repeat;"></a>';
     }).join('');
   });
-  Promise.all(['hr','ba','rs'].map(function(c){return get('/country-chat?country='+c+'&limit=10');})).then(function(rs){
-    var all=[]; rs.forEach(function(d){ if(d&&d.messages) all=all.concat(d.messages); });
-    if(!all.length) return;
-    all.sort(function(a,b){return new Date(b.created_at)-new Date(a.created_at);});
-    cols[2].innerHTML=all.slice(0,8).map(function(m){
-      return '<div class="chat-card"><div class="who">'+esc(m.who)+(m.city?' <span style="font-weight:400;color:#5a4a75;">· '+esc(m.city)+'</span>':'')+'</div><div class="msg">'+esc(m.body)+'</div></div>';
-    }).join('');
-  });
+  var FLAG={hr:'🇭🇷',ba:'🇧🇦',rs:'🇷🇸'};
+  function loadChat(){
+    return Promise.all(['hr','ba','rs'].map(function(c){return get('/country-chat?country='+c+'&limit=10').then(function(d){ (d&&d.messages||[]).forEach(function(m){m._c=c;}); return d; });})).then(function(rs){
+      var all=[]; rs.forEach(function(d){ if(d&&d.messages) all=all.concat(d.messages); });
+      if(!all.length) return;
+      all.sort(function(a,b){return new Date(b.created_at)-new Date(a.created_at);});
+      cols[2].innerHTML=all.slice(0,8).map(function(m){
+        return '<div class="chat-card"><div class="who">'+(FLAG[m._c]||'')+' '+esc(m.who)+(m.city?' <span style="font-weight:400;color:#5a4a75;">· '+esc(m.city)+'</span>':'')+'</div><div class="msg">'+esc(m.body)+'</div></div>';
+      }).join('');
+    });
+  }
+  loadChat(); setInterval(loadChat, 15000);
+  // pisanje u chat s pocetne: poruka ide u chat odabrane drzave (zadano: drzava iz vaseg profila)
+  var sel=document.getElementById('homeChatCountry'), inp=document.getElementById('homeChatInput'), btn=document.getElementById('homeChatSend');
+  get('/profile/me').then(function(me){ if(me && me.country && sel && sel.querySelector('option[value="'+me.country+'"]')) sel.value=me.country; });
+  function send(){
+    var text=(inp.value||'').trim(); if(!text) return;
+    btn.disabled=true;
+    fetch('/api/country-chat',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({country:sel.value,county:'SVI',body:text})})
+      .then(function(r){ return r.json().catch(function(){return {};}).then(function(d){ return {ok:r.ok,d:d}; }); })
+      .then(function(x){ btn.disabled=false; if(!x.ok){ alert((x.d&&x.d.error)||'Poruku nije moguće poslati.'); return; } inp.value=''; loadChat(); inp.focus(); })
+      .catch(function(){ btn.disabled=false; alert('Poruku nije moguće poslati. Pokušajte ponovo.'); });
+  }
+  if(btn) btn.addEventListener('click', send);
+  if(inp) inp.addEventListener('keydown', function(e){ if(e.key==='Enter') send(); });
 })();
 </script>
 </body>
