@@ -42,6 +42,8 @@ a{color:inherit;text-decoration:none;cursor:pointer;}
   font-family:'Cormorant Garamond',serif; font-size:26px; font-weight:700;
   letter-spacing:4px; color:#fff; text-shadow:0 0 15px rgba(162,60,255,0.7);
 }
+/* naslov EX YU DATE crven (kao FIND ME na registraciji) */
+.sidebar-brand .logo{color:#ff3b3b; text-shadow:0 0 14px rgba(255,40,40,0.55);}
 .sidebar-brand .sub{font-size:10px; color:var(--muted); letter-spacing:3px; margin-top:4px;}
 
 .sidebar-nav{flex:1; padding:14px 10px; display:flex; flex-direction:column; gap:4px;}
@@ -515,27 +517,101 @@ window.exyuAdminReady = (async function(){
     <!-- ========== ADMIN LIVE TOOLS ========== -->
     <div class="section active" id="dashboard">
 
-      <div style="background:linear-gradient(135deg,#2d0057,#4a0a7a);border:2px solid rgba(162,60,255,0.5);border-radius:16px;padding:20px;margin-bottom:20px;">
-        <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.6em;color:#fff;margin-bottom:14px;">📢 Pošalji poruku SVIM korisnicima</h2>
+      <style>
+      /* Admin panel kao na FIND ME: sklopive trake s brojevima */
+      .fm-acc{background:rgba(0,0,0,0.3);border:1px solid rgba(162,60,255,0.45);border-radius:14px;margin-bottom:12px;overflow:hidden;}
+      .fm-acc-h{width:100%;display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#2d0057,#4a0a7a);color:#fff;border:0;padding:14px 18px;cursor:pointer;font:700 17px Inter,system-ui,Arial,sans-serif;text-align:left;}
+      .fm-acc-h:hover{filter:brightness(1.15);}
+      .fm-acc-h .t{flex:1;}
+      .fm-acc-h .arr{transition:transform .2s;opacity:.8;}
+      .fm-acc.open .fm-acc-h .arr{transform:rotate(90deg);}
+      .fm-acc-b{display:none;padding:16px 18px;}
+      .fm-acc.open .fm-acc-b{display:block;}
+      .fm-cnt{min-width:26px;text-align:center;border-radius:999px;padding:3px 9px;font-size:13px;font-weight:800;background:rgba(255,255,255,0.15);color:#fff;}
+      .fm-cnt.on{background:#e0001b;color:#fff;box-shadow:0 0 10px rgba(224,0,27,.6);}
+      .fm-place{display:flex;gap:14px;align-items:flex-start;background:rgba(162,60,255,0.1);border-left:3px solid #a23cff;padding:12px;border-radius:8px;margin-bottom:10px;}
+      </style>
+
+      <div class="fm-acc" id="accNewUsers">
+        <button type="button" class="fm-acc-h" onclick="fmAcc('accNewUsers')"><span class="t">🆕 Novi korisnici (čekaju odobrenje)</span><span class="fm-cnt" id="cntNewUsers">0</span><span class="arr">▶</span></button>
+        <div class="fm-acc-b"><div id="adminNewUsersList"></div></div>
+      </div>
+
+      <div class="fm-acc" id="accBroadcast">
+        <button type="button" class="fm-acc-h" onclick="fmAcc('accBroadcast')"><span class="t">📢 Pošalji poruku svim korisnicima</span><span class="arr">▶</span></button>
+        <div class="fm-acc-b">
         <textarea id="broadcastText" placeholder="Napišite obavijest za sve korisnike sajta..." style="width:100%;min-height:90px;padding:12px;border-radius:10px;border:2px solid rgba(162,60,255,0.4);background:rgba(0,0,0,0.3);color:#fff;font-family:inherit;font-size:14px;margin-bottom:10px;"></textarea>
         <button type="button" onclick="adminBroadcast()" style="background:linear-gradient(45deg,#a23cff,#c57dff);color:#fff;border:none;padding:12px 24px;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px;">📤 Pošalji svima</button>
+        </div>
       </div>
 
-      <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(162,60,255,0.4);border-radius:16px;padding:20px;margin-bottom:20px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-          <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.6em;color:#fff;">📨 Poruke od korisnika (adminu)</h2>
-          <button type="button" onclick="adminReloadMsgs()" style="background:rgba(162,60,255,0.3);color:#fff;border:1px solid rgba(162,60,255,0.5);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:12px;">🔄 Osvježi</button>
+      <div class="fm-acc" id="accMsgs">
+        <button type="button" class="fm-acc-h" onclick="fmAcc('accMsgs')"><span class="t">📨 Poruke od korisnika</span><span class="fm-cnt" id="cntMsgs">0</span><span class="arr">▶</span></button>
+        <div class="fm-acc-b">
+          <div style="text-align:right;margin-bottom:10px;"><button type="button" onclick="adminReloadMsgs()" style="background:rgba(162,60,255,0.3);color:#fff;border:1px solid rgba(162,60,255,0.5);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:12px;">🔄 Osvježi</button></div>
+          <div id="adminMsgList" style="max-height:350px;overflow-y:auto;"></div>
         </div>
-        <div id="adminMsgList" style="max-height:350px;overflow-y:auto;"></div>
       </div>
 
-      <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(162,60,255,0.4);border-radius:16px;padding:20px;margin-bottom:20px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-          <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.6em;color:#fff;">🚩 Prijave korisnika</h2>
-          <span id="adminReportCount" style="background:#f59e0b;color:#000;font-weight:800;font-size:12px;padding:3px 10px;border-radius:10px;">0 na čekanju</span>
+      <div class="fm-acc" id="accReports">
+        <button type="button" class="fm-acc-h" onclick="fmAcc('accReports')"><span class="t">🚩 Prijave korisnika</span><span class="fm-cnt" id="cntReports">0</span><span class="arr">▶</span></button>
+        <div class="fm-acc-b">
+          <span id="adminReportCount" style="display:none">0 na čekanju</span>
+          <div id="adminReportList"></div>
         </div>
-        <div id="adminReportList"></div>
       </div>
+
+      <script>
+      // otvaranje/zatvaranje traka u admin panelu (kao na FIND ME)
+      window.fmAcc = function(id){
+        var el = document.getElementById(id); if(!el) return;
+        var open = !el.classList.contains('open');
+        el.classList.toggle('open', open);
+        if(open && id==='accMsgs' && window.adminReloadMsgs) adminReloadMsgs();
+        if(open && id==='accNewUsers' && window.fmLoadNewUsers) fmLoadNewUsers();
+      };
+      function fmSetCnt(id, n){ var c=document.getElementById(id); if(!c) return; n=Number(n)||0; c.textContent=n; c.classList.toggle('on', n>0); }
+      window.fmSetCnt = fmSetCnt;
+      (function(){
+        function esc(t){return String(t==null?'':t).replace(/[<>&"]/g,function(c){return{'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c];});}
+        var GEN = {m:'Muškarac', z:'Žena', p:'Par', par:'Par'};
+        window.fmLoadNewUsers = async function(){
+          var list = document.getElementById('adminNewUsersList');
+          var us;
+          try { us = ((await api('GET', '/admin/users')).users || []).filter(function(u){ return u.status === 'pending' && !u.suspended; }); }
+          catch(e) { if(list) list.innerHTML='<div style="text-align:center;color:#b8a4d4;padding:20px;">Greška pri učitavanju.</div>'; return; }
+          fmSetCnt('cntNewUsers', us.length);
+          if(!list) return;
+          if(!us.length){ list.innerHTML='<div style="text-align:center;color:#b8a4d4;padding:20px;font-style:italic;">Nema novih korisnika za odobrenje.</div>'; return; }
+          list.innerHTML = us.map(function(u){
+            var av = u.avatar_url ? '<img src="'+esc(u.avatar_url)+'" style="width:110px;height:110px;object-fit:cover;border-radius:8px;flex-shrink:0;">' : '<div style="width:110px;height:110px;border-radius:8px;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;color:#b8a4d4;font-size:12px;flex-shrink:0;">Nema slike</div>';
+            return '<div class="fm-place" data-nu="'+esc(u.nick)+'">'+av+
+              '<div style="flex:1;min-width:0">'+
+                '<div style="color:#fff;font-weight:700;font-size:16px;">'+esc(u.nick)+'</div>'+
+                '<div style="color:#e9c6ff;font-size:13px;margin-top:4px;">'+esc(GEN[u.gender]||u.gender||'')+' · '+esc(u.city||'')+' · '+esc((u.country||'').toUpperCase())+'</div>'+
+                '<div style="color:#b8a4d4;font-size:12px;margin-top:2px;">'+esc(u.email||'')+(u.email_verified?' ✅':'')+(u.created_at?' · registriran '+new Date(u.created_at).toLocaleString('hr-HR'):'')+'</div>'+
+                '<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">'+
+                  '<button type="button" onclick="fmNewOk(this)" style="background:#16a34a;color:#fff;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:700;">✅ Prihvati</button>'+
+                  '<button type="button" onclick="fmNewNo(this)" style="background:#dc2626;color:#fff;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:700;">❌ Odbij</button>'+
+                  '<a href="profil.html?user='+encodeURIComponent(u.nick)+'" style="background:rgba(255,255,255,0.12);color:#fff;padding:8px 14px;border-radius:8px;font-weight:700;font-size:13px;text-decoration:none;">👤 Otvori profil</a>'+
+                '</div>'+
+              '</div></div>';
+          }).join('');
+        };
+        function nuNick(b){ var c=b.closest('[data-nu]'); return c ? c.getAttribute('data-nu') : ''; }
+        window.fmNewOk = async function(b){ var n=nuNick(b); b.disabled=true; try { await api('POST', '/admin/users/' + encodeURIComponent(n) + '/approve'); fmLoadNewUsers(); } catch(e) { b.disabled=false; alert('❌ ' + e.message); } };
+        window.fmNewNo = async function(b){ var n=nuNick(b); if(!confirm('Odbiti korisnika "'+n+'"?')) return; b.disabled=true; try { await api('POST', '/admin/users/' + encodeURIComponent(n) + '/reject'); fmLoadNewUsers(); } catch(e) { b.disabled=false; alert('❌ ' + e.message); } };
+        // brojevi na trakama: poruke i prijave (prate liste koje se same osvjezavaju)
+        function watch(listId, fn){ var l=document.getElementById(listId); if(!l || !window.MutationObserver) return; new MutationObserver(fn).observe(l,{childList:true}); }
+        watch('adminMsgList', function(){ fmSetCnt('cntMsgs', document.querySelectorAll('#adminMsgList > div[style*="border-left"]').length); });
+        watch('adminReportList', function(){ var t=(document.getElementById('adminReportCount')||{}).textContent||''; fmSetCnt('cntReports', parseInt(t,10)||0); });
+        // admin.html?open=accNewUsers -> odmah otvori tu traku
+        window.exyuAdminReady.then(function(){
+          fmLoadNewUsers(); setInterval(fmLoadNewUsers, 30000);
+          try { var o = new URLSearchParams(location.search).get('open'); if(o && /^acc[A-Za-z]+$/.test(o)){ var el=document.getElementById(o); if(el && !el.classList.contains('open')) fmAcc(o); } } catch(e){}
+        });
+      })();
+      </script>
 
       <script>
       (function(){

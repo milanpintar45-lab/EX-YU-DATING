@@ -26,14 +26,8 @@
       row.appendChild(badge);
       row.appendChild(adminLink);
     } else {
-      // stranice bez admin izbornika: plutajući brojač dolje lijevo
-      badge.style.position = 'fixed';
-      badge.style.left = '14px';
-      badge.style.bottom = '14px';
-      badge.style.zIndex = '2147483000';
-      badge.style.fontSize = '15px';
-      badge.style.padding = '7px 13px';
-      document.body.appendChild(badge);
+      // stranice bez admin izbornika: brojač je već dolje u redu s admin tipkama (strelice.js) - ovdje se ne prikazuje
+      return;
     }
   }
 
