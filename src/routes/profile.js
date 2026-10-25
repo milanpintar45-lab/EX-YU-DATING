@@ -219,6 +219,20 @@ router.post('/videos/:id/check-code', requireAuth, async (req, res) => {
 // JAVNA GALERIJA (galerija.html) - vidljivo svima na sajtu, ODVOJENO od profila
 // source = 'gallery'
 // ============================================
+// GET /api/profile/gallery/public - zadnje JAVNE slike iz galerije SVIH korisnika (za pocetnu stranicu)
+router.get('/gallery/public', requireAuth, async (req, res) => {
+  const limit = Math.min(parseInt(req.query.limit, 10) || 8, 24);
+  const result = await db.query(
+    `SELECT p.id, p.data_url, u.nick
+     FROM photos p JOIN users u ON u.id = p.user_id
+     WHERE p.source = 'gallery' AND p.privacy = 'javno' AND p.data_url IS NOT NULL
+       AND u.status = 'approved' AND u.suspended = false AND u.paused = false
+     ORDER BY p.created_at DESC, p.id DESC LIMIT $1`,
+    [limit]
+  );
+  res.json({ photos: result.rows });
+});
+
 router.get('/gallery/me', requireAuth, async (req, res) => {
   const photos = await db.query(
     `SELECT id, privacy, data_url, owner_reaction FROM photos WHERE user_id = $1 AND source = 'gallery' ORDER BY id`,

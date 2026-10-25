@@ -512,10 +512,7 @@ body {
         <div class="empty">Nema poruka za prikaz.</div>
       </div>
       <div class="chat-input-wrap" id="homeChatWrap" style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
-        <select id="homeChatCountry" title="Gdje šaljete poruku" style="background:#ffffff;color:#2f2145;border:1px solid #9c86c4;border-radius:8px;padding:8px 6px;font-family:inherit;font-size:13px;">
-          <option value="hr">🇭🇷 HR</option><option value="ba">🇧🇦 BiH</option><option value="rs">🇷🇸 SRB</option>
-        </select>
-        <input type="text" id="homeChatInput" placeholder="Napiši poruku…" maxlength="1000" style="flex:1;min-width:90px;background:#ffffff;color:#2f2145;border:1px solid #9c86c4;border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13px;outline:none;">
+        <input type="text" id="homeChatInput" placeholder="Napiši poruku svima…" maxlength="1000" style="flex:1;min-width:90px;background:#ffffff;color:#2f2145;border:1px solid #9c86c4;border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13px;outline:none;">
         <button type="button" id="homeChatSend" style="background:linear-gradient(180deg,var(--purple-500),var(--purple-600));color:#fff;border:none;border-radius:8px;padding:8px 14px;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:inherit;font-size:13px;">POŠALJI</button>
       </div>
     </div>
@@ -607,7 +604,8 @@ body {
         var list = document.getElementById('onlineNowList');
         var users = od.users || [];
         if (!users.length) { list.innerHTML = '<div class="empty">Nema korisnika online.</div>'; return; }
-        list.innerHTML = users.slice(0, 12).map(function(u){
+        list.style.maxHeight='600px'; list.style.overflowY='auto'; list.style.display='flex'; list.style.flexDirection='column'; list.style.gap='5px';
+        list.innerHTML = users.map(function(u){
           var avatarHtml = u.avatar_url ? '<img src="' + u.avatar_url + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">' : '👤';
           return '<a href="profil.html?user=' + encodeURIComponent(u.nick) + '" class="profile-card">' +
             '<div class="avatar" style="overflow:hidden;">' + avatarHtml + '</div>' +
@@ -1151,34 +1149,37 @@ if (searchBtn) searchBtn.addEventListener('click', runNickSearch);  searchInput.
         '<div style="font-size:12px;color:#2f2145;margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">'+esc(a.body)+'</div></a>';
     }).join('');
   });
-  get('/profile/gallery/me').then(function(d){
+  // Galerija: zadnje javne slike SVIH korisnika (klik vodi na profil te osobe)
+  get('/profile/gallery/public?limit=6').then(function(d){
     var ph=((d&&d.photos)||[]).filter(function(x){return x.data_url;}); if(!ph.length) return;
     var g=cols[1].querySelector('.gallery-grid'); if(!g) return;
-    g.innerHTML=ph.slice(0,4).map(function(x){
-      return '<a class="thumb" href="galerija.html" style="display:block;background:#d6cbe9 url('+esc(x.data_url)+') center/cover no-repeat;"></a>';
+    g.innerHTML=ph.slice(0,6).map(function(x){
+      return '<a class="thumb" href="profil.html?user='+encodeURIComponent(x.nick)+'" title="'+esc(x.nick)+'" style="display:block;position:relative;background:#d6cbe9 url('+esc(x.data_url)+') center/cover no-repeat;">'+
+        '<span style="position:absolute;left:4px;bottom:4px;background:rgba(28,8,56,.75);color:#fff;font-size:11px;padding:2px 6px;border-radius:6px;">'+esc(x.nick)+'</span></a>';
     }).join('');
   });
   var FLAG={hr:'🇭🇷',ba:'🇧🇦',rs:'🇷🇸'};
+  // Chat na pocetnoj = ZAJEDNICKI chat za sve (odvojen od chata Hrvatske, Bosne, Srbije)
   function loadChat(){
-    return Promise.all(['hr','ba','rs'].map(function(c){return get('/country-chat?country='+c+'&limit=10').then(function(d){ (d&&d.messages||[]).forEach(function(m){m._c=c;}); return d; });})).then(function(rs){
-      var all=[]; rs.forEach(function(d){ if(d&&d.messages) all=all.concat(d.messages); });
-      if(!all.length) return;
-      all.sort(function(a,b){return new Date(b.created_at)-new Date(a.created_at);});
-      cols[2].innerHTML=all.slice(0,8).map(function(m){
-        return '<div class="chat-card"><div class="who">'+(FLAG[m._c]||'')+' '+esc(m.who)+(m.city?' <span style="font-weight:400;color:#5a4a75;">· '+esc(m.city)+'</span>':'')+'</div><div class="msg">'+esc(m.body)+'</div></div>';
+    return get('/country-chat?country=sv&limit=30').then(function(d){
+      var all=(d&&d.messages)||[];
+      if(!all.length){ cols[2].innerHTML='<div class="empty">Još nema poruka. Napiši prvu poruku svima! 🙂</div>'; return; }
+      var wasBottom = cols[2].scrollHeight - cols[2].scrollTop - cols[2].clientHeight < 40;
+      cols[2].innerHTML=all.map(function(m){
+        return '<div class="chat-card"><div class="who">'+(FLAG[m.user_country]||'')+' '+esc(m.who)+(m.city?' <span style="font-weight:400;color:#5a4a75;">· '+esc(m.city)+'</span>':'')+'</div><div class="msg">'+esc(m.body)+'</div></div>';
       }).join('');
+      if(wasBottom) cols[2].scrollTop = cols[2].scrollHeight;
     });
   }
-  loadChat(); setInterval(loadChat, 15000);
-  // pisanje u chat s pocetne: poruka ide u chat odabrane drzave (zadano: drzava iz vaseg profila)
-  var sel=document.getElementById('homeChatCountry'), inp=document.getElementById('homeChatInput'), btn=document.getElementById('homeChatSend');
-  get('/profile/me').then(function(me){ if(me && me.country && sel && sel.querySelector('option[value="'+me.country+'"]')) sel.value=me.country; });
+  cols[2].style.maxHeight='520px'; cols[2].style.overflowY='auto';
+  loadChat().then(function(){ cols[2].scrollTop = cols[2].scrollHeight; }); setInterval(loadChat, 10000);
+  var inp=document.getElementById('homeChatInput'), btn=document.getElementById('homeChatSend');
   function send(){
     var text=(inp.value||'').trim(); if(!text) return;
     btn.disabled=true;
-    fetch('/api/country-chat',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({country:sel.value,county:'SVI',body:text})})
+    fetch('/api/country-chat',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({country:'sv',county:'SVI',body:text})})
       .then(function(r){ return r.json().catch(function(){return {};}).then(function(d){ return {ok:r.ok,d:d}; }); })
-      .then(function(x){ btn.disabled=false; if(!x.ok){ alert((x.d&&x.d.error)||'Poruku nije moguće poslati.'); return; } inp.value=''; loadChat(); inp.focus(); })
+      .then(function(x){ btn.disabled=false; if(!x.ok){ alert((x.d&&x.d.error)||'Poruku nije moguće poslati.'); return; } inp.value=''; loadChat().then(function(){ cols[2].scrollTop = cols[2].scrollHeight; }); inp.focus(); })
       .catch(function(){ btn.disabled=false; alert('Poruku nije moguće poslati. Pokušajte ponovo.'); });
   }
   if(btn) btn.addEventListener('click', send);

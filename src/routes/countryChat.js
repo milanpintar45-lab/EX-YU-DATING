@@ -3,7 +3,8 @@ const db = require('../db');
 const { requireAuth } = require('../middleware/auth');
 const { getRegion } = require('../utils/geo');
 const router = express.Router();
-const ALLOWED_COUNTRIES = ['hr', 'ba', 'rs'];
+// 'sv' = zajednicki chat za SVE (na pocetnoj stranici), odvojen od chata pojedine drzave
+const ALLOWED_COUNTRIES = ['hr', 'ba', 'rs', 'sv'];
 
 function normalizeStr(s) {
   return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
@@ -20,7 +21,7 @@ router.get('/', requireAuth, async (req, res) => {
   const county = req.query.county;
   const limit = Math.min(parseInt(req.query.limit, 10) || 50, 200);
   const result = await db.query(
-    `SELECT cc.id, cc.body, cc.created_at, cc.county AS saved_county, cc.from_user_id, u.nick AS who, u.city
+    `SELECT cc.id, cc.body, cc.created_at, cc.county AS saved_county, cc.from_user_id, u.nick AS who, u.city, u.country AS user_country
      FROM country_chat_messages cc JOIN users u ON u.id = cc.from_user_id
      WHERE cc.country = $1
      ORDER BY cc.created_at DESC LIMIT 200`,
