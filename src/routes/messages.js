@@ -44,10 +44,13 @@ router.get('/inbox', requireAuth, async (req, res) => {
     [req.user.userId]
   );
 
-  await db.query(
-    'UPDATE messages SET read_at = now() WHERE to_user_id = $1 AND read_at IS NULL',
-    [req.user.userId]
-  );
+  // ?peek=1 -> samo pogledaj (ne oznacavaj kao procitano)
+  if (req.query.peek !== '1') {
+    await db.query(
+      'UPDATE messages SET read_at = now() WHERE to_user_id = $1 AND read_at IS NULL',
+      [req.user.userId]
+    );
+  }
 
   res.json({ messages: result.rows });
 });
