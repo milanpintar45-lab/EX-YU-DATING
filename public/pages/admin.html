@@ -603,7 +603,7 @@ window.exyuAdminReady = (async function(){
         window.fmNewNo = async function(b){ var n=nuNick(b); if(!confirm('Odbiti korisnika "'+n+'"?')) return; b.disabled=true; try { await api('POST', '/admin/users/' + encodeURIComponent(n) + '/reject'); fmLoadNewUsers(); } catch(e) { b.disabled=false; alert('❌ ' + e.message); } };
         // brojevi na trakama: poruke i prijave (prate liste koje se same osvjezavaju)
         function watch(listId, fn){ var l=document.getElementById(listId); if(!l || !window.MutationObserver) return; new MutationObserver(fn).observe(l,{childList:true}); }
-        watch('adminMsgList', function(){ fmSetCnt('cntMsgs', document.querySelectorAll('#adminMsgList > div[style*="border-left"]').length); });
+        // broj kod 'Poruke od korisnika' postavlja adminReloadMsgs (samo NEPROCITANE poruke)
         watch('adminReportList', function(){ var t=(document.getElementById('adminReportCount')||{}).textContent||''; fmSetCnt('cntReports', parseInt(t,10)||0); });
         // admin.html?open=accNewUsers -> odmah otvori tu traku
         window.exyuAdminReady.then(function(){
@@ -684,13 +684,19 @@ window.exyuAdminReady = (async function(){
         };
         window.adminReloadMsgs = async function(){
           var list = document.getElementById('adminMsgList');
+          var acc = document.getElementById('accMsgs');
+          var isOpen = !!(acc && acc.classList.contains('open'));
           try {
-            var data = await api('GET', '/messages/inbox');
+            // dok je traka zatvorena samo gledamo (poruke ostaju neprocitane); kad je otvorena - oznacimo kao procitane
+            var data = await api('GET', '/messages/inbox' + (isOpen ? '' : '?peek=1'));
             var msgs = data.messages || [];
+            var unread = msgs.filter(function(m){ return !m.read_at; }).length;
+            if(window.fmSetCnt) fmSetCnt('cntMsgs', isOpen ? 0 : unread);
             if(msgs.length===0){ list.innerHTML='<div style="text-align:center;color:#b8a4d4;padding:20px;font-style:italic;">Nema poruka.</div>'; return; }
             list.innerHTML = msgs.map(function(m){
-              return '<div style="background:rgba(162,60,255,0.1);border-left:3px solid #a23cff;padding:12px;border-radius:8px;margin-bottom:10px;">'+
-                '<div style="color:#c57dff;font-weight:700;font-size:13px;">Od: '+esc(m.from_nick)+'</div>'+
+              var isNew = !m.read_at;
+              return '<div style="background:'+(isNew?'rgba(224,0,27,0.15)':'rgba(162,60,255,0.1)')+';border-left:3px solid '+(isNew?'#e0001b':'#a23cff')+';padding:12px;border-radius:8px;margin-bottom:10px;">'+
+                '<div style="color:#c57dff;font-weight:700;font-size:13px;">Od: '+esc(m.from_nick)+(isNew?' <span style="background:#e0001b;color:#fff;font-size:10px;padding:2px 6px;border-radius:6px;margin-left:6px;">NOVO</span>':'')+'</div>'+
                 '<div style="margin-top:6px;color:#fff;">'+esc(m.body)+'</div>'+
                 '<div style="font-size:11px;color:#b8a4d4;margin-top:4px;">'+new Date(m.created_at).toLocaleString('hr-HR')+'</div>'+
               '</div>';
